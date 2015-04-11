@@ -1,0 +1,20 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<map version="1.0" orientation="orthogonal" renderorder="left-up" width="380" height="256" tilewidth="16" tileheight="16" nextobjectid="1">
+ <layer name="nodes" width="380" height="256">
+  <data encoding="base64" compression="zlib">
+   eJztwTEBAAAAwqD1T20Hb6AAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAD4D8EsAAQ==
+  </data>
+ </layer>
+ <imagelayer name="back01">
+  <image source="../Textures/t_map01_a.png"/>
+ </imagelayer>
+ <imagelayer name="back02" x="3000">
+  <image source="../Textures/t_map01_b.png"/>
+ </imagelayer>
+ <imagelayer name="back03" y="2000">
+  <image source="../Textures/t_map01_c.png"/>
+ </imagelayer>
+ <imagelayer name="back04" x="3000" y="2000">
+  <image source="../Textures/t_map01_d.png"/>
+ </imagelayer>
+</map>
