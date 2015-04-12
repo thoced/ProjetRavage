@@ -3,13 +3,21 @@ package coreLevel;
 import java.util.ArrayList;
 import java.util.List;
 
+import org.jbox2d.collision.shapes.ChainShape;
+import org.jbox2d.common.Vec2;
 import org.jbox2d.dynamics.Body;
+import org.jbox2d.dynamics.BodyDef;
+import org.jbox2d.dynamics.BodyType;
+import org.jbox2d.dynamics.FixtureDef;
 import org.jsfml.graphics.Drawable;
 import org.jsfml.graphics.RenderStates;
 import org.jsfml.graphics.RenderTarget;
 import org.jsfml.graphics.Sprite;
 import org.jsfml.system.Time;
 
+import coreAI.Node;
+import corePhysic.PhysicWorldManager;
+import CoreLoader.TiledObjectPolylinePoint;
 import ravage.IBaseRavage;
 
 public class Level implements IBaseRavage, Drawable 
@@ -17,7 +25,7 @@ public class Level implements IBaseRavage, Drawable
 	// Textures de background
 	private List<Sprite> backgrounds;
 	// Tableau des valeurs Tiled (pour la recherche de chemin)
-	private int[][] nodes;
+	private Node[] nodes;
 	// Obstacles box2d
 	private Body obstacles;
 	
@@ -26,7 +34,7 @@ public class Level implements IBaseRavage, Drawable
 		// instances du background
 		backgrounds = new ArrayList<Sprite>();
 		// instance des nodes
-		nodes = new int[256][256];
+		nodes = new Node[4096];
 		
 		
 	}
@@ -72,17 +80,19 @@ public class Level implements IBaseRavage, Drawable
 		this.backgrounds = backgrounds;
 	}
 
+	
+
 	/**
 	 * @return the nodes
 	 */
-	public int[][] getNodes() {
+	public Node[] getNodes() {
 		return nodes;
 	}
 
 	/**
 	 * @param nodes the nodes to set
 	 */
-	public void setNodes(int[][] nodes) {
+	public void setNodes(Node[] nodes) {
 		this.nodes = nodes;
 	}
 
@@ -100,6 +110,59 @@ public class Level implements IBaseRavage, Drawable
 		this.obstacles = obstacles;
 	}
 	
+	public void InsertObstacle(List<TiledObjectPolylinePoint> listePoint,int x,int y,String typeobstacle)
+	{
+		// ajout d'un obstacle de type polyline
+		
+		// on créer un bodydef
+		BodyDef bdef = new BodyDef();
+		bdef.type = BodyType.STATIC;
+		bdef.bullet = false;
+		// on determine 
+		
+		// on crée la chainshape
+		ChainShape cs = new ChainShape();
+		// on créer un vecteur de vec2 correspondant au nombre de point
+		Vec2[] vectors = new Vec2[listePoint.size()];
+		// on instance la liste des vecteurs
+		for(int i=0;i<vectors.length;i++)
+			vectors[i] = new Vec2();
+		// on ajoute les vecteurs
+		
+		// on récupère la position initial de polyline
+		float bx = x / PhysicWorldManager.getRatioPixelMeter();
+		float by = y / PhysicWorldManager.getRatioPixelMeter();
+		
+		int ind = 0;
+		for(Vec2 v : vectors)
+		{
+			// onrécupère les points de la listes
+			float diffx = listePoint.get(ind).x / PhysicWorldManager.getRatioPixelMeter();
+			float diffy = listePoint.get(ind).y / PhysicWorldManager.getRatioPixelMeter();
+			// on ajoute la différence entre les coordonnées du pont initial et la liste des points
+			v.set(bx + diffx,by + diffy);
+			ind++;
+			
+		}
+		// on ajoute le tout dans le chainshape
+		cs.createChain(vectors, vectors.length);
+		
+		// création du body
+		Body bPoly = PhysicWorldManager.getWorld().createBody(bdef);
+		bPoly.setUserData(typeobstacle);
+		
+		// creation dufixture
+		FixtureDef fixture = new FixtureDef();
+		fixture.shape = cs;
+		fixture.friction = 0.6f;
+		fixture.density = 1f;
+		fixture.restitution = 0.0f;
+
+		// ajout dans le body
+		bPoly.createFixture(fixture);
+		
+		
+	}
 	
 
 }

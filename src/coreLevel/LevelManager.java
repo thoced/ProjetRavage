@@ -11,6 +11,9 @@ import org.jsfml.system.Vector2f;
 import CoreLoader.LoaderTiled;
 import CoreLoader.LoaderTiledException;
 import CoreLoader.TiledLayerImages;
+import CoreLoader.TiledLayerObjects;
+import CoreLoader.TiledObjectBase;
+import CoreLoader.TiledObjectPolyline;
 import CoreTexturesManager.TexturesManager;
 import ravage.IBaseRavage;
 
@@ -46,9 +49,10 @@ public class LevelManager implements IBaseRavage
 		{
 			// chargement
 			tiled.Load(new FileInputStream("./bin/Maps/" + nameFile));
+			
+			
 			// on récupère les images
 			List<TiledLayerImages> listImages = tiled.getListLayersImages();
-			
 			
 			for(TiledLayerImages l : listImages)
 			{
@@ -61,9 +65,24 @@ public class LevelManager implements IBaseRavage
 				sprite.setPosition(new Vector2f(l.getPosx(),l.getPosy()));
 				// on ajoute dans le level
 				level.getBackgrounds().add(sprite);
+				
 			}
 			
+			// on récupère les obstacles
+			List<TiledLayerObjects> listObjects = tiled.getListLayersObjects();
 			
+			for(TiledLayerObjects obj : listObjects)
+			{
+				for(TiledObjectBase base : obj.getDataObjects())
+				{
+					if(base.getTypeObjects() == TiledObjectBase.Type.POLYLINE)
+					{
+						TiledObjectPolyline poly = (TiledObjectPolyline) base;
+						level.InsertObstacle(poly.getListPoint(), poly.getX(), poly.getY(), poly.getType());
+					}
+				}
+				
+			}
 					
 		} catch (FileNotFoundException | LoaderTiledException e) {
 					// TODO Auto-generated catch block
