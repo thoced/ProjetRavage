@@ -17,11 +17,14 @@ import ravage.IBaseRavage;
 public class DrawableUnityManager implements IBaseRavage, Drawable
 {
 
+	private VertexArray buffer;
 
 	@Override
-	public void init() {
+	public void init() 
+	{
 		// TODO Auto-generated method stub
-		
+		// création du VertexBuffer
+	 buffer = new VertexArray(PrimitiveType.QUADS);
 	}
 
 	@Override
@@ -40,9 +43,7 @@ public class DrawableUnityManager implements IBaseRavage, Drawable
 	public void draw(RenderTarget arg0, RenderStates arg1) 
 	{
 		// affichage des unity
-		// création du VertexBuffer
-		VertexArray buffer = new VertexArray(PrimitiveType.QUADS);
-		
+		buffer.clear();
 		// pour chaque unity 
 		for(Unity unity : EntityManager.getVectorUnity() )
 		{

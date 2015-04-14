@@ -23,9 +23,10 @@ public class PhysicWorldManager implements IBaseRavage
 	}
 
 	@Override
-	public void update(Time deltaTime) {
+	public void update(Time deltaTime) 
+	{
 		// TODO Auto-generated method stub
-		
+		world.step(deltaTime.asSeconds(), 2, 1);
 	}
 
 	@Override

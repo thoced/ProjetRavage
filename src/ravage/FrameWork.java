@@ -4,6 +4,7 @@ package ravage;
 
 import java.util.List;
 
+import org.jbox2d.common.Vec2;
 import org.jsfml.graphics.RenderTexture;
 import org.jsfml.graphics.RenderWindow;
 import org.jsfml.graphics.Sprite;
@@ -23,10 +24,12 @@ import coreEntity.Unity;
 import coreEntityManager.EntityManager;
 import coreLevel.Level;
 import coreLevel.LevelManager;
+import corePhysic.PhysicWorldManager;
 
 public class FrameWork
 {
 	// Managers
+	private PhysicWorldManager physicWorld;
 	private LevelManager levelManager;
 	private TexturesManager texturesManager;
 	private CameraManager cameraManager;
@@ -48,13 +51,15 @@ public class FrameWork
 	public void init() throws TextureCreationException 
 	{
 		// creation de l'environnemnet graphique jsfml
-		window = new RenderWindow(new VideoMode(1366,768),"ProjetRavage");
+		window = new RenderWindow(new VideoMode(1366,768),"ProjetRavage",RenderWindow.FULLSCREEN);
 		window.setFramerateLimit(60);
 		// Instance des variables
 		frameClock = new Clock();
 		fpsTime = Time.ZERO;
 		
 		// Instance des managers
+		physicWorld = new PhysicWorldManager();
+		physicWorld.init();
 		levelManager = new LevelManager();
 		levelManager.init();
 		texturesManager = new TexturesManager();
@@ -76,19 +81,18 @@ public class FrameWork
 		renderSprite = new Sprite(renderTexture.getTexture());
 		
 		// on place une unity
-		for(int y=0;y < 128;y++)
+		for(int y=0;y < 32;y++)
 		{
-			for(int x=0;x<128;x++)
+			for(int x=0;x<32;x++)
 			{
 				Unity unity = new Unity();
-				unity.setPosx(x * 32);
-				unity.setPosy(y * 32);
+				unity.init();
+				unity.setPosition(new Vec2(x * 2, y * 2));
 				entityManager.getVectorUnity().add(unity);
 			}
 		}
 		
-		
-		
+
 	}
 
 	public void run()
@@ -128,8 +132,10 @@ public class FrameWork
 			fps++;
 			
 			// Updates de composants
+			physicWorld.update(deltaTime);
 			currentLevel.update(deltaTime);
 			cameraManager.update(deltaTime);
+			entityManager.update(deltaTime);
 			
 			// Draw des composants
 			renderTexture.clear();

@@ -22,8 +22,12 @@ public class EntityManager implements IBaseRavage
 	}
 
 	@Override
-	public void update(Time deltaTime) {
-		// TODO Auto-generated method stub
+	public void update(Time deltaTime) 
+	{
+		for(Unity unity : vectorUnity)
+		{
+			unity.update(deltaTime);
+		}
 		
 	}
 
