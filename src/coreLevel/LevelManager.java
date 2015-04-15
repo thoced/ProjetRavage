@@ -8,10 +8,12 @@ import org.jsfml.graphics.Sprite;
 import org.jsfml.system.Time;
 import org.jsfml.system.Vector2f;
 
+import coreAI.Node;
 import CoreLoader.LoaderTiled;
 import CoreLoader.LoaderTiledException;
 import CoreLoader.TiledLayerImages;
 import CoreLoader.TiledLayerObjects;
+import CoreLoader.TiledLayerTiles;
 import CoreLoader.TiledObjectBase;
 import CoreLoader.TiledObjectPolyline;
 import CoreTexturesManager.TexturesManager;
@@ -80,6 +82,37 @@ public class LevelManager implements IBaseRavage
 						TiledObjectPolyline poly = (TiledObjectPolyline) base;
 						level.InsertObstacle(poly.getListPoint(), poly.getX(), poly.getY(), poly.getType());
 					}
+				}
+				
+			}
+			
+			// on récupère les nodes
+			List<TiledLayerTiles> listNodes = tiled.getListLayersTiles();
+			
+			for(TiledLayerTiles node : listNodes)
+			{
+				List<Integer> nodes = node.getDataMap();
+				
+				Node[] n = level.getNodes();
+				int x=0;
+				int y=0;
+				int ind=0;
+				
+				for(int w : nodes)
+				{
+					
+					Node cn = new Node(x,y,false);
+					cn.setType(w -1); // -1 car les indices du fichier JSON commence a 1
+					n[ind] =  cn;
+					
+					x++;
+					ind++;
+					if(x > 255)
+					{
+						x=0;
+						y++;
+					}
+			
 				}
 				
 			}

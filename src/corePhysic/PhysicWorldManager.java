@@ -12,6 +12,7 @@ public class PhysicWorldManager implements IBaseRavage
 	private static World world;
 	// ratio pixel meter
 	private static float RatioPixelMeter = 16f;
+	
 
 	
 	@Override
@@ -19,6 +20,7 @@ public class PhysicWorldManager implements IBaseRavage
 	{
 		// instance du World Physic
 		world = new World(new Vec2(0,0));
+		//
 		
 	}
 

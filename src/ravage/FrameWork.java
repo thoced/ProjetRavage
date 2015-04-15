@@ -2,9 +2,20 @@ package ravage;
 
 
 
+import java.util.ArrayList;
 import java.util.List;
 
+import org.jbox2d.collision.AABB;
+import org.jbox2d.collision.shapes.CircleShape;
+import org.jbox2d.collision.shapes.PolygonShape;
+import org.jbox2d.collision.shapes.Shape;
 import org.jbox2d.common.Vec2;
+import org.jbox2d.dynamics.Body;
+import org.jbox2d.dynamics.BodyDef;
+import org.jbox2d.dynamics.BodyType;
+import org.jbox2d.dynamics.Fixture;
+import org.jbox2d.dynamics.FixtureDef;
+import org.jsfml.graphics.RectangleShape;
 import org.jsfml.graphics.RenderTexture;
 import org.jsfml.graphics.RenderWindow;
 import org.jsfml.graphics.Sprite;
@@ -51,7 +62,7 @@ public class FrameWork
 	public void init() throws TextureCreationException 
 	{
 		// creation de l'environnemnet graphique jsfml
-		window = new RenderWindow(new VideoMode(1366,768),"ProjetRavage",RenderWindow.FULLSCREEN);
+		window = new RenderWindow(new VideoMode(1366,768),"ProjetRavage");
 		window.setFramerateLimit(60);
 		// Instance des variables
 		frameClock = new Clock();
@@ -81,16 +92,66 @@ public class FrameWork
 		renderSprite = new Sprite(renderTexture.getTexture());
 		
 		// on place une unity
-		for(int y=0;y < 32;y++)
+		/*for(int y=0;y < 32;y++)
 		{
 			for(int x=0;x<32;x++)
 			{
 				Unity unity = new Unity();
 				unity.init();
-				unity.setPosition(new Vec2(x * 2, y * 2));
+				unity.setPosition(new Vec2(x * 2, (y * 2) + 192 ));
 				entityManager.getVectorUnity().add(unity);
 			}
+		}*/
+		
+		// test d'automate pour le systmee de chemin
+		Body body;
+		BodyDef bdef = new BodyDef();
+		bdef.active = true;
+		bdef.bullet = false;
+		bdef.type = BodyType.DYNAMIC;
+		bdef.fixedRotation = true;
+		bdef.gravityScale = 0.0f;
+		bdef.position = new Vec2(0.5f,0.5f);
+		
+		
+		
+		// creation du body
+		body = PhysicWorldManager.getWorld().createBody(bdef);
+		body.setUserData("NO");
+		
+		PolygonShape shape = new PolygonShape();
+	
+		shape.setAsBox(0.5f,0.5f);
+		
+		FixtureDef fDef = new FixtureDef();
+		fDef.shape = shape;
+		fDef.density = 1.0f;
+		fDef.friction =1.0f;
+		fDef.restitution = 0f;
+	
+		Fixture fix = body.createFixture(fDef);
+		
+		Node[] n = currentLevel.getNodes();
+		
+		Clock c1 = new Clock();
+		
+		Astar star = new Astar();
+		
+		Time t1 = c1.restart();
+		
+		ArrayList<Node> finalpath = null;
+		
+		for(int i=0;i<100;i++)
+		{
+			 finalpath = star.search(n, 256, 256, 33, 225, 215, 2);
 		}
+		
+		Time t2 = c1.restart();
+		
+		System.out.println(t2.asMilliseconds() - t1.asMilliseconds());
+		
+		for(Node fp : finalpath)
+			System.out.println("X: " + fp.getX() + " Y: " + fp.getY());
 		
 
 	}

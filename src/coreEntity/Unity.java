@@ -48,8 +48,8 @@ public class Unity implements IBaseRavage
 		fDef.shape = shape;
 		fDef.density = 1.0f;
 		
-		fDef.friction = 0.5f;
-		fDef.restitution = 0.0f;
+		fDef.friction = 0.9f;
+		fDef.restitution = 0f;
 	
 		Fixture fix = body.createFixture(fDef);
 		
@@ -59,10 +59,17 @@ public class Unity implements IBaseRavage
 		float y = rand.nextFloat();
 		
 
+		this.setLinearVelocity(new Vec2(x*10,y*10));
 		
 		
-		body.setLinearVelocity(new Vec2(x*100,y*100));
 
+	}
+	
+	public void setLinearVelocity(Vec2 v)
+	{
+		body.setLinearVelocity(v);
+		
+		
 	}
 	
 	public void setPosition(Vec2 pos)

@@ -34,7 +34,7 @@ public class Level implements IBaseRavage, Drawable
 		// instances du background
 		backgrounds = new ArrayList<Sprite>();
 		// instance des nodes
-		nodes = new Node[4096];
+		nodes = new Node[65536];
 		
 		
 	}
@@ -148,8 +148,8 @@ public class Level implements IBaseRavage, Drawable
 		cs.createChain(vectors, vectors.length);
 		
 		// création du body
-		Body bPoly = PhysicWorldManager.getWorld().createBody(bdef);
-		bPoly.setUserData(typeobstacle);
+		obstacles = PhysicWorldManager.getWorld().createBody(bdef);
+		obstacles.setUserData(typeobstacle);
 		
 		// creation dufixture
 		FixtureDef fixture = new FixtureDef();
@@ -159,7 +159,7 @@ public class Level implements IBaseRavage, Drawable
 		fixture.restitution = 0.0f;
 
 		// ajout dans le body
-		bPoly.createFixture(fixture);
+		obstacles.createFixture(fixture);
 		
 		
 	}
