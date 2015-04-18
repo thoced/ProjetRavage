@@ -21,6 +21,8 @@ import ravage.IBaseRavage;
 
 public class LevelManager implements IBaseRavage
 {
+	private static Level level;
+	
 	@Override
 	public void init() 
 	{
@@ -41,10 +43,26 @@ public class LevelManager implements IBaseRavage
 		
 	}
 	
+	
+	
+	/**
+	 * @return the level
+	 */
+	public static Level getLevel() {
+		return level;
+	}
+
+	/**
+	 * @param level the level to set
+	 */
+	public static void setLevel(Level level) {
+		LevelManager.level = level;
+	}
+
 	public Level loadLevel(String nameFile)
 	{
-		// création de l'objet Level
-		Level level = new Level();
+		// créaleveltion de l'objet Level
+		level = new Level();
 		// Chargement
 		LoaderTiled tiled = new LoaderTiled();
 		try 
@@ -107,7 +125,7 @@ public class LevelManager implements IBaseRavage
 					
 					x++;
 					ind++;
-					if(x > 255)
+					if(x > 374)
 					{
 						x=0;
 						y++;

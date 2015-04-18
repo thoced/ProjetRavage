@@ -34,8 +34,6 @@ public class Astar implements IBaseRavage
 	
 	public  ArrayList search(Node[] map,int sizex,int sizey, int xstart,int ystart,int xtarget,int ytarget)
 	{
-		
-	
 		// map size
 		this.sizemapx = sizex;
 		this.sizemapy = sizey;

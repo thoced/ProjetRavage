@@ -50,9 +50,9 @@ public class EntityManager implements IBaseRavage
 				//unity.setLinearVelocity(new Vec2(0f,0f));
 				unity.setLinearVelocity(new Vec2(x *10,y*10));
 			}
-		}
+		}*/
 	
-		*/
+		
 	}
 
 	@Override

@@ -34,7 +34,7 @@ public class Level implements IBaseRavage, Drawable
 		// instances du background
 		backgrounds = new ArrayList<Sprite>();
 		// instance des nodes
-		nodes = new Node[65536];
+		nodes = new Node[375*250];
 		
 		
 	}
@@ -110,6 +110,8 @@ public class Level implements IBaseRavage, Drawable
 		this.obstacles = obstacles;
 	}
 	
+	
+	
 	public void InsertObstacle(List<TiledObjectPolylinePoint> listePoint,int x,int y,String typeobstacle)
 	{
 		// ajout d'un obstacle de type polyline
@@ -148,8 +150,8 @@ public class Level implements IBaseRavage, Drawable
 		cs.createChain(vectors, vectors.length);
 		
 		// création du body
-		obstacles = PhysicWorldManager.getWorld().createBody(bdef);
-		obstacles.setUserData(typeobstacle);
+		Body bodyObstacle = PhysicWorldManager.getWorld().createBody(bdef);
+		bodyObstacle.setUserData(typeobstacle);
 		
 		// creation dufixture
 		FixtureDef fixture = new FixtureDef();
@@ -159,7 +161,7 @@ public class Level implements IBaseRavage, Drawable
 		fixture.restitution = 0.0f;
 
 		// ajout dans le body
-		obstacles.createFixture(fixture);
+		bodyObstacle.createFixture(fixture);
 		
 		
 	}

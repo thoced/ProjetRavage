@@ -1,5 +1,7 @@
 package coreEntity;
 
+import java.util.ArrayList;
+import java.util.List;
 import java.util.Random;
 
 import org.jbox2d.collision.shapes.CircleShape;
@@ -10,12 +12,18 @@ import org.jbox2d.dynamics.BodyDef;
 import org.jbox2d.dynamics.BodyType;
 import org.jbox2d.dynamics.Fixture;
 import org.jbox2d.dynamics.FixtureDef;
+import org.jsfml.system.Clock;
 import org.jsfml.system.Time;
 
+import coreAI.Astar;
+import coreAI.AstarManager;
+import coreAI.ICallBackAStar;
+import coreAI.Node;
+import coreLevel.LevelManager;
 import corePhysic.PhysicWorldManager;
 import ravage.IBaseRavage;
 
-public class Unity implements IBaseRavage 
+public class Unity implements IBaseRavage,ICallBackAStar
 {
 
 	private float posx,posy;
@@ -25,6 +33,16 @@ public class Unity implements IBaseRavage
 	private float rotation;
 	
 	private Body body;
+	
+	private Vec2 targetPosition;
+	
+	private List<Node> pathFinal;
+	
+	
+	private float elapse = 0f;
+	private int ind = 0;
+	
+	private Node next;
 	
 	@Override
 	public void init() 
@@ -59,16 +77,36 @@ public class Unity implements IBaseRavage
 		float y = rand.nextFloat();
 		
 
-		this.setLinearVelocity(new Vec2(x*10,y*10));
+		//this.setLinearVelocity(new Vec2(x*10,y*10));
 		
 		
-
+	
+	}
+	
+	public void setTargetPosition(Vec2 tp)
+	{
+		this.targetPosition = tp;
+		
+		// on fait une demande au manager
+		int posx = (int) this.getBody().getPosition().x;
+		int posy = (int) this.getBody().getPosition().y;
+		
+		int targetx = (int) tp.x;
+		int targety = (int) tp.y;
+		
+		try 
+		{
+			AstarManager.askPath(this, posx, posy, targetx, targety);
+			
+		} catch (InterruptedException e) {
+			// TODO Auto-generated catch block
+			e.printStackTrace();
+		}
 	}
 	
 	public void setLinearVelocity(Vec2 v)
 	{
 		body.setLinearVelocity(v);
-		
 		
 	}
 	
@@ -84,6 +122,30 @@ public class Unity implements IBaseRavage
 		posx = body.getPosition().x * PhysicWorldManager.getRatioPixelMeter();
 		posy = body.getPosition().y * PhysicWorldManager.getRatioPixelMeter();
 		
+		// 
+		if(next == null && this.pathFinal != null && this.pathFinal.size() > 0)
+		{
+			// on récupère le node prochain
+			next = this.pathFinal.get(0);
+			// on supprme le noduer premier
+			this.pathFinal.remove(0);
+			
+		}
+		
+		if(next != null) // il y a un node suivant
+		{
+			// on calcul le vecteur velocity de différence
+			Vec2 n = new Vec2(next.getX(),next.getY());
+			
+			Vec2 diff = n.sub(this.body.getPosition());
+			if(diff.length() < 0.2f)
+				next = null;
+			else
+			{
+				diff.normalize();
+				this.body.setLinearVelocity(diff.mul(2f));
+			}	
+		}
 	}
 
 	@Override
@@ -174,6 +236,14 @@ public class Unity implements IBaseRavage
 	 */
 	public void setBody(Body body) {
 		this.body = body;
+	}
+
+	@Override
+	public void onCallSearchPath(List<Node> finalPath) 
+	{
+		// TODO Auto-generated method stub
+		this.pathFinal = finalPath;
+		
 	}
 	
 	

@@ -28,6 +28,7 @@ import org.jsfml.window.event.Event;
 
 import CoreTexturesManager.TexturesManager;
 import coreAI.Astar;
+import coreAI.AstarManager;
 import coreAI.Node;
 import coreCamera.CameraManager;
 import coreDrawable.DrawableUnityManager;
@@ -46,6 +47,7 @@ public class FrameWork
 	private CameraManager cameraManager;
 	private EntityManager entityManager;
 	private DrawableUnityManager drawaUnityManager;
+	private AstarManager astarManager;
 	// Clocks
 	private Clock frameClock;
 	// fps
@@ -81,6 +83,8 @@ public class FrameWork
 		entityManager.init();
 		drawaUnityManager = new DrawableUnityManager();
 		drawaUnityManager.init();
+		astarManager = new AstarManager();
+		astarManager.init();
 		
 		// Chargement du niveau
 		currentLevel  = levelManager.loadLevel("testlevel01.json");
@@ -102,6 +106,13 @@ public class FrameWork
 				entityManager.getVectorUnity().add(unity);
 			}
 		}*/
+		Unity unity = new Unity();
+		unity.init();
+		unity.setPosition(new Vec2(32,32));
+		entityManager.getVectorUnity().add(unity);
+		
+		unity.setTargetPosition(new Vec2(215,2));
+		
 		
 		// test d'automate pour le systmee de chemin
 		Body body;
@@ -131,28 +142,7 @@ public class FrameWork
 	
 		Fixture fix = body.createFixture(fDef);
 		
-		Node[] n = currentLevel.getNodes();
-		
-		Clock c1 = new Clock();
-		
-		Astar star = new Astar();
-		
-		Time t1 = c1.restart();
-		
-		ArrayList<Node> finalpath = null;
-		
-		for(int i=0;i<100;i++)
-		{
-			 finalpath = star.search(n, 256, 256, 33, 225, 215, 2);
-		}
-		
-		Time t2 = c1.restart();
-		
-		System.out.println(t2.asMilliseconds() - t1.asMilliseconds());
-		
-		for(Node fp : finalpath)
-			System.out.println("X: " + fp.getX() + " Y: " + fp.getY());
-		
+			
 
 	}
 
