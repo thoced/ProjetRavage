@@ -1,6 +1,8 @@
 package coreCamera;
 
 import org.jsfml.graphics.ConstView;
+import org.jsfml.graphics.FloatRect;
+import org.jsfml.graphics.IntRect;
 import org.jsfml.graphics.View;
 import org.jsfml.system.Time;
 import org.jsfml.system.Vector2f;
@@ -14,7 +16,7 @@ public class CameraManager implements IBaseRavage
 {
 
 	// View
-	private View view;
+	private static View view;
 	// rotation
 	private float rot = 0f;
 	// speed
@@ -33,6 +35,8 @@ public class CameraManager implements IBaseRavage
 	{
 		// TODO Auto-generated method stub
 		this.view.setCenter(new Vector2f(1024f,1024f));
+		
+		
 	}
 
 	@Override
@@ -84,6 +88,15 @@ public class CameraManager implements IBaseRavage
 	 */
 	public void setView( View view) {
 		this.view = view;
+	}
+	
+	public static FloatRect getCameraBounds()
+	{
+		Vector2f  size = CameraManager.view.getSize();
+		Vector2f centre = CameraManager.view.getCenter();
+		Vector2f source = Vector2f.sub(centre, Vector2f.div(size,2));
+		return  new FloatRect(source,size);
+
 	}
 	
 	

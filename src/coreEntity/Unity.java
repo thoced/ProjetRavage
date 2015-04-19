@@ -28,6 +28,8 @@ public class Unity implements IBaseRavage,ICallBackAStar
 
 	private float posx,posy;
 	
+	private int tx,ty;
+	
 	private int   nodex,nodey;
 	
 	private float rotation;
@@ -37,6 +39,9 @@ public class Unity implements IBaseRavage,ICallBackAStar
 	private Vec2 targetPosition;
 	
 	private List<Node> pathFinal;
+	
+	private Clock resetSearchClock;
+	private Time  elapseSearchClock = Time.ZERO;
 	
 	
 	private float elapse = 0f;
@@ -60,43 +65,37 @@ public class Unity implements IBaseRavage,ICallBackAStar
 		body = PhysicWorldManager.getWorld().createBody(bdef);
 		
 		Shape shape = new CircleShape();
-		shape.m_radius = 0.5f;
+		shape.m_radius = 0.4f;
 		
 		FixtureDef fDef = new FixtureDef();
 		fDef.shape = shape;
 		fDef.density = 1.0f;
 		
-		fDef.friction = 0.9f;
-		fDef.restitution = 0f;
+		fDef.friction = 0.2f;
+		fDef.restitution = 0.2f;
 	
 		Fixture fix = body.createFixture(fDef);
 		
-		// test de déplacement
-		Random rand = new Random();
-		float x = rand.nextFloat();
-		float y = rand.nextFloat();
+		// instance du resetSearch
+		resetSearchClock = new Clock();
 		
-
-		//this.setLinearVelocity(new Vec2(x*10,y*10));
-		
-		
+	
 	
 	}
 	
-	public void setTargetPosition(Vec2 tp)
+	public void setTargetPosition(int tx,int ty)
 	{
-		this.targetPosition = tp;
-		
+		//this.targetPosition = new Vec2((float)tx + 0.5f,(float)ty + 0.5f);
+		this.tx = tx;
+		this.ty = ty;
 		// on fait une demande au manager
-		int posx = (int) this.getBody().getPosition().x;
-		int posy = (int) this.getBody().getPosition().y;
-		
-		int targetx = (int) tp.x;
-		int targety = (int) tp.y;
+		int px =  (int) ((int)this.getBody().getPosition().x - 0.5f);
+		int py =  (int) ((int)this.getBody().getPosition().y - 0.5f);
 		
 		try 
 		{
-			AstarManager.askPath(this, posx, posy, targetx, targety);
+			this.pathFinal = new ArrayList<Node>();
+			AstarManager.askPath(this, px, py, tx, ty);
 			
 		} catch (InterruptedException e) {
 			// TODO Auto-generated catch block
@@ -110,9 +109,12 @@ public class Unity implements IBaseRavage,ICallBackAStar
 		
 	}
 	
-	public void setPosition(Vec2 pos)
+	public void setPosition(int x,int y)
 	{
-		body.setTransform(pos.add(new Vec2(0.5f,0.5f)),0f);
+		body.setTransform(new Vec2((float)x + 0.5f,(float)y + 0.5f),0f);
+		posx = body.getPosition().x * PhysicWorldManager.getRatioPixelMeter();
+		posy = body.getPosition().y * PhysicWorldManager.getRatioPixelMeter();
+		
 	}
 
 	@Override
@@ -122,6 +124,19 @@ public class Unity implements IBaseRavage,ICallBackAStar
 		posx = body.getPosition().x * PhysicWorldManager.getRatioPixelMeter();
 		posy = body.getPosition().y * PhysicWorldManager.getRatioPixelMeter();
 		
+		
+	/*	if(next != null)
+		{
+			elapseSearchClock = Time.add(elapseSearchClock, deltaTime);
+			if(elapseSearchClock.asSeconds() > 2f)
+			{
+				// on relance une recherche
+				elapseSearchClock = Time.ZERO;
+				
+				
+			}
+		}*/
+		
 		// 
 		if(next == null && this.pathFinal != null && this.pathFinal.size() > 0)
 		{
@@ -129,6 +144,8 @@ public class Unity implements IBaseRavage,ICallBackAStar
 			next = this.pathFinal.get(0);
 			// on supprme le noduer premier
 			this.pathFinal.remove(0);
+			// on lance le clock du resetSearchClock
+			elapseSearchClock = resetSearchClock.restart();
 			
 		}
 		else
@@ -140,7 +157,7 @@ public class Unity implements IBaseRavage,ICallBackAStar
 			Vec2 n = next.getPositionVec2();
 			
 			Vec2 diff = n.sub(this.body.getPosition());
-			if(diff.length() < 0.5f)
+			if(diff.length() < 0.4f)
 				next = null;
 			else
 			{
@@ -245,6 +262,8 @@ public class Unity implements IBaseRavage,ICallBackAStar
 	{
 		// TODO Auto-generated method stub
 		this.pathFinal = finalPath;
+		
+		System.out.println(this.toString() +  " : " + finalPath.size());
 		
 	}
 	

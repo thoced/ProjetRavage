@@ -23,7 +23,12 @@ public class MainProgram
 		FrameWork frameWork = new FrameWork();
 		try
 		{
-			frameWork.init();
+			try {
+				frameWork.init();
+			} catch (InterruptedException e) {
+				// TODO Auto-generated catch block
+				e.printStackTrace();
+			}
 		} catch (TextureCreationException e) {
 			// TODO Auto-generated catch block
 			System.out.println("Error: MainProgram: " + e.getMessage());

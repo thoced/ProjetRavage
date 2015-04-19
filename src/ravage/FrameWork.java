@@ -61,7 +61,7 @@ public class FrameWork
 	private RenderTexture renderTexture;
 	private Sprite	renderSprite;
 	
-	public void init() throws TextureCreationException 
+	public void init() throws TextureCreationException, InterruptedException 
 	{
 		// creation de l'environnemnet graphique jsfml
 		window = new RenderWindow(new VideoMode(1366,768),"ProjetRavage");
@@ -106,44 +106,17 @@ public class FrameWork
 				entityManager.getVectorUnity().add(unity);
 			}
 		}*/
-		Unity unity = new Unity();
-		unity.init();
-		unity.setPosition(new Vec2(0,0));
-		entityManager.getVectorUnity().add(unity);
-		
-	//	unity.setTargetPosition(new Vec2(297,200));
-		
-		
-		// test d'automate pour le systmee de chemin
-		Body body;
-		BodyDef bdef = new BodyDef();
-		bdef.active = true;
-		bdef.bullet = false;
-		bdef.type = BodyType.DYNAMIC;
-		bdef.fixedRotation = true;
-		bdef.gravityScale = 0.0f;
-		bdef.position = new Vec2(0.5f,0.5f);
-		
-		
-		
-		// creation du body
-		body = PhysicWorldManager.getWorld().createBody(bdef);
-		body.setUserData("NO");
-		
-		PolygonShape shape = new PolygonShape();
 	
-		shape.setAsBox(0.5f,0.5f);
-		
-		FixtureDef fDef = new FixtureDef();
-		fDef.shape = shape;
-		fDef.density = 1.0f;
-		fDef.friction =1.0f;
-		fDef.restitution = 0f;
-	
-		Fixture fix = body.createFixture(fDef);
-		
+		for(int i=0;i<20;i+=2)
+		{
+			Unity unity = new Unity();
+			unity.init();
+			unity.setPosition(20 + i,12);
+			entityManager.getVectorUnity().add(unity);
 			
-
+			unity.setTargetPosition(297,200);
+		}
+		
 	}
 
 	public void run()
@@ -156,14 +129,14 @@ public class FrameWork
 			{
 				if(event.type == Event.Type.CLOSED) 
 				{
-					window.close();
+					this.destroyFrameWork();
 				}
 				
 				if(event.type == Event.Type.KEY_PRESSED)
 				{
 					if(event.asKeyEvent().key == Keyboard.Key.ESCAPE)
 					{
-						window.close();
+						this.destroyFrameWork();
 					}
 					
 				}
@@ -187,6 +160,7 @@ public class FrameWork
 			currentLevel.update(deltaTime);
 			cameraManager.update(deltaTime);
 			entityManager.update(deltaTime);
+			astarManager.update(deltaTime);
 			
 			// Draw des composants
 			renderTexture.clear();
@@ -203,7 +177,15 @@ public class FrameWork
 			
 		}
 		
-		
+	
 	}
 
+	public void destroyFrameWork()
+	{
+		// destruction du thread
+		if(astarManager != null)
+			astarManager.interrupt();
+		// fermeture de la fenetre
+		window.close();
+	}
 }

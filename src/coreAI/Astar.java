@@ -76,7 +76,7 @@ public class Astar implements IBaseRavage
 				int newG;
 				// on calcul son cout , si diagonal +14, si horinzontale ou verticale + 10
 				if(node.isDiagonal())
-					 newG = node.getParent().getG() + 10;  // on ajoute 14 si c'est un node diagonal
+					 newG = node.getParent().getG() + 14;  // on ajoute 14 si c'est un node diagonal
 				else
 					newG = node.getParent().getG() + 10; // on ajoute 10 si pas diagonal
 				
@@ -87,26 +87,53 @@ public class Astar implements IBaseRavage
 				int newF = newH + newG;
 				
 				// si le node est  dans la liste ouverte
-				if(this.isInOpenList(node))
+				Node backNode = this.isInOpenList(node);
+				if(backNode != null)
 				{
-					if(newG < node.getG())
+					if(newG < backNode.getG()) // si le nouveau G est plus petit que l'ancien
 					{
 						node.setParent(currentNode);
+						
+						if(node.isDiagonal())
+							 newG = currentNode.getG() + 14;  // on ajoute 14 si c'est un node diagonal
+						else
+							newG = currentNode.getG() + 10; // on ajoute 10 si pas diagonal
+						
+						// on calcul son H
+						 newH = (Math.abs(end.getX() - node.getX()) + Math.abs(end.getY() - node.getY())) * 10;
+						
+						// valeur F
+						newF = newH + newG;
 						node.setG(newG);
 						node.setH(newH);
 						node.setF(newF);
+						this.listOpen.remove(backNode);
+						this.listOpen.add(node);
 						
 					}
 					
 				}
 				else
 				{
-					this.listOpen.add(node);
-					this.listClosed.remove(node);
+					// le node n'est pas dans la liste ouverte
+					if(node.isDiagonal())
+						 newG = currentNode.getG() + 14;  // on ajoute 14 si c'est un node diagonal
+					else
+						newG = currentNode.getG() + 10; // on ajoute 10 si pas diagonal
+					
+					// on calcul son H
+					 newH = (Math.abs(end.getX() - node.getX()) + Math.abs(end.getY() - node.getY())) * 10;
+					
+					// valeur F
+					 newF = newH + newG;
+					
 					node.setParent(currentNode);
 					node.setG(newG);
 					node.setH(newH);
 					node.setF(newF);
+					this.listOpen.add(node);
+					this.listClosed.remove(node);
+					
 				}
 				
 			}
@@ -115,6 +142,7 @@ public class Astar implements IBaseRavage
 		}
 		
 		finalPath = new ArrayList<Node>();
+		
 		
 		// on est sorti de la boucle
 		if(this.listOpen.size() == 0) // pas de solution
@@ -193,7 +221,6 @@ public class Astar implements IBaseRavage
 				current = n;
 			
 		}
-		
 		return current;
 	}
 	
@@ -220,15 +247,15 @@ public class Astar implements IBaseRavage
 		return false;
 	}
 	
-	public boolean isInOpenList(Node n)
+	public Node isInOpenList(Node n)
 	{
 		for(Node c : this.listOpen)
 		{
 			if(c.getX() == n.getX() && c.getY() == n.getY())
-				return true;
+				return c;
 		}
 		
-		return false;
+		return null;
 	}
 	
 	@Override

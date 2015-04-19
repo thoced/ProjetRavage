@@ -3,6 +3,8 @@ package coreAI;
 import java.util.ArrayList;
 import java.util.List;
 import java.util.concurrent.Semaphore;
+import java.util.concurrent.locks.Lock;
+import java.util.concurrent.locks.ReentrantLock;
 
 import org.jsfml.system.Time;
 
@@ -19,6 +21,8 @@ public class AstarManager extends Thread implements IBaseRavage
 	
 	private static Semaphore semaphore;
 	
+	private static Lock lock;
+	
 	@Override
 	public void init() 
 	{
@@ -29,6 +33,8 @@ public class AstarManager extends Thread implements IBaseRavage
 		this.listAsk = new ArrayList<AskPath>();
 		// instance du semaphore
 		semaphore = new Semaphore(MAX_AVAILABLE,true);
+		// instance du lock
+		lock = new ReentrantLock();
 		// on lance le thread
 		this.start();
 		
@@ -56,29 +62,34 @@ public class AstarManager extends Thread implements IBaseRavage
 		super.run();
 		
 		//
-		while(this.isAlive())
+		try
 		{
-			try 
+			while(this.isAlive())
 			{
-				// on prend le semaphore
-				semaphore.acquire();
-				// on récupère la demande dans liste
-				if(this.listAsk.size() > 0)
-				{
-					AskPath ask = this.listAsk.get(0);
+					// on prend le semaphore
+					semaphore.acquire();
+					// on récupère la demande dans liste
+					if(this.listAsk.size() > 0)
+					{
+						lock.lock();
+							AskPath ask = this.listAsk.get(0); // récupèration de la demande 
+							this.listAsk.remove(0); // suppresion de la demande
+						lock.unlock();
+						
+						// on lance une recherche de chemin
+						List<Node> finalPath = star.search(LevelManager.getLevel().getNodes(), 375, 250, ask.getX(), ask.getY(), ask.getTx(), ask.getTy());
+						
+						// on appel le caller
+						ask.getCaller().onCallSearchPath(finalPath);
+						
+					}
 					
-					// on lance une recherche de chemin
-					List<Node> finalPath = star.search(LevelManager.getLevel().getNodes(), 375, 250, ask.getX(), ask.getY(), ask.getTx(), ask.getTy());
-					
-					// on appel le caller
-					ask.getCaller().onCallSearchPath(finalPath);
-					
-				}
 				
-			} catch (InterruptedException e) {
-				// TODO Auto-generated catch block
-				e.printStackTrace();
 			}
+		
+		} catch (InterruptedException e) {
+			// TODO Auto-generated catch block
+			e.printStackTrace();
 		}
 		
 		
@@ -89,15 +100,16 @@ public class AstarManager extends Thread implements IBaseRavage
 		// on créé une demande
 		AskPath ask = new AskPath(caller,posx,posy,targetx,targety);
 		
+		
 		// on place la demande dans la liste
-		listAsk.add(ask);
+		lock.lock();
+			listAsk.add(ask);
+		lock.unlock();
+		
 		semaphore.release();
 		
 		
 	}
-
-	
-	
 	
 
 }

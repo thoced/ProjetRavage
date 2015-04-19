@@ -18,6 +18,8 @@ public class DrawableUnityManager implements IBaseRavage, Drawable
 {
 
 	private VertexArray buffer;
+	
+	private RenderStates state = new RenderStates(TexturesManager.GetTextureByName("unity_sprite_01.png"));
 
 	@Override
 	public void init() 
@@ -50,10 +52,10 @@ public class DrawableUnityManager implements IBaseRavage, Drawable
 			// on récupère la position
 			Vector2f pos = new Vector2f(unity.getPosx(),unity.getPosy());
 			// on crée les 4 vertex
-			Vertex v1 = new Vertex(Vector2f.add(pos, new Vector2f(-8f,-8f)), this.getCoordText(1));
-			Vertex v2 = new Vertex(Vector2f.add(pos, new Vector2f(8f,-8f)), this.getCoordText(2));
-			Vertex v3 = new Vertex(Vector2f.add(pos,new Vector2f(8f,8f)), this.getCoordText(3));
-			Vertex v4 = new Vertex(Vector2f.add(pos, new Vector2f(-8f,8f)), this.getCoordText(4));
+			Vertex v1 = new Vertex(Vector2f.add(pos, new Vector2f(-16f,-16f)), this.getCoordText(1));
+			Vertex v2 = new Vertex(Vector2f.add(pos, new Vector2f(16f,-16f)), this.getCoordText(2));
+			Vertex v3 = new Vertex(Vector2f.add(pos,new Vector2f(16f,16f)), this.getCoordText(3));
+			Vertex v4 = new Vertex(Vector2f.add(pos, new Vector2f(-16f,16f)), this.getCoordText(4));
 			
 			// on ajoute dans le buffer
 			buffer.add(v1);
@@ -63,7 +65,7 @@ public class DrawableUnityManager implements IBaseRavage, Drawable
 			
 		}
 		
-		RenderStates state = new RenderStates(TexturesManager.GetTextureByName("unity_sprite_01.png"));
+		
 		// affichage
 		arg0.draw(buffer,state);
 		
@@ -77,11 +79,11 @@ public class DrawableUnityManager implements IBaseRavage, Drawable
 		{
 		case 1 : return new Vector2f(0,0);
 		
-		case 2 : return new Vector2f(16,0);
+		case 2 : return new Vector2f(32,0);
 		
-		case 3 : return new Vector2f(16,16);
+		case 3 : return new Vector2f(32,32);
 		
-		case 4 : return new Vector2f(0,16);
+		case 4 : return new Vector2f(0,32);
 		
 		default: return new Vector2f(0,0);
 		}

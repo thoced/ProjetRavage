@@ -17,6 +17,9 @@ public class Node
 	{
 		this.x = x;
 		this.y = y;
+		this.g=0;
+		this.h=0;
+		this.f=0;
 		this.isDiagonal = isdiagonal;
 		this.parent = this;
 	}

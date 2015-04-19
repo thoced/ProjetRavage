@@ -10,12 +10,14 @@ import org.jbox2d.dynamics.BodyDef;
 import org.jbox2d.dynamics.BodyType;
 import org.jbox2d.dynamics.FixtureDef;
 import org.jsfml.graphics.Drawable;
+import org.jsfml.graphics.FloatRect;
 import org.jsfml.graphics.RenderStates;
 import org.jsfml.graphics.RenderTarget;
 import org.jsfml.graphics.Sprite;
 import org.jsfml.system.Time;
 
 import coreAI.Node;
+import coreCamera.CameraManager;
 import corePhysic.PhysicWorldManager;
 import CoreLoader.TiledObjectPolylinePoint;
 import ravage.IBaseRavage;
@@ -43,8 +45,14 @@ public class Level implements IBaseRavage, Drawable
 	public void draw(RenderTarget render, RenderStates state) 
 	{
 		// on affiche le background du level
+		
 		for(Sprite s : backgrounds)
-			render.draw(s);
+		{
+			FloatRect result = s.getGlobalBounds().intersection(CameraManager.getCameraBounds());
+			if(result != null)
+				render.draw(s);
+		}
+		
 		
 	}
 

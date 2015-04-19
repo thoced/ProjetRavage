@@ -7,11 +7,14 @@ import java.util.Random;
 import org.jbox2d.common.Vec2;
 import org.jsfml.system.Clock;
 import org.jsfml.system.Time;
+import org.jsfml.system.Vector2f;
+import org.jsfml.window.Keyboard.Key;
 
 import coreEntity.Unity;
 import ravage.IBaseRavage;
+import ravage.IEvent;
 
-public class EntityManager implements IBaseRavage 
+public class EntityManager implements IBaseRavage,IEvent 
 {
 	
 	private static List<Unity> vectorUnity;
@@ -37,22 +40,6 @@ public class EntityManager implements IBaseRavage
 			unity.update(deltaTime);
 		}
 		
-		/*Time ret = clock.restart();
-		delta = Time.add(delta,ret);
-		if(delta.asSeconds() > 3f)
-		{
-			delta = Time.ZERO;
-			for(Unity unity : vectorUnity)
-			{
-				Random rand = new Random();
-				float x = rand.nextFloat();
-				float y = rand.nextFloat();
-				//unity.setLinearVelocity(new Vec2(0f,0f));
-				unity.setLinearVelocity(new Vec2(x *10,y*10));
-			}
-		}*/
-	
-		
 	}
 
 	@Override
@@ -73,6 +60,18 @@ public class EntityManager implements IBaseRavage
 	 */
 	public static void setVectorUnity(List<Unity> vectorUnity) {
 		EntityManager.vectorUnity = vectorUnity;
+	}
+
+	@Override
+	public void onMouse(Vector2f pos, int click) {
+		// TODO Auto-generated method stub
+		
+	}
+
+	@Override
+	public void onKeyboard(Key k) {
+		// TODO Auto-generated method stub
+		
 	}
 
 }

@@ -1,5 +1,7 @@
 package coreAI;
 
+import java.util.List;
+
 public class AskPath 
 {
 	private ICallBackAStar caller;
@@ -8,15 +10,21 @@ public class AskPath
 	private int y;
 	private int tx;
 	private int ty;
+
 	
 	public AskPath(ICallBackAStar caller,int posx,int posy,int targetx,int targety)
+	
 	{
 		this.caller = caller;
 		this.x = posx;
 		this.y = posy;
 		this.tx = targetx;
 		this.ty = targety;
+		
 	}
+
+	
+
 
 	/**
 	 * @return the caller
