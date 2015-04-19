@@ -112,7 +112,7 @@ public class Unity implements IBaseRavage,ICallBackAStar
 	
 	public void setPosition(Vec2 pos)
 	{
-		body.setTransform(pos, 0f);
+		body.setTransform(pos.add(new Vec2(0.5f,0.5f)),0f);
 	}
 
 	@Override
@@ -131,19 +131,21 @@ public class Unity implements IBaseRavage,ICallBackAStar
 			this.pathFinal.remove(0);
 			
 		}
+		else
+			this.body.setLinearVelocity(new Vec2(0f,0f)); // il est arrivé à destination
 		
 		if(next != null) // il y a un node suivant
 		{
 			// on calcul le vecteur velocity de différence
-			Vec2 n = new Vec2(next.getX(),next.getY());
+			Vec2 n = next.getPositionVec2();
 			
 			Vec2 diff = n.sub(this.body.getPosition());
-			if(diff.length() < 0.2f)
+			if(diff.length() < 0.5f)
 				next = null;
 			else
 			{
 				diff.normalize();
-				this.body.setLinearVelocity(diff.mul(2f));
+				this.body.setLinearVelocity(diff.mul(6f));
 			}	
 		}
 	}

@@ -76,7 +76,7 @@ public class Astar implements IBaseRavage
 				int newG;
 				// on calcul son cout , si diagonal +14, si horinzontale ou verticale + 10
 				if(node.isDiagonal())
-					 newG = node.getParent().getG() + 14;  // on ajoute 14 si c'est un node diagonal
+					 newG = node.getParent().getG() + 10;  // on ajoute 14 si c'est un node diagonal
 				else
 					newG = node.getParent().getG() + 10; // on ajoute 10 si pas diagonal
 				

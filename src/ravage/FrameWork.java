@@ -108,10 +108,10 @@ public class FrameWork
 		}*/
 		Unity unity = new Unity();
 		unity.init();
-		unity.setPosition(new Vec2(32,32));
+		unity.setPosition(new Vec2(0,0));
 		entityManager.getVectorUnity().add(unity);
 		
-		unity.setTargetPosition(new Vec2(215,2));
+	//	unity.setTargetPosition(new Vec2(297,200));
 		
 		
 		// test d'automate pour le systmee de chemin

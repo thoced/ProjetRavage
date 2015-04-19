@@ -1,5 +1,7 @@
 package coreAI;
 
+import org.jbox2d.common.Vec2;
+
 public class Node 
 {
 	private int type; // wall, ground, ...
@@ -19,6 +21,11 @@ public class Node
 		this.parent = this;
 	}
 
+	public Vec2 getPositionVec2()
+	{
+		return new Vec2(this.x +0.5f,this.y + 0.5f);
+	}
+	
 	/**
 	 * @return the x
 	 */
