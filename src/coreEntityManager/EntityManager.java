@@ -8,9 +8,15 @@ import org.jbox2d.common.Vec2;
 import org.jsfml.system.Clock;
 import org.jsfml.system.Time;
 import org.jsfml.system.Vector2f;
+import org.jsfml.system.Vector2i;
+import org.jsfml.window.Keyboard;
+import org.jsfml.window.Mouse;
 import org.jsfml.window.Keyboard.Key;
+import org.jsfml.window.event.MouseButtonEvent;
 
 import coreEntity.Unity;
+import corePhysic.PhysicWorldManager;
+import ravage.FrameWork;
 import ravage.IBaseRavage;
 import ravage.IEvent;
 
@@ -21,6 +27,8 @@ public class EntityManager implements IBaseRavage,IEvent
 	// test clock
 	private Clock clock;
 	private Time delta;
+	// unity selected
+	private Unity unitySelected = null;
 
 	@Override
 	public void init()
@@ -35,6 +43,7 @@ public class EntityManager implements IBaseRavage,IEvent
 	@Override
 	public void update(Time deltaTime) 
 	{
+		// on parse les unité
 		for(Unity unity : vectorUnity)
 		{
 			unity.update(deltaTime);
@@ -63,15 +72,57 @@ public class EntityManager implements IBaseRavage,IEvent
 	}
 
 	@Override
-	public void onMouse(Vector2f pos, int click) {
-		// TODO Auto-generated method stub
+	public void onMouse(MouseButtonEvent mouseEvent) 
+	{
+		
+		Vector2f posMouseWorld = FrameWork.getWindow().mapPixelToCoords(mouseEvent.position);
+		float pixels =  PhysicWorldManager.getRatioPixelMeter();
+		
+		// si c'est un click gauche
+		
+		if(mouseEvent.button == Mouse.Button.LEFT)
+		{
+		
+			// si une unité est déja selectionné, on déselectionne avant l'unité
+			if(unitySelected != null)
+				unitySelected.setSelected(false);
+			
+			Vec2 mousePos = new Vec2(posMouseWorld.x / pixels,posMouseWorld.y / pixels ); 
+			for(Unity unity : vectorUnity)
+			{
+				// si la souris est sur l'unité
+				if(unity.getBody().getPosition().sub(mousePos).length() < .5f)
+				{
+					unity.setSelected(true);
+					unitySelected = unity;
+					break;
+				}
+				
+			}
+			
+			
+		}
+		else if(mouseEvent.button == Mouse.Button.RIGHT)
+		{
+			
+			
+			if(unitySelected != null)
+			{
+				// on précise la node target
+				Vector2f pos = Vector2f.div(posMouseWorld, pixels);
+				unitySelected.setTargetPosition((int)pos.x+1,(int)pos.y+1);
+			}
+		}
+		
 		
 	}
 
 	@Override
-	public void onKeyboard(Key k) {
+	public void onKeyboard(Keyboard keyboardEvent) {
 		// TODO Auto-generated method stub
 		
 	}
+
+	
 
 }

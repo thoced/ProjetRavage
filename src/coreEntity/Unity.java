@@ -42,12 +42,14 @@ public class Unity implements IBaseRavage,ICallBackAStar
 	
 	private Clock resetSearchClock;
 	private Time  elapseSearchClock = Time.ZERO;
-	
-	
+
 	private float elapse = 0f;
 	private int ind = 0;
 	
-	private Node next;
+	private Node next = null;
+	
+	// is selected
+	private boolean isSelected = false;
 	
 	@Override
 	public void init() 
@@ -94,8 +96,9 @@ public class Unity implements IBaseRavage,ICallBackAStar
 		
 		try 
 		{
-			this.pathFinal = new ArrayList<Node>();
-			AstarManager.askPath(this, px, py, tx, ty);
+			// si le target position est sur un node noir, on ne fait aucune recherche
+			if(LevelManager.getLevel().getNodes()[(ty * 375) + tx].getType() == 0)
+				AstarManager.askPath(this, px, py, tx, ty);
 			
 		} catch (InterruptedException e) {
 			// TODO Auto-generated catch block
@@ -125,19 +128,33 @@ public class Unity implements IBaseRavage,ICallBackAStar
 		posy = body.getPosition().y * PhysicWorldManager.getRatioPixelMeter();
 		
 		
-	/*	if(next != null)
+		// ------------------------------------
+		// Code pour téléporter une unité bloqué
+		// ------------------------------------
+		if(next != null)
 		{
 			elapseSearchClock = Time.add(elapseSearchClock, deltaTime);
-			if(elapseSearchClock.asSeconds() > 2f)
+			if(elapseSearchClock.asSeconds() > 2f) // si bloqué plus de 2 secondes
 			{
-				// on relance une recherche
 				elapseSearchClock = Time.ZERO;
+				// on saute une node de recherche
+				if(this.pathFinal.size() > 0)
+				{
+					Node node = this.pathFinal.get(0);
+					this.pathFinal.remove(0);
+					// on téléporte l'unité
+					this.body.setTransform(node.getPositionVec2(), 0f);
+					next = null;
+				}
 				
-				
+
 			}
-		}*/
+		}
 		
-		// 
+		// -------------------------------------
+		// Code pour prendre le node suivant
+		// -------------------------------------
+		
 		if(next == null && this.pathFinal != null && this.pathFinal.size() > 0)
 		{
 			// on récupère le node prochain
@@ -150,6 +167,10 @@ public class Unity implements IBaseRavage,ICallBackAStar
 		}
 		else
 			this.body.setLinearVelocity(new Vec2(0f,0f)); // il est arrivé à destination
+		
+		// -------------------------------------
+		// Code de déplacement - mouvement
+		// -------------------------------------
 		
 		if(next != null) // il y a un node suivant
 		{
@@ -223,7 +244,7 @@ public class Unity implements IBaseRavage,ICallBackAStar
 	}
 
 	/**
-	 * @param nodey the nodey to set
+	 * @param nodey the vnodey to set
 	 */
 	public void setNodey(int nodey) {
 		this.nodey = nodey;
@@ -255,6 +276,25 @@ public class Unity implements IBaseRavage,ICallBackAStar
 	 */
 	public void setBody(Body body) {
 		this.body = body;
+	}
+	
+	
+
+	/**
+	 * @return the isSelected
+	 */
+	public boolean isSelected() {
+		return isSelected;
+	}
+
+	/**
+	 * @param isSelected the isSelected to set
+	 */
+	public void setSelected(boolean isSelected) 
+	{
+		this.isSelected = isSelected;
+		if(this.isSelected)
+			System.out.println("Unité : " + this.toString() + " est sélectionné");
 	}
 
 	@Override

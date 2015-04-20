@@ -1,7 +1,5 @@
 package ravage;
 
-
-
 import java.util.ArrayList;
 import java.util.List;
 
@@ -22,6 +20,7 @@ import org.jsfml.graphics.Sprite;
 import org.jsfml.graphics.TextureCreationException;
 import org.jsfml.system.Clock;
 import org.jsfml.system.Time;
+import org.jsfml.system.Vector2f;
 import org.jsfml.window.Keyboard;
 import org.jsfml.window.VideoMode;
 import org.jsfml.window.event.Event;
@@ -56,7 +55,7 @@ public class FrameWork
 	// Level
 	private Level currentLevel;
 	// RenderWindown
-	private RenderWindow window;
+	private static RenderWindow window;
 	// RenderTarget
 	private RenderTexture renderTexture;
 	private Sprite	renderSprite;
@@ -114,7 +113,7 @@ public class FrameWork
 			unity.setPosition(20 + i,12);
 			entityManager.getVectorUnity().add(unity);
 			
-			unity.setTargetPosition(297,200);
+			//unity.setTargetPosition(297,200);
 		}
 		
 	}
@@ -139,6 +138,13 @@ public class FrameWork
 						this.destroyFrameWork();
 					}
 					
+				}
+				
+				if(event.type == Event.Type.MOUSE_BUTTON_PRESSED)
+				{
+					
+					Vector2f posMouseWorld = window.mapPixelToCoords(event.asMouseButtonEvent().position);
+					entityManager.onMouse(event.asMouseButtonEvent());
 				}
 			}
 			
@@ -188,4 +194,20 @@ public class FrameWork
 		// fermeture de la fenetre
 		window.close();
 	}
+
+	/**
+	 * @return the window
+	 */
+	public static RenderWindow getWindow() {
+		return window;
+	}
+
+	/**
+	 * @param window the window to set
+	 */
+	public static void setWindow(RenderWindow window) {
+		FrameWork.window = window;
+	}
+	
+	
 }
