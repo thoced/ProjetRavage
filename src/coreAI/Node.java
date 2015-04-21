@@ -23,6 +23,15 @@ public class Node
 		this.isDiagonal = isdiagonal;
 		this.parent = this;
 	}
+	
+	public void reset(boolean diagonal)
+	{
+		this.g=0;
+		this.h=0;
+		this.f=0;
+		this.isDiagonal = diagonal;
+		this.parent = this;
+	}
 
 	public Vec2 getPositionVec2()
 	{

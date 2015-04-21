@@ -6,5 +6,6 @@
 	<classpathentry kind="lib" path="/home/thonon/workspacegame/ProjetRavage/lib/jdom-2.0.5.jar"/>
 	<classpathentry kind="lib" path="/home/thonon/workspacegame/ProjetRavage/lib/jbox2d-library.jar"/>
 	<classpathentry kind="lib" path="/home/thonon/workspacegame/ProjetRavage/lib/javax.json-1.0.2.jar"/>
+	<classpathentry kind="lib" path="/home/thonon/workspacegame/ProjetRavage/lib/slick.jar"/>
 	<classpathentry kind="output" path="bin"/>
 </classpath>

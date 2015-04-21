@@ -133,6 +133,8 @@ public class LevelManager implements IBaseRavage
 			
 				}
 				
+				level.setNodes(n);
+				
 			}
 					
 		} catch (FileNotFoundException | LoaderTiledException e) {

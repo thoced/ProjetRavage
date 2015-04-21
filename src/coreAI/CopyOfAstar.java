@@ -9,7 +9,7 @@ import org.jsfml.system.Time;
 
 import ravage.IBaseRavage;
 
-public class Astar implements IBaseRavage 
+public class CopyOfAstar implements IBaseRavage 
 {
 	private List<Node> listOpen;
 	
@@ -48,9 +48,7 @@ public class Astar implements IBaseRavage
 		Node end = map[(375 * ytarget) + xtarget];
 		end.reset(false);
 		// on ajoute le point de départ dans la liste ouverte
-		//Node start = new Node(xstart,ystart,false);
-		Node start = map[(375 * ystart) + xstart];
-		start.reset(false);
+		Node start = new Node(xstart,ystart,false);
 		listOpen.add(start);
 		
 		while(listOpen.size() > 0)
@@ -66,7 +64,7 @@ public class Astar implements IBaseRavage
 			this.listOpen.remove(currentNode);
 			
 			// on récupère les nodes adjacents
-			List<Node> Neightboring = this.getNodeNeighboring(currentNode.getX(),currentNode.getY());
+			List<Node> Neightboring = this.getNodeNeighboring(currentNode);
 			
 			// pour chaque noeud adjacents
 			for(Node node : Neightboring)
@@ -90,9 +88,10 @@ public class Astar implements IBaseRavage
 				int newF = newH + newG;
 				
 				// si le node est  dans la liste ouverte
-				if(this.isInOpenList(node))
+				Node backNode = this.isInOpenList(node);
+				if(backNode != null)
 				{
-					if(newG < node.getG()) // si le nouveau G est plus petit que l'ancien
+					if(newG < backNode.getG()) // si le nouveau G est plus petit que l'ancien
 					{
 						node.setParent(currentNode);
 						
@@ -109,7 +108,7 @@ public class Astar implements IBaseRavage
 						node.setG(newG);
 						node.setH(newH);
 						node.setF(newF);
-						this.listOpen.remove(node);
+						this.listOpen.remove(backNode);
 						this.listOpen.add(node);
 						
 					}
@@ -166,72 +165,48 @@ public class Astar implements IBaseRavage
 		
 	}
 	
-	public List<Node> getNodeNeighboring(int x,int y)
+	public List<Node> getNodeNeighboring(Node c)
 	{
 			List<Node> ret = new ArrayList<Node>(8);
 			
-			if(this.isFree(x + 1, y))   // EST
+			if(this.isFree(c.getX() + 1, c.getY()))   // EST
 			{
-				Node n = this.tempmap[(375 * y) + x + 1];
-				//n.reset(false);
-				n.setDiagonal(false);
-				ret.add(n);
+				ret.add(new Node(c.getX() + 1,c.getY(),false));
 			}
 			
-			if(this.isFree(x, y + 1))   // SUD
+			if(this.isFree(c.getX(), c.getY() + 1))   // SUD
 			{
-				Node n = this.tempmap[(375 * (y + 1)) + x];
-				//n.reset(false);
-				n.setDiagonal(false);
-				ret.add(n);
+				ret.add(new Node(c.getX(),c.getY() + 1,false));
 			}
 			
-			if(this.isFree(x - 1, y))   // OUEST
+			if(this.isFree(c.getX() - 1, c.getY()))   // OUEST
 			{
-				Node n = this.tempmap[(375 * y) + x - 1];
-				//n.reset(false);
-				n.setDiagonal(false);
-				ret.add(n);
+				ret.add(new Node(c.getX() - 1,c.getY(),false));
 			}
 			
-			if(this.isFree(x, y - 1))   // NORD
+			if(this.isFree(c.getX(), c.getY() - 1))   // NORD
 			{
-				Node n = this.tempmap[(375 * (y - 1)) + x ];
-				//n.reset(false);
-				n.setDiagonal(false);
-				ret.add(n);
+				ret.add(new Node(c.getX(),c.getY() - 1,false));
 			}
 			
-			if(this.isFree(x + 1, y + 1 ))   // SUD / EST
+			if(this.isFree(c.getX() + 1, c.getY() + 1 ))   // SUD / EST
 			{
-				Node n = this.tempmap[(375 * (y + 1)) + x + 1];
-				//n.reset(true);
-				n.setDiagonal(true);
-				ret.add(n);
+				ret.add(new Node(c.getX() + 1,c.getY() + 1,true));
 			}
 			
-			if(this.isFree(x - 1, y + 1))   // SUD / OUEST
+			if(this.isFree(c.getX() - 1, c.getY() + 1))   // SUD / OUEST
 			{
-				Node n = this.tempmap[(375 * (y + 1)) + x - 1];
-				//n.reset(true);
-				n.setDiagonal(true);
-				ret.add(n);
+				ret.add(new Node(c.getX() - 1,c.getY() + 1,true));
 			}
 			
-			if(this.isFree(x - 1, y - 1))   // NORD / OUEST
+			if(this.isFree(c.getX() - 1, c.getY() - 1))   // NORD / OUEST
 			{
-				Node n = this.tempmap[(375 * (y - 1)) + x - 1];
-				//n.reset(true);
-				n.setDiagonal(true);
-				ret.add(n);
+				ret.add(new Node(c.getX() - 1,c.getY() - 1,true));
 			}
 			
-			if(this.isFree(x + 1, y - 1))   // NORD / EST
+			if(this.isFree(c.getX() + 1, c.getY() - 1))   // NORD / EST
 			{
-				Node n = this.tempmap[(375 * (y - 1)) + x + 1];
-				//n.reset(true);
-				n.setDiagonal(true);
-				ret.add(n);
+				ret.add(new Node(c.getX() + 1,c.getY() - 1,true));
 			}
 			
 			
@@ -267,27 +242,22 @@ public class Astar implements IBaseRavage
 	{
 		for(Node c : this.listClosed)
 		{
-			//if(c.getX() == n.getX() && c.getY() == n.getY())
-				//return true;
-			if(n == c)
+			if(c.getX() == n.getX() && c.getY() == n.getY())
 				return true;
 		}
 		
 		return false;
 	}
 	
-	public boolean isInOpenList(Node n)
+	public Node isInOpenList(Node n)
 	{
 		for(Node c : this.listOpen)
 		{
-			//if(c.getX() == n.getX() && c.getY() == n.getY())
-			//	return true;
-			
-			if(c == n)
-				return true;
+			if(c.getX() == n.getX() && c.getY() == n.getY())
+				return c;
 		}
 		
-		return false;
+		return null;
 	}
 	
 	@Override

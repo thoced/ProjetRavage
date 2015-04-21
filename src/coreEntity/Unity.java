@@ -98,7 +98,15 @@ public class Unity implements IBaseRavage,ICallBackAStar
 		{
 			// si le target position est sur un node noir, on ne fait aucune recherche
 			if(LevelManager.getLevel().getNodes()[(ty * 375) + tx].getType() == 0)
+			{
+				// on remet à zero l'elapsed timer pour la téléportation
+				elapseSearchClock = Time.ZERO;
+				// on remet à zero le pathfinal
+				if(this.pathFinal != null)
+					this.pathFinal.clear();
+				// Lancement recherche
 				AstarManager.askPath(this, px, py, tx, ty);
+			}
 			
 		} catch (InterruptedException e) {
 			// TODO Auto-generated catch block

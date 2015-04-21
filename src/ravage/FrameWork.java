@@ -1,6 +1,11 @@
 package ravage;
 
 import java.util.ArrayList;
+
+import org.newdawn.slick.geom.Path;
+import org.newdawn.slick.util.pathfinding.TileBasedMap;
+import org.newdawn.slick.util.pathfinding.navmesh.*;
+
 import java.util.List;
 
 import org.jbox2d.collision.AABB;
@@ -115,6 +120,34 @@ public class FrameWork
 			
 			//unity.setTargetPosition(297,200);
 		}
+		
+		// test de navmesh
+		NavMesh navmesh = new NavMesh();
+		
+		Space space = new Space(0,0,64,64);
+		Space space2 = new Space(64,64,64,64);
+		space2.link(space);
+	
+		
+		navmesh.addSpace(space);
+		navmesh.addSpace(space2);
+		
+		
+		NavPath paths = navmesh.findPath(1f	, 1f, 100, 110, true);
+		
+		if(paths != null)
+		{
+			System.out.println(paths.length());
+			
+			for(int i=0;i<paths.length();i++)
+			{
+				float x = paths.getX(i);
+				float y = paths.getY(i);
+				System.out.println("X: " + x + " Y: " + y);
+			}
+		}
+		
+		
 		
 	}
 
