@@ -7,13 +7,24 @@ import java.util.concurrent.locks.Lock;
 import java.util.concurrent.locks.ReentrantLock;
 
 import org.jsfml.system.Time;
+import org.newdawn.slick.util.pathfinding.AStarPathFinder;
+import org.newdawn.slick.util.pathfinding.Path;
+import org.newdawn.slick.util.pathfinding.navmesh.NavMesh;
+import org.newdawn.slick.util.pathfinding.navmesh.NavMeshBuilder;
+import org.newdawn.slick.util.pathfinding.navmesh.NavPath;
 
+import coreAINavMesh.Agent;
+import coreAINavMesh.TileMap;
 import coreLevel.LevelManager;
 import ravage.IBaseRavage;
 
 public class AstarManager extends Thread implements IBaseRavage 
 {
 	private static Astar star;
+	
+	private static AStarPathFinder navmesh;
+	
+	private static Agent agent;
 	
 	private final int MAX_AVAILABLE = 1;
 
@@ -27,6 +38,13 @@ public class AstarManager extends Thread implements IBaseRavage
 	public void init() 
 	{
 		
+		agent = new Agent();
+		
+		TileMap tilemap = new TileMap(LevelManager.getLevel().getNodes());
+		// instance du navmesh
+		//NavMeshBuilder build = new NavMeshBuilder();
+		//navmesh = build.build(tilemap);
+		navmesh = new AStarPathFinder(tilemap, 1024, true);
 		// instance du star
 		star = new Astar();
 		// instance de la liste des demandes
@@ -77,10 +95,14 @@ public class AstarManager extends Thread implements IBaseRavage
 						lock.unlock();
 						
 						// on lance une recherche de chemin
-						List<Node> finalPath = star.search(LevelManager.getLevel().getNodes(), 375, 250, ask.getX(), ask.getY(), ask.getTx(), ask.getTy());
-						
+						//List<Node> finalPath = star.search(LevelManager.getLevel().getNodes(), 375, 250, ask.getX(), ask.getY(), ask.getTx(), ask.getTy());
+						// on lance la recherche de chemin navmesh
+						System.out.println(ask.getX() + " " + ask.getY() + " " + ask.getTx() + " " + ask.getTy());
+						Path paths = this.navmesh.findPath(null,ask.getX(), ask.getY(), ask.getTx(), ask.getTy());
 						// on appel le caller
-						ask.getCaller().onCallSearchPath(finalPath);
+						//ask.getCaller().onCallSearchPath(finalPath); // version classic
+						ask.getCaller().onCallsearchPath(paths);
+						
 						
 					}
 					
@@ -96,6 +118,22 @@ public class AstarManager extends Thread implements IBaseRavage
 	}
 	
 	public static void askPath(ICallBackAStar caller,int posx,int posy,int targetx,int targety) throws InterruptedException
+	{
+		// on créé une demande
+		AskPath ask = new AskPath(caller,posx,posy,targetx,targety);
+		
+		
+		// on place la demande dans la liste
+		lock.lock();
+			listAsk.add(ask);
+		lock.unlock();
+		
+		semaphore.release();
+		
+		
+	}
+	
+	public static void askPath(ICallBackAStar caller,float posx,float posy,float targetx,float targety) throws InterruptedException
 	{
 		// on créé une demande
 		AskPath ask = new AskPath(caller,posx,posy,targetx,targety);

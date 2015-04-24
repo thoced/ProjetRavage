@@ -9,10 +9,13 @@ import org.jsfml.system.Vector2f;
 import org.jsfml.window.Keyboard;
 import org.jsfml.window.Keyboard.Key;
 import org.jsfml.window.Mouse;
+import org.jsfml.window.event.KeyEvent;
+import org.jsfml.window.event.MouseButtonEvent;
 
 import ravage.IBaseRavage;
+import ravage.IEvent;
 
-public class CameraManager implements IBaseRavage 
+public class CameraManager implements IBaseRavage, IEvent
 {
 
 	// View
@@ -97,6 +100,25 @@ public class CameraManager implements IBaseRavage
 		Vector2f source = Vector2f.sub(centre, Vector2f.div(size,2));
 		return  new FloatRect(source,size);
 
+	}
+
+	@Override
+	public void onMouse(MouseButtonEvent buttonEvent) {
+		// TODO Auto-generated method stub
+		
+	}
+
+	@Override
+	public void onKeyboard(KeyEvent keyboardEvent) 
+	{
+		// TODO Auto-generated method stub
+		if(keyboardEvent.key == Keyboard.Key.C )
+		{
+			this.center = new Vector2f(640,640);
+			// compute du View
+			this.view.setCenter(this.center);
+		}
+		
 	}
 	
 	

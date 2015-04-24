@@ -87,12 +87,12 @@ public class FrameWork
 		entityManager.init();
 		drawaUnityManager = new DrawableUnityManager();
 		drawaUnityManager.init();
-		astarManager = new AstarManager();
-		astarManager.init();
 		
 		// Chargement du niveau
 		currentLevel  = levelManager.loadLevel("testlevel01.json");
-		
+		// creatin du astarmanager
+		astarManager = new AstarManager();
+		astarManager.init();
 		
 		// création d'une première render texture
 		renderTexture = new RenderTexture();
@@ -118,24 +118,15 @@ public class FrameWork
 			unity.setPosition(20 + i,12);
 			entityManager.getVectorUnity().add(unity);
 			
-			//unity.setTargetPosition(297,200);
+		//	unity.setTargetPosition(363,217);
 		}
 		
-		// test de navmesh
-		NavMesh navmesh = new NavMesh();
-		
-		Space space = new Space(0,0,64,64);
-		Space space2 = new Space(64,64,64,64);
-		space2.link(space);
-	
-		
-		navmesh.addSpace(space);
-		navmesh.addSpace(space2);
 		
 		
-		NavPath paths = navmesh.findPath(1f	, 1f, 100, 110, true);
 		
-		if(paths != null)
+	//	NavPath paths = navmesh.findPath(1f	, 1f, 100, 110, true);
+		
+	/*	if(paths != null)
 		{
 			System.out.println(paths.length());
 			
@@ -145,7 +136,7 @@ public class FrameWork
 				float y = paths.getY(i);
 				System.out.println("X: " + x + " Y: " + y);
 			}
-		}
+		}*/
 		
 		
 		
@@ -169,6 +160,11 @@ public class FrameWork
 					if(event.asKeyEvent().key == Keyboard.Key.ESCAPE)
 					{
 						this.destroyFrameWork();
+					}
+					
+					if(event.asKeyEvent().key == Keyboard.Key.C)
+					{
+						cameraManager.onKeyboard(event.asKeyEvent());
 					}
 					
 				}

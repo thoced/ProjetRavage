@@ -12,6 +12,7 @@ import org.jsfml.system.Vector2i;
 import org.jsfml.window.Keyboard;
 import org.jsfml.window.Mouse;
 import org.jsfml.window.Keyboard.Key;
+import org.jsfml.window.event.KeyEvent;
 import org.jsfml.window.event.MouseButtonEvent;
 
 import coreEntity.Unity;
@@ -104,8 +105,6 @@ public class EntityManager implements IBaseRavage,IEvent
 		}
 		else if(mouseEvent.button == Mouse.Button.RIGHT)
 		{
-			
-			
 			if(unitySelected != null)
 			{
 				// on précise la node target
@@ -118,7 +117,7 @@ public class EntityManager implements IBaseRavage,IEvent
 	}
 
 	@Override
-	public void onKeyboard(Keyboard keyboardEvent) {
+	public void onKeyboard(KeyEvent keyboardEvent) {
 		// TODO Auto-generated method stub
 		
 	}

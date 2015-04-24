@@ -14,6 +14,8 @@ import org.jbox2d.dynamics.Fixture;
 import org.jbox2d.dynamics.FixtureDef;
 import org.jsfml.system.Clock;
 import org.jsfml.system.Time;
+import org.newdawn.slick.util.pathfinding.Path;
+import org.newdawn.slick.util.pathfinding.navmesh.NavPath;
 
 import coreAI.Astar;
 import coreAI.AstarManager;
@@ -38,7 +40,13 @@ public class Unity implements IBaseRavage,ICallBackAStar
 	
 	private Vec2 targetPosition;
 	
+	// pathfinal pour le systeme classique
 	private List<Node> pathFinal;
+	// pathfinal pour le systeme navmesh
+	private NavPath pathFinalNavMesh;
+	private Path pathFinalPath;
+	private int     indNavMesh = 0;
+	private int     cptNavMesh = 0;
 	
 	private Clock resetSearchClock;
 	private Time  elapseSearchClock = Time.ZERO;
@@ -91,8 +99,14 @@ public class Unity implements IBaseRavage,ICallBackAStar
 		this.tx = tx;
 		this.ty = ty;
 		// on fait une demande au manager
-		int px =  (int) ((int)this.getBody().getPosition().x - 0.5f);
-		int py =  (int) ((int)this.getBody().getPosition().y - 0.5f);
+		int px =  (int) ((int)this.getBody().getPosition().x );
+		int py =  (int) ((int)this.getBody().getPosition().y );
+		
+		float fx = this.getBody().getPosition().x - 0.5f;
+		float fy = this.getBody().getPosition().y - 0.5f;
+		
+		float ftx = (float)tx;
+		float fty = (float)ty;
 		
 		try 
 		{
@@ -105,7 +119,8 @@ public class Unity implements IBaseRavage,ICallBackAStar
 				if(this.pathFinal != null)
 					this.pathFinal.clear();
 				// Lancement recherche
-				AstarManager.askPath(this, px, py, tx, ty);
+				AstarManager.askPath(this, px, py, tx, ty); // classic
+				//AstarManager.askPath(this, fx, fy, ftx, fty);
 			}
 			
 		} catch (InterruptedException e) {
@@ -139,7 +154,7 @@ public class Unity implements IBaseRavage,ICallBackAStar
 		// ------------------------------------
 		// Code pour téléporter une unité bloqué
 		// ------------------------------------
-		if(next != null)
+		/*if(next != null)
 		{
 			elapseSearchClock = Time.add(elapseSearchClock, deltaTime);
 			if(elapseSearchClock.asSeconds() > 2f) // si bloqué plus de 2 secondes
@@ -157,18 +172,23 @@ public class Unity implements IBaseRavage,ICallBackAStar
 				
 
 			}
-		}
+		}*/
 		
 		// -------------------------------------
 		// Code pour prendre le node suivant
 		// -------------------------------------
 		
-		if(next == null && this.pathFinal != null && this.pathFinal.size() > 0)
+		if(next == null /*&& this.pathFinal != null && this.pathFinal.size() > 0 */ && this.pathFinalPath != null && 
+				this.pathFinalPath.getLength() > this.indNavMesh)
 		{
 			// on récupère le node prochain
-			next = this.pathFinal.get(0);
+			//next = this.pathFinal.get(0); // version classic
+			int nx = this.pathFinalPath.getX(indNavMesh);
+			int ny = this.pathFinalPath.getY(indNavMesh);
+			next = new Node((int) nx,(int) ny,false);
+			indNavMesh ++;
 			// on supprme le noduer premier
-			this.pathFinal.remove(0);
+			//this.pathFinal.remove(0); // version classic
 			// on lance le clock du resetSearchClock
 			elapseSearchClock = resetSearchClock.restart();
 			
@@ -313,6 +333,33 @@ public class Unity implements IBaseRavage,ICallBackAStar
 		
 		System.out.println(this.toString() +  " : " + finalPath.size());
 		
+	}
+
+	@Override
+	public void onCallSearchPath(NavPath finalPath) 
+	{
+		
+		if(finalPath != null)
+		{
+			this.pathFinalNavMesh = finalPath;
+			this.cptNavMesh = this.pathFinalNavMesh.length();
+			this.indNavMesh = 0;
+		}
+		
+		
+	}
+
+	@Override
+	public void onCallsearchPath(Path finalPath) 
+	{
+	
+		
+		if(finalPath != null)
+		{
+			this.pathFinalPath = finalPath;
+			this.cptNavMesh = this.pathFinalPath.getLength();
+			this.indNavMesh = 0;
+		}
 	}
 	
 	
