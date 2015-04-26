@@ -154,25 +154,26 @@ public class Unity implements IBaseRavage,ICallBackAStar
 		// ------------------------------------
 		// Code pour téléporter une unité bloqué
 		// ------------------------------------
-		/*if(next != null)
+		if(next != null)
 		{
 			elapseSearchClock = Time.add(elapseSearchClock, deltaTime);
-			if(elapseSearchClock.asSeconds() > 2f) // si bloqué plus de 2 secondes
+			if(elapseSearchClock.asSeconds() > 4f) // si bloqué plus de 2 secondes
 			{
 				elapseSearchClock = Time.ZERO;
 				// on saute une node de recherche
-				if(this.pathFinal.size() > 0)
+				if(this.pathFinalPath.getLength() > 0 && indNavMesh < this.pathFinalPath.getLength())
 				{
-					Node node = this.pathFinal.get(0);
-					this.pathFinal.remove(0);
+					int x = this.pathFinalPath.getX(indNavMesh);
+					int y = this.pathFinalPath.getY(indNavMesh);
+					//this.pathFinal.remove(0);
 					// on téléporte l'unité
-					this.body.setTransform(node.getPositionVec2(), 0f);
+					this.body.setTransform(new Vec2(x,y), 0f);
 					next = null;
 				}
 				
 
 			}
-		}*/
+		}
 		
 		// -------------------------------------
 		// Code pour prendre le node suivant
@@ -206,7 +207,7 @@ public class Unity implements IBaseRavage,ICallBackAStar
 			Vec2 n = next.getPositionVec2();
 			
 			Vec2 diff = n.sub(this.body.getPosition());
-			if(diff.length() < 0.4f)
+			if(diff.length() < 0.6f)
 				next = null;
 			else
 			{
@@ -361,7 +362,6 @@ public class Unity implements IBaseRavage,ICallBackAStar
 			this.indNavMesh = 0;
 		}
 	}
-	
-	
+
 
 }

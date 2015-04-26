@@ -308,4 +308,6 @@ public class Astar implements IBaseRavage
 		
 	}
 
+	
+
 }

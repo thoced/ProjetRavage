@@ -8,4 +8,5 @@ public interface IBaseRavage
 	public void update(Time deltaTime);
 	public void destroy();
 	
+	
 }

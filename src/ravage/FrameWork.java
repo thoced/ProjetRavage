@@ -38,6 +38,7 @@ import coreCamera.CameraManager;
 import coreDrawable.DrawableUnityManager;
 import coreEntity.Unity;
 import coreEntityManager.EntityManager;
+import coreGUI.RectSelected;
 import coreLevel.Level;
 import coreLevel.LevelManager;
 import corePhysic.PhysicWorldManager;
@@ -52,6 +53,7 @@ public class FrameWork
 	private EntityManager entityManager;
 	private DrawableUnityManager drawaUnityManager;
 	private AstarManager astarManager;
+	private RectSelected rect;
 	// Clocks
 	private Clock frameClock;
 	// fps
@@ -87,6 +89,11 @@ public class FrameWork
 		entityManager.init();
 		drawaUnityManager = new DrawableUnityManager();
 		drawaUnityManager.init();
+		rect = new RectSelected();
+		rect.init();
+		
+		// attachement au call back
+		RectSelected.attachCallBack(entityManager);
 		
 		// Chargement du niveau
 		currentLevel  = levelManager.loadLevel("testlevel01.json");
@@ -111,7 +118,7 @@ public class FrameWork
 			}
 		}*/
 	
-		for(int i=0;i<20;i+=2)
+		for(int i=0;i<60;i+=2)
 		{
 			Unity unity = new Unity();
 			unity.init();
@@ -174,7 +181,21 @@ public class FrameWork
 					
 					Vector2f posMouseWorld = window.mapPixelToCoords(event.asMouseButtonEvent().position);
 					entityManager.onMouse(event.asMouseButtonEvent());
+					
+					rect.onMousePressed(event.asMouseButtonEvent());
 				}
+				
+				if(event.type == Event.Type.MOUSE_BUTTON_RELEASED)
+				{
+					rect.onMouseReleased(event.asMouseButtonEvent());
+				}
+				
+				if(event.type == Event.Type.MOUSE_MOVED)
+				{
+					rect.onMouseMove(event.asMouseEvent());
+				}
+				
+			
 			}
 			
 			// Créatin du deltaTime
@@ -196,6 +217,7 @@ public class FrameWork
 			cameraManager.update(deltaTime);
 			entityManager.update(deltaTime);
 			astarManager.update(deltaTime);
+			rect.update(deltaTime);
 			
 			// Draw des composants
 			renderTexture.clear();
@@ -204,6 +226,10 @@ public class FrameWork
 			currentLevel.draw(renderTexture, null);
 			// Draw des unity
 			drawaUnityManager.draw(renderTexture, null);
+			renderTexture.display();
+			
+			// draw du rect
+			rect.draw(renderTexture, null);
 			renderTexture.display();
 			// draw final
 			window.clear();

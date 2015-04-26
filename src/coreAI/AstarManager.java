@@ -148,6 +148,8 @@ public class AstarManager extends Thread implements IBaseRavage
 		
 		
 	}
+
+	
 	
 
 }

@@ -9,8 +9,10 @@ import org.jsfml.system.Vector2f;
 import org.jsfml.window.Keyboard;
 import org.jsfml.window.Keyboard.Key;
 import org.jsfml.window.Mouse;
+import org.jsfml.window.event.Event;
 import org.jsfml.window.event.KeyEvent;
 import org.jsfml.window.event.MouseButtonEvent;
+import org.jsfml.window.event.MouseEvent;
 
 import ravage.IBaseRavage;
 import ravage.IEvent;
@@ -102,11 +104,7 @@ public class CameraManager implements IBaseRavage, IEvent
 
 	}
 
-	@Override
-	public void onMouse(MouseButtonEvent buttonEvent) {
-		// TODO Auto-generated method stub
-		
-	}
+	
 
 	@Override
 	public void onKeyboard(KeyEvent keyboardEvent) 
@@ -120,6 +118,34 @@ public class CameraManager implements IBaseRavage, IEvent
 		}
 		
 	}
+
+	@Override
+	public void onMouseMove(MouseEvent event) {
+		// TODO Auto-generated method stub
+		
+	}
+
+	@Override
+	public void onMouse(MouseEvent buttonEvent) {
+		// TODO Auto-generated method stub
+		
+	}
+
+	@Override
+	public void onMousePressed(MouseButtonEvent event) {
+		// TODO Auto-generated method stub
+		
+	}
+
+	@Override
+	public void onMouseReleased(MouseButtonEvent event) {
+		// TODO Auto-generated method stub
+		
+	}
+
+
+	
+
 	
 	
 

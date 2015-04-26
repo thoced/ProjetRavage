@@ -5,6 +5,7 @@ import java.util.List;
 import java.util.Random;
 
 import org.jbox2d.common.Vec2;
+import org.jsfml.graphics.FloatRect;
 import org.jsfml.system.Clock;
 import org.jsfml.system.Time;
 import org.jsfml.system.Vector2f;
@@ -12,30 +13,35 @@ import org.jsfml.system.Vector2i;
 import org.jsfml.window.Keyboard;
 import org.jsfml.window.Mouse;
 import org.jsfml.window.Keyboard.Key;
+import org.jsfml.window.event.Event;
 import org.jsfml.window.event.KeyEvent;
 import org.jsfml.window.event.MouseButtonEvent;
+import org.jsfml.window.event.MouseEvent;
 
 import coreEntity.Unity;
+import coreGUI.IRegionSelectedCallBack;
 import corePhysic.PhysicWorldManager;
 import ravage.FrameWork;
 import ravage.IBaseRavage;
 import ravage.IEvent;
 
-public class EntityManager implements IBaseRavage,IEvent 
+public class EntityManager implements IBaseRavage,IEvent,IRegionSelectedCallBack 
 {
 	
 	private static List<Unity> vectorUnity;
 	// test clock
 	private Clock clock;
 	private Time delta;
-	// unity selected
-	private Unity unitySelected = null;
+	// listdes unités selectionés
+	private List<Unity> listUnitySelected;
 
 	@Override
 	public void init()
 	{
 		// TODO Auto-generated method stub
 		vectorUnity = new ArrayList<Unity>();
+		// liste des unités selectionnés
+		listUnitySelected = new ArrayList<Unity>();
 		
 		clock = new Clock();
 		delta = Time.ZERO;
@@ -73,7 +79,7 @@ public class EntityManager implements IBaseRavage,IEvent
 	}
 
 	@Override
-	public void onMouse(MouseButtonEvent mouseEvent) 
+	public void onMouse(MouseEvent mouseEvent) 
 	{
 		
 		Vector2f posMouseWorld = FrameWork.getWindow().mapPixelToCoords(mouseEvent.position);
@@ -81,12 +87,11 @@ public class EntityManager implements IBaseRavage,IEvent
 		
 		// si c'est un click gauche
 		
-		if(mouseEvent.button == Mouse.Button.LEFT)
+		if(mouseEvent.asMouseButtonEvent().button == Mouse.Button.LEFT)
 		{
-		
-			// si une unité est déja selectionné, on déselectionne avant l'unité
-			if(unitySelected != null)
-				unitySelected.setSelected(false);
+					
+			// on vide la liste des objets selectionné
+			this.listUnitySelected.clear();
 			
 			Vec2 mousePos = new Vec2(posMouseWorld.x / pixels,posMouseWorld.y / pixels ); 
 			for(Unity unity : vectorUnity)
@@ -95,7 +100,7 @@ public class EntityManager implements IBaseRavage,IEvent
 				if(unity.getBody().getPosition().sub(mousePos).length() < .5f)
 				{
 					unity.setSelected(true);
-					unitySelected = unity;
+					this.listUnitySelected.add(unity);
 					break;
 				}
 				
@@ -103,13 +108,15 @@ public class EntityManager implements IBaseRavage,IEvent
 			
 			
 		}
-		else if(mouseEvent.button == Mouse.Button.RIGHT)
+		else if(mouseEvent.asMouseButtonEvent().button == Mouse.Button.RIGHT)
 		{
-			if(unitySelected != null)
+			
+			Vector2f pos = Vector2f.div(posMouseWorld, pixels);
+			
+			for(Unity u : this.listUnitySelected)
 			{
 				// on précise la node target
-				Vector2f pos = Vector2f.div(posMouseWorld, pixels);
-				unitySelected.setTargetPosition((int)pos.x+1,(int)pos.y+1);
+				u.setTargetPosition((int)pos.x+1,(int)pos.y+1);
 			}
 		}
 		
@@ -121,6 +128,42 @@ public class EntityManager implements IBaseRavage,IEvent
 		// TODO Auto-generated method stub
 		
 	}
+
+	@Override
+	public void onMouseMove(MouseEvent event) {
+		// TODO Auto-generated method stub
+		
+	}
+	
+	@Override
+	public void onMousePressed(MouseButtonEvent event) {
+		// TODO Auto-generated method stub
+		
+	}
+
+	@Override
+	public void onMouseReleased(MouseButtonEvent event) {
+		// TODO Auto-generated method stub
+		
+	}
+
+	@Override
+	public void onRegionSelected(FloatRect region) 
+	{
+		
+		// on vient de receptionné la region selectionné
+		for(Unity unity : vectorUnity)
+		{
+			if(region.contains(new Vector2f(unity.getBody().getPosition().x * PhysicWorldManager.getRatioPixelMeter(),
+					unity.getBody().getPosition().y * PhysicWorldManager.getRatioPixelMeter())))
+					{
+						unity.setSelected(true);
+						this.listUnitySelected.add(unity);
+					}
+		}
+		
+	}
+
 
 	
 
