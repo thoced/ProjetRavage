@@ -120,7 +120,7 @@ public class Level implements IBaseRavage, Drawable
 	
 	
 	
-	public void InsertObstacle(List<TiledObjectPolylinePoint> listePoint,int x,int y,String typeobstacle)
+	public void InsertObstacle(List<TiledObjectPolylinePoint> listePoint,int x,int y,String typeobstacle) throws java.lang.RuntimeException
 	{
 		// ajout d'un obstacle de type polyline
 		
@@ -155,21 +155,28 @@ public class Level implements IBaseRavage, Drawable
 			
 		}
 		// on ajoute le tout dans le chainshape
-		cs.createChain(vectors, vectors.length);
-		
-		// création du body
-		Body bodyObstacle = PhysicWorldManager.getWorld().createBody(bdef);
-		bodyObstacle.setUserData(typeobstacle);
-		
-		// creation dufixture
-		FixtureDef fixture = new FixtureDef();
-		fixture.shape = cs;
-		fixture.friction = 0.6f;
-		fixture.density = 1f;
-		fixture.restitution = 0.0f;
-
-		// ajout dans le body
-		bodyObstacle.createFixture(fixture);
+		try
+		{
+			cs.createChain(vectors, vectors.length);
+			
+			// création du body
+			Body bodyObstacle = PhysicWorldManager.getWorld().createBody(bdef);
+			bodyObstacle.setUserData(typeobstacle);
+			
+			// creation dufixture
+			FixtureDef fixture = new FixtureDef();
+			fixture.shape = cs;
+			fixture.friction = 0.6f;
+			fixture.density = 1f;
+			fixture.restitution = 0.0f;
+	
+			// ajout dans le body
+			bodyObstacle.createFixture(fixture);
+		}
+		catch(java.lang.RuntimeException e)
+		{
+			
+		}
 		
 		
 	}

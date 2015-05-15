@@ -70,7 +70,7 @@ public class FrameWork
 	public void init() throws TextureCreationException, InterruptedException 
 	{
 		// creation de l'environnemnet graphique jsfml
-		window = new RenderWindow(new VideoMode(1366,768),"ProjetRavage");
+		window = new RenderWindow(new VideoMode(1366,768),"ProjetRavage",RenderWindow.FULLSCREEN);
 		window.setFramerateLimit(60);
 		// Instance des variables
 		frameClock = new Clock();
