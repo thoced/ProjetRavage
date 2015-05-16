@@ -1,8 +1,10 @@
 package coreNet;
 
-public class NetHeader 
+import java.io.Serializable;
+
+public class NetHeader implements Serializable
 {
-	private enum TYPE {HELLO,ADD,MOVE};
+	public static enum TYPE {HELLO,ADD,MOVE};
 	// type de message
 	private TYPE typeMessage;
 	

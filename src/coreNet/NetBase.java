@@ -1,6 +1,8 @@
 package coreNet;
 
-public class NetBase 
+import java.io.Serializable;
+
+public class NetBase implements Serializable
 {
 	
 }

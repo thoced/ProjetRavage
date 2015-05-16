@@ -65,6 +65,25 @@ public class DrawableUnityManager implements IBaseRavage, Drawable
 			
 		}
 		
+		// pour chaque unity r�seau
+		for(Unity unity : EntityManager.getVectorUnityNet() )
+		{
+			// on récupère la position
+			Vector2f pos = new Vector2f(unity.getPosx(),unity.getPosy());
+			// on crée les 4 vertex
+			Vertex v1 = new Vertex(Vector2f.add(pos, new Vector2f(-16f,-16f)), this.getCoordText(1));
+			Vertex v2 = new Vertex(Vector2f.add(pos, new Vector2f(16f,-16f)), this.getCoordText(2));
+			Vertex v3 = new Vertex(Vector2f.add(pos,new Vector2f(16f,16f)), this.getCoordText(3));
+			Vertex v4 = new Vertex(Vector2f.add(pos, new Vector2f(-16f,16f)), this.getCoordText(4));
+			
+			// on ajoute dans le buffer
+			buffer.add(v1);
+			buffer.add(v2);
+			buffer.add(v3);
+			buffer.add(v4);
+			
+		}
+		
 		
 		// affichage
 		arg0.draw(buffer,state);

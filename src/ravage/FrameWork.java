@@ -39,8 +39,10 @@ import coreDrawable.DrawableUnityManager;
 import coreEntity.Unity;
 import coreEntityManager.EntityManager;
 import coreGUI.RectSelected;
+import coreGUISwing.menuDialogRavage;
 import coreLevel.Level;
 import coreLevel.LevelManager;
+import coreNet.NetManager;
 import corePhysic.PhysicWorldManager;
 
 public class FrameWork
@@ -54,6 +56,7 @@ public class FrameWork
 	private DrawableUnityManager drawaUnityManager;
 	private AstarManager astarManager;
 	private RectSelected rect;
+	private NetManager netManager;
 	// Clocks
 	private Clock frameClock;
 	// fps
@@ -67,15 +70,30 @@ public class FrameWork
 	private RenderTexture renderTexture;
 	private Sprite	renderSprite;
 	
+	private menuDialogRavage menu;
+	
 	public void init() throws TextureCreationException, InterruptedException 
 	{
+		
+		// Instance du réseau
+		netManager = new NetManager();
+		netManager.init();
+		
+		// Lancement du menu
+		menu = new menuDialogRavage(null, "Projet Ravage Menu", true,netManager);
+		menu.setVisible(true);
+		menu.dispose();
+
 		// creation de l'environnemnet graphique jsfml
-		window = new RenderWindow(new VideoMode(1366,768),"ProjetRavage",RenderWindow.FULLSCREEN);
+		window = new RenderWindow(new VideoMode(1024,768),"ProjetRavage");
 		window.setFramerateLimit(60);
 		// Instance des variables
 		frameClock = new Clock();
 		fpsTime = Time.ZERO;
 		
+	
+				
+	
 		// Instance des managers
 		physicWorld = new PhysicWorldManager();
 		physicWorld.init();
@@ -92,6 +110,7 @@ public class FrameWork
 		rect = new RectSelected();
 		rect.init();
 		
+		
 		// attachement au call back
 		RectSelected.attachCallBack(entityManager);
 		
@@ -106,6 +125,9 @@ public class FrameWork
 		renderTexture.create(window.getSize().x, window.getSize().y);
 		renderSprite = new Sprite(renderTexture.getTexture());
 		
+		
+		
+		
 		// on place une unity
 		/*for(int y=0;y < 32;y++)
 		{
@@ -118,7 +140,7 @@ public class FrameWork
 			}
 		}*/
 	
-		for(int i=0;i<60;i+=2)
+	/*	for(int i=0;i<60;i+=2)
 		{
 			Unity unity = new Unity();
 			unity.init();
@@ -127,7 +149,7 @@ public class FrameWork
 			
 		//	unity.setTargetPosition(363,217);
 		}
-		
+		*/
 		
 		
 		
@@ -169,10 +191,8 @@ public class FrameWork
 						this.destroyFrameWork();
 					}
 					
-					if(event.asKeyEvent().key == Keyboard.Key.C)
-					{
-						cameraManager.onKeyboard(event.asKeyEvent());
-					}
+					cameraManager.onKeyboard(event.asKeyEvent());
+					entityManager.onKeyboard(event.asKeyEvent());
 					
 				}
 				
@@ -218,6 +238,7 @@ public class FrameWork
 			entityManager.update(deltaTime);
 			astarManager.update(deltaTime);
 			rect.update(deltaTime);
+			netManager.update(deltaTime);
 			
 			// Draw des composants
 			renderTexture.clear();
@@ -236,6 +257,7 @@ public class FrameWork
 			window.draw(renderSprite);
 			window.display();
 			
+			
 		}
 		
 	
@@ -246,6 +268,9 @@ public class FrameWork
 		// destruction du thread
 		if(astarManager != null)
 			astarManager.interrupt();
+		// fermeture de la connection UDP et du theadd
+		if(netManager != null)
+			netManager.close();
 		// fermeture de la fenetre
 		window.close();
 	}

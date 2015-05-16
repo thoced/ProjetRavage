@@ -1,6 +1,8 @@
 package coreNet;
 
+import java.io.ByteArrayInputStream;
 import java.io.IOException;
+import java.io.ObjectInputStream;
 import java.net.DatagramPacket;
 import java.net.DatagramSocket;
 import java.net.SocketException;
@@ -30,23 +32,45 @@ public class NetReceiverThread extends Thread
 			buffer = new byte[SIZEBUFFER];
 			DatagramPacket datagram = new DatagramPacket(buffer,SIZEBUFFER);
 
-			while(true)
+			while(this.isAlive())
 			{
 				// reception bloquante d'un datagram udp
 				socketReceiver.receive(datagram);
 				// on vient de réceptionner un datagram
 				// on envoie le tout dans le NetManager
+				byte[] b = new byte[datagram.getLength()];
+				b = datagram.getData();
+				// transformation dans un bytearrayinputstream
+				ByteArrayInputStream bais = new ByteArrayInputStream(b);
+				ObjectInputStream ois = new ObjectInputStream(bais);
+				NetHeader header = (NetHeader) ois.readObject();
+				// push dans le netmanager
+				NetManager.pushNetMessage(header);
 				
 			}
-		} catch (SocketException e) {
+			
+		} 
+		catch (SocketException e) 
+		{
 			// TODO Auto-generated catch block
 			e.printStackTrace();
-		} catch (IOException e) {
+		} catch (IOException e) 
+		{
 			// TODO Auto-generated catch block
 			e.printStackTrace();
-		}
+		} catch (ClassNotFoundException e) 
+		{
+			// TODO Auto-generated catch block
+			e.printStackTrace();
+		} 
 		
 		
+	}
+	
+	public void closeConnection()
+	{
+		// fermeture
+		socketReceiver.close();
 	}
 
 }

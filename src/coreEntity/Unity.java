@@ -142,6 +142,16 @@ public class Unity implements IBaseRavage,ICallBackAStar
 		posy = body.getPosition().y * PhysicWorldManager.getRatioPixelMeter();
 		
 	}
+	
+	public float getPositionMeterX()
+	{
+		return body.getPosition().x;
+	}
+	
+	public float getPositionMeterY()
+	{
+		return body.getPosition().y;
+	}
 
 	@Override
 	public void update(Time deltaTime) 

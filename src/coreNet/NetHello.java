@@ -1,6 +1,8 @@
 package coreNet;
 
-public class NetHello extends NetBase 
+import java.io.Serializable;
+
+public class NetHello extends NetBase implements Serializable
 {
 	private String nickName;
 	

@@ -1,5 +1,6 @@
 package coreEntityManager;
 
+import java.io.IOException;
 import java.util.ArrayList;
 import java.util.List;
 import java.util.Random;
@@ -20,15 +21,24 @@ import org.jsfml.window.event.MouseEvent;
 
 import coreEntity.Unity;
 import coreGUI.IRegionSelectedCallBack;
+import coreNet.INetManagerCallBack;
+import coreNet.NetAddUnity;
+import coreNet.NetHeader;
+import coreNet.NetHeader.TYPE;
+import coreNet.NetHello;
+import coreNet.NetManager;
 import corePhysic.PhysicWorldManager;
 import ravage.FrameWork;
 import ravage.IBaseRavage;
 import ravage.IEvent;
 
-public class EntityManager implements IBaseRavage,IEvent,IRegionSelectedCallBack 
+public class EntityManager implements IBaseRavage,IEvent,IRegionSelectedCallBack,INetManagerCallBack
 {
 	
+	// vecteur des unity du player
 	private static List<Unity> vectorUnity;
+	// vecteur des unity du joueur adverse (réseau)
+	private static List<Unity> vectorUnityNet;
 	// test clock
 	private Clock clock;
 	private Time delta;
@@ -42,9 +52,14 @@ public class EntityManager implements IBaseRavage,IEvent,IRegionSelectedCallBack
 		vectorUnity = new ArrayList<Unity>();
 		// liste des unitÃ©s selectionnÃ©s
 		listUnitySelected = new ArrayList<Unity>();
+		// instance vectorunitynet
+		vectorUnityNet = new ArrayList<Unity>();
 		
 		clock = new Clock();
 		delta = Time.ZERO;
+		
+		// on s'accroche au NetManager
+		NetManager.attachCallBack(this);
 	}
 
 	@Override
@@ -52,6 +67,11 @@ public class EntityManager implements IBaseRavage,IEvent,IRegionSelectedCallBack
 	{
 		// on parse les unitÃ©
 		for(Unity unity : vectorUnity)
+		{
+			unity.update(deltaTime);
+		}
+		// on parse les unités adverses (réseau)
+		for(Unity unity :vectorUnityNet)
 		{
 			unity.update(deltaTime);
 		}
@@ -76,6 +96,16 @@ public class EntityManager implements IBaseRavage,IEvent,IRegionSelectedCallBack
 	 */
 	public static void setVectorUnity(List<Unity> vectorUnity) {
 		EntityManager.vectorUnity = vectorUnity;
+	}
+	
+	
+
+	public static List<Unity> getVectorUnityNet() {
+		return vectorUnityNet;
+	}
+
+	public static void setVectorUnityNet(List<Unity> vectorUnityNet) {
+		EntityManager.vectorUnityNet = vectorUnityNet;
 	}
 
 	@Override
@@ -124,8 +154,31 @@ public class EntityManager implements IBaseRavage,IEvent,IRegionSelectedCallBack
 	}
 
 	@Override
-	public void onKeyboard(KeyEvent keyboardEvent) {
-		// TODO Auto-generated method stub
+	public void onKeyboard(KeyEvent keyboardEvent) 
+	{
+		if(keyboardEvent.key == Keyboard.Key.A )
+		{
+			// on ajoute une unité
+			Unity unity = new Unity();
+			unity.init();
+			unity.setPosition(NetManager.getPosxStartFlag(),NetManager.getPosyStartFlag());
+			EntityManager.getVectorUnity().add(unity);
+			// on envoie sur le réseau
+			NetHeader header = new NetHeader();
+			header.setTypeMessage(TYPE.ADD);
+			NetAddUnity add = new NetAddUnity();
+			add.setPosx(unity.getPositionMeterX());
+			add.setPosy(unity.getPositionMeterY());
+			add.setTypeUnity(0);
+			header.setMessage(add);
+			try 
+			{
+				NetManager.SendMessage(header);
+			} catch (IOException e) {
+				// TODO Auto-generated catch block
+				e.printStackTrace();
+			}
+		}
 		
 	}
 
@@ -161,6 +214,26 @@ public class EntityManager implements IBaseRavage,IEvent,IRegionSelectedCallBack
 						this.listUnitySelected.add(unity);
 					}
 		}
+		
+	}
+
+	@Override
+	public void onHello(NetHello hello) 
+	{
+		// TODO Auto-generated method stub
+		
+	}
+
+	@Override
+	public void onAddUnity(NetAddUnity unity)
+	{
+		// création d'une unité venant du réseau
+		Unity u= new Unity();
+		u.init();
+		u.setPosition((int)unity.getPosx(), (int)unity.getPosy());;
+		// ajout dans le vecteur unity réseau
+		vectorUnityNet.add(u);
+		
 		
 	}
 
