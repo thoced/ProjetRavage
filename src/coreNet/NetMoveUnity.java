@@ -1,0 +1,56 @@
+package coreNet;
+
+public class NetMoveUnity extends NetBase 
+{
+	private int id;
+	
+	private float posx;
+	
+	private float posy;
+	
+	private float nextPosx;
+	
+	private float nextPosy;
+
+	public int getId() {
+		return id;
+	}
+
+	public void setId(int id) {
+		this.id = id;
+	}
+
+	public float getPosx() {
+		return posx;
+	}
+
+	public void setPosx(float posx) {
+		this.posx = posx;
+	}
+
+	public float getPosy() {
+		return posy;
+	}
+
+	public void setPosy(float posy) {
+		this.posy = posy;
+	}
+
+	public float getNextPosx() {
+		return nextPosx;
+	}
+
+	public void setNextPosx(float nextPosx) {
+		this.nextPosx = nextPosx;
+	}
+
+	public float getNextPosy() {
+		return nextPosy;
+	}
+
+	public void setNextPosy(float nextPosy) {
+		this.nextPosy = nextPosy;
+	}
+	
+	
+}

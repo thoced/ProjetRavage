@@ -6,6 +6,8 @@ public class NetAddUnity extends NetBase implements Serializable
 {
 	private int typeUnity;
 	
+	private int idUnity;
+	
 	private float posx;
 	
 	private float posy;
@@ -43,6 +45,15 @@ public class NetAddUnity extends NetBase implements Serializable
 	public void setRotation(float rotation) {
 		this.rotation = rotation;
 	}
+
+	public int getIdUnity() {
+		return idUnity;
+	}
+
+	public void setIdUnity(int idUnity) {
+		this.idUnity = idUnity;
+	}
+	
 	
 	
 }

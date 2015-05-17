@@ -222,14 +222,14 @@ public class FrameWork
 			Time deltaTime = frameClock.restart();
 			fpsTime = Time.add(fpsTime, deltaTime);
 			
-			if(fpsTime.asSeconds() > 1.0f)
+			/*if(fpsTime.asSeconds() > 1.0f)
 			{
 				System.out.println("fps : " + String.valueOf(fps));
 				fps=0;
 				fpsTime = Time.ZERO;
 			}
 			
-			fps++;
+			fps++;*/
 			
 			// Updates de composants
 			physicWorld.update(deltaTime);

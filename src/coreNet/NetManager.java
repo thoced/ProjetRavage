@@ -121,14 +121,11 @@ public class NetManager implements IBaseRavage
 			
 			if(header != null)	// appel au dispatcher
 				dispatcher(header);
-			
-			
+
 		}
 		
 		lock.unlock();
-		
-		
-		
+
 	}
 	
 	private void dispatcher(NetHeader header)
@@ -139,11 +136,13 @@ public class NetManager implements IBaseRavage
 						callBackHello(hello);
 						break;
 			
-			case ADD: NetAddUnity unity = (NetAddUnity)header.getMessage();
-					  callBackAdd(unity);
-					  break;
+			case ADD: 	NetAddUnity unity = (NetAddUnity)header.getMessage();
+					  	callBackAdd(unity);
+					  	break;
 			
-			case MOVE: break;
+			case MOVE: 	NetMoveUnity munity = (NetMoveUnity)header.getMessage();
+					   	callBackMove(munity);
+					   	break;
 			
 			default: break;
 		}
@@ -162,6 +161,14 @@ public class NetManager implements IBaseRavage
 		for(INetManagerCallBack i : listCallBack)
 		{
 			i.onAddUnity(unity);
+		}
+	}
+	
+	private void callBackMove(NetMoveUnity unity)
+	{
+		for(INetManagerCallBack i : listCallBack)
+		{
+			i.onMoveUnity(unity);
 		}
 	}
 	

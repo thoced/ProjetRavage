@@ -1,5 +1,6 @@
 package coreEntity;
 
+import java.io.IOException;
 import java.util.ArrayList;
 import java.util.List;
 import java.util.Random;
@@ -22,42 +23,48 @@ import coreAI.AstarManager;
 import coreAI.ICallBackAStar;
 import coreAI.Node;
 import coreLevel.LevelManager;
+import coreNet.NetHeader;
+import coreNet.NetHeader.TYPE;
+import coreNet.NetManager;
+import coreNet.NetMoveUnity;
 import corePhysic.PhysicWorldManager;
 import ravage.IBaseRavage;
 
 public class Unity implements IBaseRavage,ICallBackAStar
 {
 
-	private float posx,posy;
+	protected int id;
 	
-	private int tx,ty;
+	protected float posx,posy;
 	
-	private int   nodex,nodey;
+	protected int tx,ty;
 	
-	private float rotation;
+	protected int   nodex,nodey;
 	
-	private Body body;
+	protected float rotation;
 	
-	private Vec2 targetPosition;
+	protected Body body;
+	
+	protected Vec2 targetPosition;
 	
 	// pathfinal pour le systeme classique
-	private List<Node> pathFinal;
+	protected List<Node> pathFinal;
 	// pathfinal pour le systeme navmesh
-	private NavPath pathFinalNavMesh;
-	private Path pathFinalPath;
-	private int     indNavMesh = 0;
-	private int     cptNavMesh = 0;
+	protected NavPath pathFinalNavMesh;
+	protected Path pathFinalPath;
+	protected int     indNavMesh = 0;
+	protected int     cptNavMesh = 0;
 	
-	private Clock resetSearchClock;
-	private Time  elapseSearchClock = Time.ZERO;
+	protected Clock resetSearchClock;
+	protected Time  elapseSearchClock = Time.ZERO;
 
-	private float elapse = 0f;
-	private int ind = 0;
+	protected float elapse = 0f;
+	protected int ind = 0;
 	
-	private Node next = null;
+	protected Node next = null;
 	
 	// is selected
-	private boolean isSelected = false;
+	protected boolean isSelected = false;
 	
 	@Override
 	public void init() 
@@ -203,6 +210,26 @@ public class Unity implements IBaseRavage,ICallBackAStar
 			// on lance le clock du resetSearchClock
 			elapseSearchClock = resetSearchClock.restart();
 			
+			// code émission réseau
+			NetHeader header = new NetHeader();
+			header.setTypeMessage(TYPE.MOVE);
+			NetMoveUnity move = new NetMoveUnity();
+			move.setId(this.getId());
+			move.setPosx(this.getPositionMeterX());
+			move.setPosy(this.getPositionMeterY());
+			move.setNextPosx(next.getX());
+			move.setNextPosy(next.getY());
+			header.setMessage(move);
+			// émission
+			try
+			{
+				NetManager.SendMessage(header);
+				
+			} catch (IOException e) {
+				// TODO Auto-generated catch block
+				e.printStackTrace();
+			}
+			
 		}
 		else
 			this.body.setLinearVelocity(new Vec2(0f,0f)); // il est arrivÃ© Ã  destination
@@ -318,6 +345,22 @@ public class Unity implements IBaseRavage,ICallBackAStar
 	}
 	
 	
+
+	public Node getNext() {
+		return next;
+	}
+
+	public void setNext(Node next) {
+		this.next = next;
+	}
+
+	public int getId() {
+		return id;
+	}
+
+	public void setId(int id) {
+		this.id = id;
+	}
 
 	/**
 	 * @return the isSelected

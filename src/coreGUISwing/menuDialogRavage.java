@@ -24,6 +24,7 @@ import coreNet.NetHeader;
 import coreNet.NetHeader.TYPE;
 import coreNet.NetHello;
 import coreNet.NetManager;
+import coreNet.NetMoveUnity;
 
 import java.awt.Color;
 
@@ -59,6 +60,7 @@ public class menuDialogRavage extends JDialog implements ActionListener, INetMan
 	public menuDialogRavage(JFrame frame,String titre,boolean modal,NetManager netmanager)
 	{
 		super(frame,titre,modal);
+		setAlwaysOnTop(true);
 		setAutoRequestFocus(false);
 		
 		netManager = netmanager;
@@ -139,10 +141,7 @@ public class menuDialogRavage extends JDialog implements ActionListener, INetMan
 		builderString = new StringBuilder();
 		
 		 mt = new menuThread(netManager);
-		mt.start();
-		
-		
-		
+		 mt.start();
 
 	}
 	@Override
@@ -219,6 +218,11 @@ public class menuDialogRavage extends JDialog implements ActionListener, INetMan
 	}
 	@Override
 	public void onAddUnity(NetAddUnity unity) {
+		// TODO Auto-generated method stub
+		
+	}
+	@Override
+	public void onMoveUnity(NetMoveUnity unity) {
 		// TODO Auto-generated method stub
 		
 	}
