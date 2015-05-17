@@ -25,6 +25,7 @@ import coreNet.NetHeader.TYPE;
 import coreNet.NetHello;
 import coreNet.NetManager;
 import coreNet.NetMoveUnity;
+import coreNet.NetSynchronize;
 
 import java.awt.Color;
 
@@ -223,6 +224,11 @@ public class menuDialogRavage extends JDialog implements ActionListener, INetMan
 	}
 	@Override
 	public void onMoveUnity(NetMoveUnity unity) {
+		// TODO Auto-generated method stub
+		
+	}
+	@Override
+	public void onSynchronize(NetSynchronize sync) {
 		// TODO Auto-generated method stub
 		
 	}

@@ -4,7 +4,7 @@ import java.io.Serializable;
 
 public class NetHeader implements Serializable
 {
-	public static enum TYPE {HELLO,ADD,MOVE};
+	public static enum TYPE {HELLO,ADD,MOVE,SYNC};
 	// type de message
 	private TYPE typeMessage;
 	

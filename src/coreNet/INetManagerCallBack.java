@@ -7,5 +7,7 @@ public interface INetManagerCallBack
 	public void onAddUnity(NetAddUnity unity);
 	
 	public void onMoveUnity(NetMoveUnity unity);
+	
+	public void onSynchronize(NetSynchronize sync);
 		
 }

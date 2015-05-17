@@ -102,6 +102,10 @@ public class Unity implements IBaseRavage,ICallBackAStar
 	
 	public void setTargetPosition(int tx,int ty)
 	{
+		
+		// une demande de chemin va être effectuée, on stoppe l'unité pour éviter le phénomène de rebond
+		this.body.setLinearVelocity(new Vec2(0f,0f)); // il est arrivÃ© Ã  destination
+		
 		//this.targetPosition = new Vec2((float)tx + 0.5f,(float)ty + 0.5f);
 		this.tx = tx;
 		this.ty = ty;
@@ -142,7 +146,7 @@ public class Unity implements IBaseRavage,ICallBackAStar
 		
 	}
 	
-	public void setPosition(int x,int y)
+	public void setPosition(float x,float y)
 	{
 		body.setTransform(new Vec2((float)x + 0.5f,(float)y + 0.5f),0f);
 		posx = body.getPosition().x * PhysicWorldManager.getRatioPixelMeter();
@@ -258,6 +262,23 @@ public class Unity implements IBaseRavage,ICallBackAStar
 	public void destroy() {
 		// TODO Auto-generated method stub
 		
+	}
+	
+	public float getPosXMeter()
+	{
+		return this.body.getPosition().x;
+	}
+	
+	public float getPosYMeter()
+	{
+		return this.body.getPosition().y;
+	}
+	
+	public void setPosXYMeter(float x,float y)
+	{
+		this.body.setTransform(new Vec2(x,y), 0f);
+		posx = body.getPosition().x * PhysicWorldManager.getRatioPixelMeter();
+		posy = body.getPosition().y * PhysicWorldManager.getRatioPixelMeter();
 	}
 
 	/**

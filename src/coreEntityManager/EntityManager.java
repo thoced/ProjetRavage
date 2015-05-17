@@ -30,6 +30,7 @@ import coreNet.NetHeader.TYPE;
 import coreNet.NetHello;
 import coreNet.NetManager;
 import coreNet.NetMoveUnity;
+import coreNet.NetSynchronize;
 import corePhysic.PhysicWorldManager;
 import ravage.FrameWork;
 import ravage.IBaseRavage;
@@ -259,8 +260,9 @@ public class EntityManager implements IBaseRavage,IEvent,IRegionSelectedCallBack
 			if(u.getId() == unity.getId())
 			{
 				System.out.println("application du move : " + String.valueOf(unity.getId()));
+				// création d'un node NEXT
 				Node n = new Node((int)unity.getNextPosx(),(int)unity.getNextPosy(),true);
-				u.setPosition((int)unity.getPosx(), (int)unity.getPosy());
+				u.setPosXYMeter(unity.getPosx(),unity.getPosy());
 				u.setNext(n);
 				vectorUnityNet.set(i,u);
 			}
@@ -273,6 +275,12 @@ public class EntityManager implements IBaseRavage,IEvent,IRegionSelectedCallBack
 		// génération d'un id unique pour les unités
 		EntityManager.cptIdUnity++;
 		return EntityManager.cptIdUnity;
+	}
+
+	@Override
+	public void onSynchronize(NetSynchronize sync) {
+		// TODO Auto-generated method stub
+		
 	}
 
 	

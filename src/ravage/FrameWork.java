@@ -85,7 +85,7 @@ public class FrameWork
 		menu.dispose();
 
 		// creation de l'environnemnet graphique jsfml
-		window = new RenderWindow(new VideoMode(1024,768),"ProjetRavage");
+		window = new RenderWindow(new VideoMode(1280,720),"ProjetRavage",RenderWindow.FULLSCREEN);
 		window.setFramerateLimit(60);
 		// Instance des variables
 		frameClock = new Clock();

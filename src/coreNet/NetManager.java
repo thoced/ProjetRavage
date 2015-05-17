@@ -143,7 +143,11 @@ public class NetManager implements IBaseRavage
 			case MOVE: 	NetMoveUnity munity = (NetMoveUnity)header.getMessage();
 					   	callBackMove(munity);
 					   	break;
-			
+					   	
+			case SYNC:  NetSynchronize sync = (NetSynchronize)header.getMessage();
+						callBackSync(sync);
+						break;
+					   	
 			default: break;
 		}
 	}
@@ -169,6 +173,14 @@ public class NetManager implements IBaseRavage
 		for(INetManagerCallBack i : listCallBack)
 		{
 			i.onMoveUnity(unity);
+		}
+	}
+	
+	private void callBackSync(NetSynchronize sync)
+	{
+		for(INetManagerCallBack i : listCallBack)
+		{
+			i.onSynchronize(sync);
 		}
 	}
 	
