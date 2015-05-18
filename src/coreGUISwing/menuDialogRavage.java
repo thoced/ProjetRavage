@@ -142,7 +142,9 @@ public class menuDialogRavage extends JDialog implements ActionListener, INetMan
 		builderString = new StringBuilder();
 		
 		 mt = new menuThread(netManager);
-		 mt.start();
+		// mt.start();
+		 
+		
 
 	}
 	@Override

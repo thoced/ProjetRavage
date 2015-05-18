@@ -22,6 +22,7 @@ import org.jsfml.window.event.MouseEvent;
 import coreAI.Node;
 import coreEntity.Unity;
 import coreEntity.UnityNet;
+import coreEvent.IEventCallBack;
 import coreGUI.IRegionSelectedCallBack;
 import coreNet.INetManagerCallBack;
 import coreNet.NetAddUnity;
@@ -36,7 +37,7 @@ import ravage.FrameWork;
 import ravage.IBaseRavage;
 import ravage.IEvent;
 
-public class EntityManager implements IBaseRavage,IEvent,IRegionSelectedCallBack,INetManagerCallBack
+public class EntityManager implements IBaseRavage,IEventCallBack,IRegionSelectedCallBack,INetManagerCallBack
 {
 	
 	// compteur d'id 
@@ -115,7 +116,7 @@ public class EntityManager implements IBaseRavage,IEvent,IRegionSelectedCallBack
 	}
 
 	@Override
-	public void onMouse(MouseEvent mouseEvent) 
+	public void onMousePressed(MouseButtonEvent mouseEvent) 
 	{
 		
 		Vector2f posMouseWorld = FrameWork.getWindow().mapPixelToCoords(mouseEvent.position);
@@ -197,12 +198,7 @@ public class EntityManager implements IBaseRavage,IEvent,IRegionSelectedCallBack
 		
 	}
 	
-	@Override
-	public void onMousePressed(MouseButtonEvent event) {
-		// TODO Auto-generated method stub
-		
-	}
-
+	
 	@Override
 	public void onMouseReleased(MouseButtonEvent event) {
 		// TODO Auto-generated method stub
@@ -279,6 +275,12 @@ public class EntityManager implements IBaseRavage,IEvent,IRegionSelectedCallBack
 
 	@Override
 	public void onSynchronize(NetSynchronize sync) {
+		// TODO Auto-generated method stub
+		
+	}
+
+	@Override
+	public void onMouse(MouseEvent buttonEvent) {
 		// TODO Auto-generated method stub
 		
 	}

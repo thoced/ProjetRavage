@@ -38,6 +38,7 @@ import coreCamera.CameraManager;
 import coreDrawable.DrawableUnityManager;
 import coreEntity.Unity;
 import coreEntityManager.EntityManager;
+import coreEvent.EventManager;
 import coreGUI.RectSelected;
 import coreGUISwing.menuDialogRavage;
 import coreLevel.Level;
@@ -57,6 +58,7 @@ public class FrameWork
 	private AstarManager astarManager;
 	private RectSelected rect;
 	private NetManager netManager;
+	private EventManager eventManager;
 	// Clocks
 	private Clock frameClock;
 	// fps
@@ -80,18 +82,18 @@ public class FrameWork
 		netManager.init();
 		
 		// Lancement du menu
-		menu = new menuDialogRavage(null, "Projet Ravage Menu", true,netManager);
-		menu.setVisible(true);
-		menu.dispose();
+		
 
 		// creation de l'environnemnet graphique jsfml
-		window = new RenderWindow(new VideoMode(1280,720),"ProjetRavage",RenderWindow.FULLSCREEN);
+		window = new RenderWindow(new VideoMode(1024,768),"ProjetRavage");
 		window.setFramerateLimit(60);
 		// Instance des variables
 		frameClock = new Clock();
 		fpsTime = Time.ZERO;
 		
-	
+		menu = new menuDialogRavage(null, "Projet Ravage Menu", true,netManager);
+		menu.setVisible(true);
+		menu.dispose();
 				
 	
 		// Instance des managers
@@ -109,10 +111,15 @@ public class FrameWork
 		drawaUnityManager.init();
 		rect = new RectSelected();
 		rect.init();
+		eventManager = new EventManager();
+		eventManager.init();
 		
 		
 		// attachement au call back
 		RectSelected.attachCallBack(entityManager);
+		eventManager.addCallBack(cameraManager);
+		eventManager.addCallBack(entityManager);
+		eventManager.addCallBack(rect);
 		
 		// Chargement du niveau
 		currentLevel  = levelManager.loadLevel("testlevel01.json");
@@ -179,6 +186,9 @@ public class FrameWork
 			// Pool des evenements
 			for(Event event : window.pollEvents())
 			{
+				// catch des events
+				eventManager.catchEvent(event);
+
 				if(event.type == Event.Type.CLOSED) 
 				{
 					this.destroyFrameWork();
@@ -190,32 +200,10 @@ public class FrameWork
 					{
 						this.destroyFrameWork();
 					}
-					
-					cameraManager.onKeyboard(event.asKeyEvent());
-					entityManager.onKeyboard(event.asKeyEvent());
+				
 					
 				}
-				
-				if(event.type == Event.Type.MOUSE_BUTTON_PRESSED)
-				{
-					
-					Vector2f posMouseWorld = window.mapPixelToCoords(event.asMouseButtonEvent().position);
-					entityManager.onMouse(event.asMouseButtonEvent());
-					
-					rect.onMousePressed(event.asMouseButtonEvent());
-				}
-				
-				if(event.type == Event.Type.MOUSE_BUTTON_RELEASED)
-				{
-					rect.onMouseReleased(event.asMouseButtonEvent());
-				}
-				
-				if(event.type == Event.Type.MOUSE_MOVED)
-				{
-					rect.onMouseMove(event.asMouseEvent());
-				}
-				
-			
+
 			}
 			
 			// Créatin du deltaTime

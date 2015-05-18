@@ -14,10 +14,11 @@ import org.jsfml.window.event.KeyEvent;
 import org.jsfml.window.event.MouseButtonEvent;
 import org.jsfml.window.event.MouseEvent;
 
+import coreEvent.IEventCallBack;
 import ravage.IBaseRavage;
 import ravage.IEvent;
 
-public class CameraManager implements IBaseRavage, IEvent
+public class CameraManager implements IBaseRavage, IEventCallBack
 {
 
 	// View

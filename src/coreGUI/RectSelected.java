@@ -20,11 +20,12 @@ import org.jsfml.window.event.Event;
 import org.jsfml.window.event.KeyEvent;
 import org.jsfml.window.event.MouseButtonEvent;
 
+import coreEvent.IEventCallBack;
 import ravage.FrameWork;
 import ravage.IBaseRavage;
 import ravage.IEvent;
 
-public class RectSelected implements IBaseRavage, Drawable,IEvent
+public class RectSelected implements IBaseRavage, Drawable,IEventCallBack
 {
 	
 	private FloatRect boundSelected;
