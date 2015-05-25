@@ -39,6 +39,8 @@ public class Unity implements IBaseRavage,ICallBackAStar
 	
 	protected int tx,ty;
 	
+	protected float tfx,tfy;  // target en pixels
+	
 	protected int   nodex,nodey;
 	
 	protected float rotation;
@@ -54,6 +56,7 @@ public class Unity implements IBaseRavage,ICallBackAStar
 	protected Path pathFinalPath;
 	protected int     indNavMesh = 0;
 	protected int     cptNavMesh = 0;
+	protected boolean isArrived = true;
 	
 	protected Clock resetSearchClock;
 	protected Time  elapseSearchClock = Time.ZERO;
@@ -76,6 +79,7 @@ public class Unity implements IBaseRavage,ICallBackAStar
 		bdef.bullet = false;
 		bdef.type = BodyType.DYNAMIC;
 		bdef.fixedRotation = false;
+	
 		//bdef.gravityScale = 0.0f;
 		
 		// creation du body
@@ -88,21 +92,25 @@ public class Unity implements IBaseRavage,ICallBackAStar
 		fDef.shape = shape;
 		fDef.density = 1.0f;
 		
-		fDef.friction = 0.2f;
-		fDef.restitution = 0.2f;
+		fDef.friction = 0.0f;
+		fDef.restitution = 0.0f;
 	
 		Fixture fix = body.createFixture(fDef);
 		
 		// instance du resetSearch
 		resetSearchClock = new Clock();
 		
+		
+		
+	
 	
 	
 	}
 	
-	public void setTargetPosition(int tx,int ty)
+	public boolean setTargetPosition(float px,float py,int tx,int ty)
 	{
-		
+		this.tfx = px;
+		this.tfy = py;
 		// une demande de chemin va Ítre effectuÈe, on stoppe l'unitÈ pour Èviter le phÈnomËne de rebond
 		this.body.setLinearVelocity(new Vec2(0f,0f)); // il est arriv√© √† destination
 		
@@ -110,8 +118,8 @@ public class Unity implements IBaseRavage,ICallBackAStar
 		this.tx = tx;
 		this.ty = ty;
 		// on fait une demande au manager
-		int px =  (int) ((int)this.getBody().getPosition().x );
-		int py =  (int) ((int)this.getBody().getPosition().y );
+		int pdx =  (int) ((int)this.getBody().getPosition().x );
+		int pdy =  (int) ((int)this.getBody().getPosition().y );
 		
 		float fx = this.getBody().getPosition().x - 0.5f;
 		float fy = this.getBody().getPosition().y - 0.5f;
@@ -127,17 +135,23 @@ public class Unity implements IBaseRavage,ICallBackAStar
 				// on remet √† zero l'elapsed timer pour la t√©l√©portation
 				elapseSearchClock = Time.ZERO;
 				// on remet √† zero le pathfinal
-				if(this.pathFinal != null)
-					this.pathFinal.clear();
+			//	if(this.pathFinalPath != null)
+					//this.pathFinalPath.clear();
 				// Lancement recherche
-				AstarManager.askPath(this, px, py, tx, ty); // classic
+				AstarManager.askPath(this, pdx, pdy, tx, ty); // classic
 				//AstarManager.askPath(this, fx, fy, ftx, fty);
+				return true;
+			}
+			else
+			{
+				return false; // return false car il n'y pas de destination possible
 			}
 			
 		} catch (InterruptedException e) {
 			// TODO Auto-generated catch block
 			e.printStackTrace();
 		}
+		return false;
 	}
 	
 	public void setLinearVelocity(Vec2 v)
@@ -151,6 +165,9 @@ public class Unity implements IBaseRavage,ICallBackAStar
 		body.setTransform(new Vec2((float)x + 0.5f,(float)y + 0.5f),0f);
 		posx = body.getPosition().x * PhysicWorldManager.getRatioPixelMeter();
 		posy = body.getPosition().y * PhysicWorldManager.getRatioPixelMeter();
+		this.tfx = posx;
+		this.tfy = posy;
+		this.isArrived = true;
 		
 	}
 	
@@ -178,7 +195,7 @@ public class Unity implements IBaseRavage,ICallBackAStar
 		if(next != null)
 		{
 			elapseSearchClock = Time.add(elapseSearchClock, deltaTime);
-			if(elapseSearchClock.asSeconds() > 4f) // si bloqu√© plus de 2 secondes
+			if(elapseSearchClock.asSeconds() > 2f) // si bloqu√© plus de 2 secondes
 			{
 				elapseSearchClock = Time.ZERO;
 				// on saute une node de recherche
@@ -244,11 +261,39 @@ public class Unity implements IBaseRavage,ICallBackAStar
 		
 		if(next != null) // il y a un node suivant
 		{
-			// on calcul le vecteur velocity de diff√©rence
-			Vec2 n = next.getPositionVec2();
+			
+			Vec2 n;
+		
+			if(this.cptNavMesh < this.indNavMesh + 1)
+			{
+				// on est sur la derniËre node, on va reprendre le pixls prÈcis pour la destination de fin
+				n =  new Vec2(this.tfx / PhysicWorldManager.getRatioPixelMeter(),this.tfy / PhysicWorldManager.getRatioPixelMeter());
+				this.isArrived = true;
+			}
+			else
+			{
+				// on calcul le vecteur velocity de diff√©rence
+				n = next.getPositionVec2();
+				this.isArrived = false;
+			}
 			
 			Vec2 diff = n.sub(this.body.getPosition());
 			if(diff.length() < 0.6f)
+				next = null;
+			else
+			{
+				diff.normalize();
+				this.body.setLinearVelocity(diff.mul(6f));
+			}	
+		}
+		
+		
+		// code permettant de reposionner l'unitÈ si elle est pousÈÈe
+		if(this.isArrived)
+		{
+			Vec2 n =  new Vec2(this.tfx / PhysicWorldManager.getRatioPixelMeter(),this.tfy / PhysicWorldManager.getRatioPixelMeter());
+			Vec2 diff = n.sub(this.body.getPosition());
+			if(diff.length() < 0.2f)
 				next = null;
 			else
 			{
@@ -418,7 +463,8 @@ public class Unity implements IBaseRavage,ICallBackAStar
 		{
 			this.pathFinalNavMesh = finalPath;
 			this.cptNavMesh = this.pathFinalNavMesh.length();
-			this.indNavMesh = 0;
+			this.indNavMesh = 1;
+			elapseSearchClock = Time.ZERO;
 		}
 		
 		
@@ -433,7 +479,8 @@ public class Unity implements IBaseRavage,ICallBackAStar
 		{
 			this.pathFinalPath = finalPath;
 			this.cptNavMesh = this.pathFinalPath.getLength();
-			this.indNavMesh = 0;
+			this.indNavMesh = 1;
+			elapseSearchClock = Time.ZERO;
 		}
 	}
 

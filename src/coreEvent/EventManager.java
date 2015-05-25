@@ -15,6 +15,14 @@ public class EventManager implements IBaseRavage
 
 	// list d'objets attachés (callback)
 	private static List<IEventCallBack> listCallBack;
+	// list d'ibhet attacgés (temporary)
+	private static List<IEventCallBack> listCallBackTemporary;
+	// list de suppression des objet callback
+	private static List<IEventCallBack> listCallBackRemove;
+	
+	// variable empechant d'appler en boucle lors des clic souris
+	private boolean isMousePressed = false;
+
 	
 	@Override
 	public void init() 
@@ -22,6 +30,8 @@ public class EventManager implements IBaseRavage
 		// TODO Auto-generated method stub
 		// instance du listcallback
 		listCallBack = new ArrayList<IEventCallBack>();
+		listCallBackTemporary = new ArrayList<IEventCallBack>();
+		listCallBackRemove = new ArrayList<IEventCallBack>();
 
 	}
 
@@ -29,17 +39,30 @@ public class EventManager implements IBaseRavage
 	public void update(Time deltaTime) 
 	{
 		// TODO Auto-generated method stub
-
+		
+		// transferts des objets de la liste temporary à la liste call back
+		listCallBack.addAll(listCallBackTemporary);
+		listCallBackTemporary.clear();
+		
+		// suppression des objets 
+		listCallBack.removeAll(listCallBackRemove);
+		listCallBackRemove.clear();
 	}
 	
 	public void catchEvent(Event event)
 	{
 		if(event.type == Event.Type.KEY_PRESSED)
 			this.callOnKeyBoard(event);
-		if(event.type == Event.Type.MOUSE_BUTTON_PRESSED)
+		if(!this.isMousePressed && event.type == Event.Type.MOUSE_BUTTON_PRESSED)
+		{
 			this.callOnMousePressed(event);
+			this.isMousePressed = true;
+		}
 		if(event.type == Event.Type.MOUSE_BUTTON_RELEASED)
+		{
 			this.callOnMouseReleased(event);
+			this.isMousePressed = false;
+		}
 		if(event.type == Event.Type.MOUSE_MOVED)
 			this.callOnMouseMoved(event);
 			
@@ -79,7 +102,14 @@ public class EventManager implements IBaseRavage
 	
 	public static void addCallBack(IEventCallBack i)
 	{
-		listCallBack.add(i);
+		// ajout dans la liste call back temporary
+		listCallBackTemporary.add(i);
+	}
+	
+	public static void removeCallBack(IEventCallBack r)
+	{
+		// ajout dans la liste des remove
+		listCallBackRemove.add(r);
 	}
 	
 	

@@ -16,7 +16,6 @@ import org.jsfml.window.event.MouseEvent;
 
 import coreEvent.IEventCallBack;
 import ravage.IBaseRavage;
-import ravage.IEvent;
 
 public class CameraManager implements IBaseRavage, IEventCallBack
 {

@@ -1,5 +1,8 @@
 package coreDrawable;
 
+import java.util.ArrayList;
+import java.util.List;
+
 import org.jsfml.graphics.Drawable;
 import org.jsfml.graphics.PrimitiveType;
 import org.jsfml.graphics.RenderStates;
@@ -17,6 +20,11 @@ import ravage.IBaseRavage;
 public class DrawableUnityManager implements IBaseRavage, Drawable
 {
 
+	// listCallBack des drawable
+	private static List<Drawable> listCallBackDrawable;
+	// listCallBack remove
+	private static List<Drawable> listCallBackRemove;
+	
 	private VertexArray buffer;
 	
 	private RenderStates state = new RenderStates(TexturesManager.GetTextureByName("unity_sprite_01.png"));
@@ -27,12 +35,17 @@ public class DrawableUnityManager implements IBaseRavage, Drawable
 		// TODO Auto-generated method stub
 		// cr√©ation du VertexBuffer
 	 buffer = new VertexArray(PrimitiveType.QUADS);
+	 
+	 // instance du listCallBackDrawable
+	 listCallBackDrawable = new ArrayList<Drawable>();
+	 listCallBackRemove = new ArrayList<Drawable>();
 	}
 
 	@Override
-	public void update(Time deltaTime) {
-		// TODO Auto-generated method stub
-		
+	public void update(Time deltaTime) 
+	{
+		// appel au callback update
+	
 	}
 
 	@Override
@@ -88,6 +101,8 @@ public class DrawableUnityManager implements IBaseRavage, Drawable
 		// affichage
 		arg0.draw(buffer,state);
 		
+		// appel des drawable call back
+		this.CallBackDrawable(arg0,arg1);
 	
 		
 	}
@@ -106,6 +121,30 @@ public class DrawableUnityManager implements IBaseRavage, Drawable
 		
 		default: return new Vector2f(0,0);
 		}
+	}
+	
+	// attachement
+	public static void AddDrawable(Drawable d)
+	{
+		listCallBackDrawable.add(d);
+	}
+	
+	public static void RemoveDrawable(Drawable d)
+	{
+		listCallBackRemove.add(d);
+	}
+	
+
+	
+	private void CallBackDrawable(RenderTarget render, RenderStates states)
+	{
+	
+		for(Drawable d : listCallBackDrawable)
+			d.draw(render, states);
+		
+		// suppresion des Èlements dans la liste remove
+		listCallBackDrawable.removeAll(listCallBackRemove);
+		listCallBackRemove.clear();
 	}
 
 	

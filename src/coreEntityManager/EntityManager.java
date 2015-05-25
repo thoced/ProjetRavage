@@ -24,6 +24,7 @@ import coreEntity.Unity;
 import coreEntity.UnityNet;
 import coreEvent.IEventCallBack;
 import coreGUI.IRegionSelectedCallBack;
+import coreLevel.LevelManager;
 import coreNet.INetManagerCallBack;
 import coreNet.NetAddUnity;
 import coreNet.NetHeader;
@@ -35,7 +36,7 @@ import coreNet.NetSynchronize;
 import corePhysic.PhysicWorldManager;
 import ravage.FrameWork;
 import ravage.IBaseRavage;
-import ravage.IEvent;
+
 
 public class EntityManager implements IBaseRavage,IEventCallBack,IRegionSelectedCallBack,INetManagerCallBack
 {
@@ -51,6 +52,13 @@ public class EntityManager implements IBaseRavage,IEventCallBack,IRegionSelected
 	private Time delta;
 	// listdes unitÃ©s selectionÃ©s
 	private List<Unity> listUnitySelected;
+	
+	// instance du ChooseAngleFormationDrawable
+	private ChooseAngleFormationDrawable arrow;
+	// variable de vecteur de direction de formation
+	private Vec2 dirFormation;
+	// variable sur les coordonnées de souris
+	private Vector2f posMouseWorld;
 
 	@Override
 	public void init()
@@ -83,6 +91,8 @@ public class EntityManager implements IBaseRavage,IEventCallBack,IRegionSelected
 			unity.update(deltaTime);
 		}
 		
+		if(arrow!=null)
+			arrow.update(deltaTime);
 	}
 
 	@Override
@@ -119,7 +129,7 @@ public class EntityManager implements IBaseRavage,IEventCallBack,IRegionSelected
 	public void onMousePressed(MouseButtonEvent mouseEvent) 
 	{
 		
-		Vector2f posMouseWorld = FrameWork.getWindow().mapPixelToCoords(mouseEvent.position);
+		posMouseWorld = FrameWork.getWindow().mapPixelToCoords(mouseEvent.position);
 		float pixels =  PhysicWorldManager.getRatioPixelMeter();
 		
 		// si c'est un click gauche
@@ -148,13 +158,10 @@ public class EntityManager implements IBaseRavage,IEventCallBack,IRegionSelected
 		else if(mouseEvent.asMouseButtonEvent().button == Mouse.Button.RIGHT)
 		{
 			
-			Vector2f pos = Vector2f.div(posMouseWorld, pixels);
-			
-			for(Unity u : this.listUnitySelected)
-			{
-				// on prÃ©cise la node target
-				u.setTargetPosition((int)pos.x+1,(int)pos.y+1);
-			}
+			// création de la fleche de selection d'angle de formation
+		    if(arrow == null)
+		    	arrow  = new ChooseAngleFormationDrawable(posMouseWorld,posMouseWorld);
+		
 		}
 		
 		
@@ -193,16 +200,29 @@ public class EntityManager implements IBaseRavage,IEventCallBack,IRegionSelected
 	}
 
 	@Override
-	public void onMouseMove(MouseEvent event) {
-		// TODO Auto-generated method stub
+	public void onMouseMove(MouseEvent event) 
+	{
 		
 	}
 	
 	
 	@Override
-	public void onMouseReleased(MouseButtonEvent event) {
-		// TODO Auto-generated method stub
-		
+	public void onMouseReleased(MouseButtonEvent event) 
+	{
+		// on relache le clic, on récupère la dirction de formation et on lance la formation
+		if(arrow != null)
+		{
+			// on récupère le vecteur de direction pour la formation
+			dirFormation = arrow.getVectorDirectionFormation();
+			// on calcul la formation
+			Vector2f pos = Vector2f.div(posMouseWorld, PhysicWorldManager.getRatioPixelMeter());
+		    computeFormation(listUnitySelected,posMouseWorld.x,posMouseWorld.y,dirFormation);
+			    
+		    // suppression de la fleche dans les callback
+			arrow.destroy();
+			arrow = null;
+		}
+
 	}
 
 	@Override
@@ -285,6 +305,103 @@ public class EntityManager implements IBaseRavage,IEventCallBack,IRegionSelected
 		
 	}
 
+	public void computeFormation(List<Unity> listUnity,float px,float py,Vec2 dir)
+	{
+		
+		// variable définissant le nombre maximal d'unité sur une ligne
+		int nbUnityPerLine = 0;
+		int cptLine = 0;
+		// on défini les positions
+		float dx = px;
+		
+		Vector2f posInitial = new Vector2f(dx,py);
+		Vector2f dep = posInitial;
 	
+		Vec2 skew = dir.skew();
+		
+		for(int i=0;i<listUnity.size();i++)
+		{
+		
+			// on récupère une unité
+			Unity u = listUnity.get(i);
+			// on calcul la position ecran
+			Vector2f pos = Vector2f.div(new Vector2f(dep.x,dep.y), PhysicWorldManager.getRatioPixelMeter());
+			// on envoie l'unité sur sa positoin
+			if(u.setTargetPosition(dep.x,dep.y,(int)pos.x+1,(int)pos.y+1) == false)
+			{
+				// aucune position possible pour l'unité, on la place derrière
+				
+				//dep = posInitial;
+				cptLine++;
+				dep = Vector2f.add(posInitial, Vector2f.mul(Vector2f.neg(new Vector2f(dir.x * 20  ,dir.y * 20)),cptLine));
+				i--;
+				nbUnityPerLine = 0;
+				
+			}
+			else
+			{
+				// on a défini la position final de l'unité, on incrémente le nb d'unité par ligne
+				nbUnityPerLine++;
+			}
+			//dx = dx + 20;
+			dep = Vector2f.add(dep, new Vector2f(skew.x * 20,skew.y * 20));
+			
+			if(nbUnityPerLine > 7)
+			{
+				//si un ligne est complète, on place en dessous
+				nbUnityPerLine = 0;
+				cptLine++;
+				
+				dep = Vector2f.add(posInitial, Vector2f.mul(Vector2f.neg(new Vector2f(dir.x * 20  ,dir.y * 20)),cptLine));
+				//dep = Vector2f.add(dep, Vector2f.neg(new Vector2f(dir.x * 20,dir.y * 20)));
+
+			}
+			
+		}
+		
+		/*
+		for(int i=0;i<listUnity.size();i++)
+		{
+		
+			// on récupère une unité
+			Unity u = listUnity.get(i);
+			// on calcul la position ecran
+			Vector2f pos = Vector2f.div(new Vector2f(dx,py), PhysicWorldManager.getRatioPixelMeter());
+			// on envoie l'unité sur sa positoin
+			if(u.setTargetPosition(dx,py,(int)pos.x+1,(int)pos.y+1) == false)
+			{
+				// aucune position possible pour l'unité, on la place derrière
+				dx = px;
+				py = py + 20;	
+				i--;
+				nbUnityPerLine = 0;
+				
+			}
+			else
+			{
+				// on a défini la position final de l'unité, on incrémente le nb d'unité par ligne
+				nbUnityPerLine++;
+			}
+			dx = dx + 20;
+			//dep = Vector2f.add(dep, new Vector2f(skew.x * 20,skew.y * 20));
+			dx = dep.x;
+			py = dep.y;
+			
+			if(nbUnityPerLine > 7)
+			{
+				//si un ligne est complète, on place en dessous
+				nbUnityPerLine = 0;
+				dx = px;
+				py = py + 20;
+				
+			
+				
+				
+			}
+			
+		}*/
+		
+
+	}
 
 }
