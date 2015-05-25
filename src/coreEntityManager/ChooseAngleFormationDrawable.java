@@ -37,9 +37,6 @@ public class ChooseAngleFormationDrawable implements IBaseRavage, Drawable, IEve
 	private Vector2f posStart;
 	private Vector2f posEnd;
 	
-	// Timer
-	private Clock clock;
-	private Time  time;
 	
 	// Button pressed
 	private Mouse.Button buttonPressed;
@@ -62,10 +59,7 @@ public class ChooseAngleFormationDrawable implements IBaseRavage, Drawable, IEve
 		arrowPoint = new Sprite(TexturesManager.GetTextureByName("arrowPoint.png"));
 		arrowPoint.setOrigin(new Vector2f(0,8));
 		
-		// instance du timer
-	/*	clock = new Clock();
-		clock.restart();
-		time = Time.ZERO;*/
+	
 	}
 	
 	
@@ -122,15 +116,6 @@ public class ChooseAngleFormationDrawable implements IBaseRavage, Drawable, IEve
 		// affichage
 		arg0.draw(buffer);
 		arg0.draw(arrowPoint);
-		
-		/*Time delta = clock.getElapsedTime();
-		time = Time.add(delta, time);
-		if(time.asSeconds() > 5f)
-			this.destroy();
-		clock.restart();
-		*/
-		
-
 	}
 
 	@Override
@@ -142,13 +127,7 @@ public class ChooseAngleFormationDrawable implements IBaseRavage, Drawable, IEve
 	@Override
 	public void update(Time deltaTime)
 	{
-		// TODO Auto-generated method stub
-	/*	Vec2 ps = new Vec2(this.posStart.x / PhysicWorldManager.getRatioPixelMeter(),this.posStart.y / PhysicWorldManager.getRatioPixelMeter());
-		Vec2 pe = new Vec2(this.posEnd.x / PhysicWorldManager.getRatioPixelMeter(),this.posEnd.y / PhysicWorldManager.getRatioPixelMeter());
-		
-		Vec2 angle = pe.sub(ps);
-		angle.normalize();*/
-		
+	
 		// on défini la position de fin
 		this.posEnd = FrameWork.getWindow().mapPixelToCoords(Mouse.getPosition(FrameWork.getWindow()));
 		
@@ -189,8 +168,6 @@ public class ChooseAngleFormationDrawable implements IBaseRavage, Drawable, IEve
 		
 		
 	}
-
-
 
 	@Override
 	public void onMousePressed(MouseButtonEvent event) 

@@ -18,7 +18,7 @@ import org.jsfml.system.Time;
 import org.newdawn.slick.util.pathfinding.Path;
 import org.newdawn.slick.util.pathfinding.navmesh.NavPath;
 
-import coreAI.Astar;
+
 import coreAI.AstarManager;
 import coreAI.ICallBackAStar;
 import coreAI.Node;
@@ -151,6 +151,10 @@ public class Unity implements IBaseRavage,ICallBackAStar
 			// TODO Auto-generated catch block
 			e.printStackTrace();
 		}
+		  catch(ArrayIndexOutOfBoundsException ex)
+		{
+			  
+		}
 		return false;
 	}
 	
@@ -269,6 +273,27 @@ public class Unity implements IBaseRavage,ICallBackAStar
 				// on est sur la dernière node, on va reprendre le pixls précis pour la destination de fin
 				n =  new Vec2(this.tfx / PhysicWorldManager.getRatioPixelMeter(),this.tfy / PhysicWorldManager.getRatioPixelMeter());
 				this.isArrived = true;
+				
+				// emission réseau
+				// code émission réseau
+				NetHeader header = new NetHeader();
+				header.setTypeMessage(TYPE.MOVE);
+				NetMoveUnity move = new NetMoveUnity();
+				move.setId(this.getId());
+				move.setPosx(this.getPositionMeterX());
+				move.setPosy(this.getPositionMeterY());
+				move.setNextPosx(n.x);
+				move.setNextPosy(n.y);
+				header.setMessage(move);
+				// émission
+				try
+				{
+					NetManager.SendMessage(header);
+					
+				} catch (IOException e) {
+					// TODO Auto-generated catch block
+					e.printStackTrace();
+				}
 			}
 			else
 			{
@@ -288,17 +313,43 @@ public class Unity implements IBaseRavage,ICallBackAStar
 		}
 		
 		
-		// code permettant de reposionner l'unité si elle est pouséée
+		// code permettant de reposionner l'unité si elle est poussée
 		if(this.isArrived)
 		{
 			Vec2 n =  new Vec2(this.tfx / PhysicWorldManager.getRatioPixelMeter(),this.tfy / PhysicWorldManager.getRatioPixelMeter());
 			Vec2 diff = n.sub(this.body.getPosition());
 			if(diff.length() < 0.2f)
+			{
 				next = null;
+				
+				
+			}
 			else
 			{
 				diff.normalize();
 				this.body.setLinearVelocity(diff.mul(6f));
+				
+				// c'est la position finale, on envoie une dernire fois la position sur le réseau
+				// code émission réseau
+				NetHeader header = new NetHeader();
+				header.setTypeMessage(TYPE.MOVE);
+				NetMoveUnity move = new NetMoveUnity();
+				move.setId(this.getId());
+				move.setPosx(n.x);
+				move.setPosy(n.y);
+				move.setNextPosx(n.x);
+				move.setNextPosy(n.y);
+				header.setMessage(move);
+				// émission
+				try
+				{
+					NetManager.SendMessage(header);
+					
+				} catch (IOException e) {
+					// TODO Auto-generated catch block
+					e.printStackTrace();
+				}
+				
 			}	
 		}
 	}

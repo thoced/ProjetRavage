@@ -5,15 +5,15 @@ import org.jbox2d.common.Vec2;
 public class Node 
 {
 	private int type; // wall, ground, ...
-	private int x;
-	private int y;
+	private float x;
+	private float y;
 	private Node parent;
 	private int g;
 	private int h;
 	private int f;
 	private boolean isDiagonal;
 	
-	public Node(int x,int y,boolean isdiagonal)
+	public Node(float x,float y,boolean isdiagonal)
 	{
 		this.x = x;
 		this.y = y;
@@ -35,34 +35,24 @@ public class Node
 
 	public Vec2 getPositionVec2()
 	{
-		return new Vec2(this.x +0.5f,this.y + 0.5f);
+		return new Vec2(this.x /*+0.5f*/,this.y /*+ 0.5f*/);
 	}
 	
-	/**
-	 * @return the x
-	 */
-	public int getX() {
+	
+
+	public float getX() {
 		return x;
 	}
 
-	/**
-	 * @param x the x to set
-	 */
-	public void setX(int x) {
+	public void setX(float x) {
 		this.x = x;
 	}
 
-	/**
-	 * @return the y
-	 */
-	public int getY() {
+	public float getY() {
 		return y;
 	}
 
-	/**
-	 * @param y the y to set
-	 */
-	public void setY(int y) {
+	public void setY(float y) {
 		this.y = y;
 	}
 

@@ -237,6 +237,11 @@ public class EntityManager implements IBaseRavage,IEventCallBack,IRegionSelected
 					{
 						unity.setSelected(true);
 						this.listUnitySelected.add(unity);
+						
+						// on sort de la sélection si on dépasse 32
+						if(this.listUnitySelected.size() > 31)
+							break;
+						
 					}
 		}
 		
@@ -255,7 +260,7 @@ public class EntityManager implements IBaseRavage,IEventCallBack,IRegionSelected
 		// création d'une unité venant du réseau
 		UnityNet u= new UnityNet();
 		u.init();
-		u.setPosition((int)unity.getPosx(), (int)unity.getPosy());;
+		u.setPosition(unity.getPosx(), unity.getPosy());;
 		u.setId(unity.getIdUnity());
 		// ajout dans le vecteur unity réseau
 		vectorUnityNet.add(u);
@@ -277,7 +282,7 @@ public class EntityManager implements IBaseRavage,IEventCallBack,IRegionSelected
 			{
 				System.out.println("application du move : " + String.valueOf(unity.getId()));
 				// création d'un node NEXT
-				Node n = new Node((int)unity.getNextPosx(),(int)unity.getNextPosy(),true);
+				Node n = new Node(unity.getNextPosx(),unity.getNextPosy(),true);
 				u.setPosXYMeter(unity.getPosx(),unity.getPosy());
 				u.setNext(n);
 				vectorUnityNet.set(i,u);
@@ -356,6 +361,10 @@ public class EntityManager implements IBaseRavage,IEventCallBack,IRegionSelected
 				//dep = Vector2f.add(dep, Vector2f.neg(new Vector2f(dir.x * 20,dir.y * 20)));
 
 			}
+			
+			
+			if(cptLine > 12)
+				break;
 			
 		}
 		

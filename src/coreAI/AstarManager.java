@@ -20,7 +20,8 @@ import ravage.IBaseRavage;
 
 public class AstarManager extends Thread implements IBaseRavage 
 {
-	private static Astar star;
+
+
 	
 	private static AStarPathFinder navmesh;
 	
@@ -46,7 +47,7 @@ public class AstarManager extends Thread implements IBaseRavage
 		//navmesh = build.build(tilemap);
 		navmesh = new AStarPathFinder(tilemap, 1024, true);
 		// instance du star
-		star = new Astar();
+		//star = new Astar();
 		// instance de la liste des demandes
 		this.listAsk = new ArrayList<AskPath>();
 		// instance du semaphore

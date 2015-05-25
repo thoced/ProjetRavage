@@ -31,7 +31,6 @@ import org.jsfml.window.VideoMode;
 import org.jsfml.window.event.Event;
 
 import CoreTexturesManager.TexturesManager;
-import coreAI.Astar;
 import coreAI.AstarManager;
 import coreAI.Node;
 import coreCamera.CameraManager;
@@ -85,7 +84,7 @@ public class FrameWork
 		
 
 		// creation de l'environnemnet graphique jsfml
-		window = new RenderWindow(new VideoMode(1920,1080),"ProjetRavage",RenderWindow.FULLSCREEN);
+		window = new RenderWindow(new VideoMode(1024,768),"ProjetRavage",RenderWindow.FULLSCREEN);
 		window.setFramerateLimit(60);
 		// Instance des variables
 		frameClock = new Clock();
