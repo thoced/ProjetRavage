@@ -56,7 +56,7 @@ public class Unity implements IBaseRavage,ICallBackAStar
 	protected Path pathFinalPath;
 	protected int     indNavMesh = 0;
 	protected int     cptNavMesh = 0;
-	protected boolean isArrived = true;
+	protected boolean isArrived = false;
 	
 	protected Clock resetSearchClock;
 	protected Time  elapseSearchClock = Time.ZERO;
@@ -69,6 +69,13 @@ public class Unity implements IBaseRavage,ICallBackAStar
 	// is selected
 	protected boolean isSelected = false;
 	
+	protected boolean nextNode = true;
+	protected int indexNode = 0;
+	protected float mx =0;
+	protected float my = 0;
+	
+	protected boolean isStop =false;
+	
 	@Override
 	public void init() 
 	{
@@ -79,6 +86,7 @@ public class Unity implements IBaseRavage,ICallBackAStar
 		bdef.bullet = false;
 		bdef.type = BodyType.DYNAMIC;
 		bdef.fixedRotation = false;
+		bdef.userData = this;
 	
 		//bdef.gravityScale = 0.0f;
 		
@@ -86,7 +94,7 @@ public class Unity implements IBaseRavage,ICallBackAStar
 		body = PhysicWorldManager.getWorld().createBody(bdef);
 		
 		Shape shape = new CircleShape();
-		shape.m_radius = 0.4f;
+		shape.m_radius = 0.45f;
 		
 		FixtureDef fDef = new FixtureDef();
 		fDef.shape = shape;
@@ -100,11 +108,18 @@ public class Unity implements IBaseRavage,ICallBackAStar
 		// instance du resetSearch
 		resetSearchClock = new Clock();
 		
+	
 		
 		
+		
 	
 	
 	
+	}
+	
+	public void stop()
+	{
+		this.isStop = true;
 	}
 	
 	public boolean setTargetPosition(float px,float py,int tx,int ty)
@@ -184,66 +199,17 @@ public class Unity implements IBaseRavage,ICallBackAStar
 	{
 		return body.getPosition().y;
 	}
-
-	@Override
-	public void update(Time deltaTime) 
+	
+	protected void NetSend(float x,float y,float dx,float dy)
 	{
-		// on positionne les coordonn√©es √©cran par rapport au coordonn√©e physique
-		posx = body.getPosition().x * PhysicWorldManager.getRatioPixelMeter();
-		posy = body.getPosition().y * PhysicWorldManager.getRatioPixelMeter();
-		
-		
-		// ------------------------------------
-		// Code pour t√©l√©porter une unit√© bloqu√©
-		// ------------------------------------
-		if(next != null)
-		{
-			elapseSearchClock = Time.add(elapseSearchClock, deltaTime);
-			if(elapseSearchClock.asSeconds() > 2f) // si bloqu√© plus de 2 secondes
-			{
-				elapseSearchClock = Time.ZERO;
-				// on saute une node de recherche
-				if(this.pathFinalPath.getLength() > 0 && indNavMesh < this.pathFinalPath.getLength())
-				{
-					int x = this.pathFinalPath.getX(indNavMesh);
-					int y = this.pathFinalPath.getY(indNavMesh);
-					//this.pathFinal.remove(0);
-					// on t√©l√©porte l'unit√©
-					this.body.setTransform(new Vec2(x,y), 0f);
-					next = null;
-				}
-				
-
-			}
-		}
-		
-		// -------------------------------------
-		// Code pour prendre le node suivant
-		// -------------------------------------
-		
-		if(next == null /*&& this.pathFinal != null && this.pathFinal.size() > 0 */ && this.pathFinalPath != null && 
-				this.pathFinalPath.getLength() > this.indNavMesh)
-		{
-			// on r√©cup√®re le node prochain
-			//next = this.pathFinal.get(0); // version classic
-			int nx = this.pathFinalPath.getX(indNavMesh);
-			int ny = this.pathFinalPath.getY(indNavMesh);
-			next = new Node((int) nx,(int) ny,false);
-			indNavMesh ++;
-			// on supprme le noduer premier
-			//this.pathFinal.remove(0); // version classic
-			// on lance le clock du resetSearchClock
-			elapseSearchClock = resetSearchClock.restart();
-			
-			// code Èmission rÈseau
-			NetHeader header = new NetHeader();
+		    NetHeader header = new NetHeader();
 			header.setTypeMessage(TYPE.MOVE);
 			NetMoveUnity move = new NetMoveUnity();
 			move.setId(this.getId());
-			move.setPosx(this.getPositionMeterX());
-			move.setPosy(this.getPositionMeterY());
-			move.setNextPosx(next.getX());
-			move.setNextPosy(next.getY());
+			move.setPosx(x);
+			move.setPosy(y);
+			move.setNextPosx(dx);
+			move.setNextPosy(dy);
 			header.setMessage(move);
 			// Èmission
 			try
@@ -254,104 +220,136 @@ public class Unity implements IBaseRavage,ICallBackAStar
 				// TODO Auto-generated catch block
 				e.printStackTrace();
 			}
-			
-		}
-		else
-			this.body.setLinearVelocity(new Vec2(0f,0f)); // il est arriv√© √† destination
+		 
+	}
+
+	@Override
+	public void update(Time deltaTime) 
+	{
+		// on positionne les coordonn√©es √©cran par rapport au coordonn√©e physique
+		posx = body.getPosition().x * PhysicWorldManager.getRatioPixelMeter();
+		posy = body.getPosition().y * PhysicWorldManager.getRatioPixelMeter();
 		
-		// -------------------------------------
-		// Code de d√©placement - mouvement
-		// -------------------------------------
+		if(this.isStop)
+			return;
 		
-		if(next != null) // il y a un node suivant
+		// -------------
+		// tÈlÈportation
+		// -------------
+		
+		
+		if(!nextNode)
 		{
-			
-			Vec2 n;
-		
-			if(this.cptNavMesh < this.indNavMesh + 1)
+			elapseSearchClock = Time.add(elapseSearchClock, deltaTime);
+			if(elapseSearchClock.asSeconds() > 2f) // si bloqu√© plus de 2 secondes
 			{
-				// on est sur la derniËre node, on va reprendre le pixls prÈcis pour la destination de fin
-				n =  new Vec2(this.tfx / PhysicWorldManager.getRatioPixelMeter(),this.tfy / PhysicWorldManager.getRatioPixelMeter());
-				this.isArrived = true;
-				
-				// emission rÈseau
-				// code Èmission rÈseau
-				NetHeader header = new NetHeader();
-				header.setTypeMessage(TYPE.MOVE);
-				NetMoveUnity move = new NetMoveUnity();
-				move.setId(this.getId());
-				move.setPosx(this.getPositionMeterX());
-				move.setPosy(this.getPositionMeterY());
-				move.setNextPosx(n.x);
-				move.setNextPosy(n.y);
-				header.setMessage(move);
-				// Èmission
-				try
+				elapseSearchClock = Time.ZERO;
+				// on saute une node de recherche
+				if(this.pathFinalPath != null && this.pathFinalPath.getLength() > 0 && this.indexNode < this.pathFinalPath.getLength())
 				{
-					NetManager.SendMessage(header);
-					
-				} catch (IOException e) {
-					// TODO Auto-generated catch block
-					e.printStackTrace();
-				}
-			}
-			else
-			{
-				// on calcul le vecteur velocity de diff√©rence
-				n = next.getPositionVec2();
-				this.isArrived = false;
-			}
-			
-			Vec2 diff = n.sub(this.body.getPosition());
-			if(diff.length() < 0.6f)
-				next = null;
-			else
-			{
-				diff.normalize();
-				this.body.setLinearVelocity(diff.mul(6f));
-			}	
-		}
-		
-		
-		// code permettant de reposionner l'unitÈ si elle est poussÈe
-		if(this.isArrived)
-		{
-			Vec2 n =  new Vec2(this.tfx / PhysicWorldManager.getRatioPixelMeter(),this.tfy / PhysicWorldManager.getRatioPixelMeter());
-			Vec2 diff = n.sub(this.body.getPosition());
-			if(diff.length() < 0.2f)
-			{
-				next = null;
-				
-				
-			}
-			else
-			{
-				diff.normalize();
-				this.body.setLinearVelocity(diff.mul(6f));
-				
-				// c'est la position finale, on envoie une dernire fois la position sur le rÈseau
-				// code Èmission rÈseau
-				NetHeader header = new NetHeader();
-				header.setTypeMessage(TYPE.MOVE);
-				NetMoveUnity move = new NetMoveUnity();
-				move.setId(this.getId());
-				move.setPosx(n.x);
-				move.setPosy(n.y);
-				move.setNextPosx(n.x);
-				move.setNextPosy(n.y);
-				header.setMessage(move);
-				// Èmission
-				try
-				{
-					NetManager.SendMessage(header);
-					
-				} catch (IOException e) {
-					// TODO Auto-generated catch block
-					e.printStackTrace();
+					int x = this.pathFinalPath.getX(this.indexNode);
+					int y = this.pathFinalPath.getY(this.indexNode);
+					//this.pathFinal.remove(0);
+					// on t√©l√©porte l'unit√©
+					this.body.setTransform(new Vec2(x,y), 0f);
+					nextNode = true;
 				}
 				
-			}	
+
+			}
 		}
+		
+		
+		// ------------------------------------
+		// rÈcupÈration d'une nouvelle position
+		// ------------------------------------
+		
+				if(nextNode && this.pathFinalPath != null && this.pathFinalPath.getLength() > 0 && this.indexNode  < this.pathFinalPath.getLength()  )
+				{
+					// on rÈcupËre la node suivante
+				
+					int nx = this.pathFinalPath.getX(this.indexNode);
+					int ny = this.pathFinalPath.getY(this.indexNode);
+					
+					// on lance le clock du resetSearchClock
+					elapseSearchClock = Time.ZERO;
+					
+					// transformation en postion meter
+					
+					 mx = (float)nx + 0.5f;
+					 my = (float)ny +0.5f;
+					
+					 nextNode = false;
+					 
+					 this.indexNode++;
+					 
+					 // envoie des informations sur le rÈseau
+					 this.NetSend(this.body.getPosition().x, this.body.getPosition().y, mx, my);
+					 
+				}
+				else
+				{
+				// -------------------------------------
+				// mouvement vers la destination finale
+				// ------------------------------------
+						
+					Vec2 n =  new Vec2(this.tfx / PhysicWorldManager.getRatioPixelMeter(),this.tfy  / PhysicWorldManager.getRatioPixelMeter());
+					Vec2 diff = n.sub(this.body.getPosition());
+					if(diff.length() < 0.2f )
+						{
+							this.body.setLinearVelocity(new Vec2(0f,0f));
+							// envoie sur le rÈseau
+									
+							if(!this.isArrived)
+							{
+								this.NetSend(this.body.getPosition().x, this.body.getPosition().y,this.body.getPosition().x, this.body.getPosition().y);
+								this.isArrived = true;
+							}
+									
+						}
+						else
+						{
+							diff.normalize();
+							this.body.setLinearVelocity(diff.mul(6f));
+									
+							// envoie des informations sur le rÈseau
+								this.NetSend(this.body.getPosition().x, this.body.getPosition().y, n.x, n.y);
+								
+								this.isArrived = false;
+						}
+					
+					
+				}
+				
+				
+				if(!nextNode)
+				{
+				
+					// -----------------------------------
+					// Mouvement vers une destination centrale ‡ un node
+					// ------------------------------------------------
+				
+					Vec2 n =  new Vec2(mx,my);
+					Vec2 diff = n.sub(this.body.getPosition());
+					if(diff.length() < 0.4f)
+					{
+						nextNode = true;
+						
+						this.body.setLinearVelocity(new Vec2(0f,0f));
+					}
+					else
+					{
+						diff.normalize();
+						this.body.setLinearVelocity(diff.mul(6f));
+					}
+					
+				}
+				
+				
+		// ------------------------------------
+		// Code pour t√©l√©porter une unit√© bloqu√©
+		// ------------------------------------
+			
 	}
 
 	@Override
@@ -516,6 +514,10 @@ public class Unity implements IBaseRavage,ICallBackAStar
 			this.cptNavMesh = this.pathFinalNavMesh.length();
 			this.indNavMesh = 1;
 			elapseSearchClock = Time.ZERO;
+			this.isArrived = false;
+			
+			
+		
 		}
 		
 		
@@ -532,6 +534,10 @@ public class Unity implements IBaseRavage,ICallBackAStar
 			this.cptNavMesh = this.pathFinalPath.getLength();
 			this.indNavMesh = 1;
 			elapseSearchClock = Time.ZERO;
+		
+			this.indexNode = 1;
+			this.nextNode = true;
+			this.isArrived = false;
 		}
 	}
 
