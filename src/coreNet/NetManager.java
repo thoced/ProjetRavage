@@ -25,6 +25,8 @@ public class NetManager implements IBaseRavage
 	
 	private static List<NetHeader> listNetMessage;
 	
+	private static List<NetDatagram> listNetDatagram;
+	
 	// list des callback attachés au netmanager
 	private static  List<INetManagerCallBack> listCallBack;
 	
@@ -39,15 +41,21 @@ public class NetManager implements IBaseRavage
 	private static int posxStartFlag;
 	private static int posyStartFlag;
 	
+	// NetMessage
+	private static NetDatagram netDatagram;
+	
 	public NetManager()
 	{
 		// instance du listcallback
 		listCallBack = new ArrayList<INetManagerCallBack>();
 		// instance de listNetMessage
 		listNetMessage = new ArrayList<NetHeader>();
+		listNetDatagram = new ArrayList<NetDatagram>();
 		// instance du lock
 		lock = new ReentrantLock();
 		// instance de socket emission
+		// instance de NetDatagram
+		netDatagram = new NetDatagram();
 		
 	}
 	
@@ -62,6 +70,15 @@ public class NetManager implements IBaseRavage
 		lock.lock();
 		
 		listNetMessage.add(header);
+		
+		lock.unlock();
+	}
+	
+	public static void pushNetDatagram(NetDatagram data)
+	{
+		lock.lock();
+		
+		listNetDatagram.add(data);
 		
 		lock.unlock();
 	}
@@ -101,17 +118,70 @@ public class NetManager implements IBaseRavage
 		socketEmission.send(datagram);
 		
 	}
+	
+	public static void PackMessage(NetHeader header) throws IOException
+	{
+		
+		if(netDatagram.getListHeader().size() < 8)
+		{
+			netDatagram.getListHeader().add(header);
+		}
+		else
+		{
+			netDatagram.getListHeader().add(header);
+			// emission
+			SendDatagram();
+			// clear du netdatagram
+			netDatagram.clear();
+		}
+
+	}
+	
+	public static void SendDatagram() throws IOException
+	{
+		// création du message en buffer
+				ByteArrayOutputStream baos = new ByteArrayOutputStream();
+				ObjectOutputStream oos = new ObjectOutputStream(baos);
+				oos.writeObject(netDatagram);
+				// on récupère le buffer array
+				byte[] buffer = new byte[baos.size()];
+				buffer = baos.toByteArray();
+				// création d'un datagramudp
+				DatagramPacket datagram = new DatagramPacket(buffer,buffer.length);
+				datagram.setPort(1234);
+				datagram.setAddress(inet);
+				// emission
+				if(socketEmission != null)
+				socketEmission.send(datagram);
+				
+				System.out.println("Buffer Size : " + String.valueOf(buffer.length));
+	}
 
 	
 	
 	@Override
 	public void update(Time deltaTime) 
 	{
-		NetHeader header = null; 
+		//NetHeader header = null; 
+		
+		// code d'envoie du netDatagram
+				try 
+				{
+					// envoie
+					if(netDatagram.getListHeader().size() > 0)
+						SendDatagram();
+					// suppression
+					netDatagram.clear();
+					
+				} catch (IOException e) {
+					// TODO Auto-generated catch block
+					e.printStackTrace();
+				}
+		
 		
 		// on vérifie si il n'y a pas qlq chose dans le listnetmessage
 		lock.lock();
-		
+		/*
 		while(listNetMessage.size() > 0)
 		{
 			// on récupère le premier placé
@@ -123,6 +193,37 @@ public class NetManager implements IBaseRavage
 				dispatcher(header);
 
 		}
+		*/
+		
+		
+		
+		
+		// code de réception de données par le réseau
+		while(listNetDatagram.size() > 0)
+		{
+			// on récupère le Netdatagram
+			NetDatagram datagram = listNetDatagram.get(0);
+			// on supprime le premier de la liste
+			listNetDatagram.remove(0);
+			
+			// on décapsule l'ensemble des NetHeader présent dans le datagram
+			while(datagram.getListHeader().size() > 0)
+			{
+				for(NetHeader header : datagram.getListHeader())
+				{
+					// on appel le dispatcher
+					if(header != null)
+						dispatcher(header);
+				}
+				
+				// on supprime l'ensemble du datagram
+				datagram.getListHeader().clear();
+			}
+			
+			// clear du listnetdatagram
+			listNetDatagram.clear();
+		}
+		
 		
 		lock.unlock();
 

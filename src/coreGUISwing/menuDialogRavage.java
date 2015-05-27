@@ -189,7 +189,7 @@ public class menuDialogRavage extends JDialog implements ActionListener, INetMan
 		{
 			try
 			{
-				// on configure l'adresse ip du joueur adverse
+				// on configure l'adresse ip du joueur aProjetRdverse
 				NetManager.configureIp(tIp.getText());
 				// création du message Hello
 				NetHello hello = new NetHello();
@@ -199,7 +199,7 @@ public class menuDialogRavage extends JDialog implements ActionListener, INetMan
 				header.setMessage(hello);
 				header.setTypeMessage(TYPE.HELLO);
 				// emission
-				NetManager.SendMessage(header);
+				NetManager.PackMessage(header);
 					
 			} catch (IOException e1) 
 			{

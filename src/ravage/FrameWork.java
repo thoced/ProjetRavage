@@ -225,8 +225,8 @@ public class FrameWork
 			entityManager.update(deltaTime);
 			astarManager.update(deltaTime);
 			rect.update(deltaTime);
-			netManager.update(deltaTime);
 			eventManager.update(deltaTime);
+			netManager.update(deltaTime);
 			
 			// Draw des composants
 			renderTexture.clear();

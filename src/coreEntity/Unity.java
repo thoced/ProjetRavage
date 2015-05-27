@@ -214,7 +214,7 @@ public class Unity implements IBaseRavage,ICallBackAStar
 			// émission
 			try
 			{
-				NetManager.SendMessage(header);
+				NetManager.PackMessage(header);
 				
 			} catch (IOException e) {
 				// TODO Auto-generated catch block

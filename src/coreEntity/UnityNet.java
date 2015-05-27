@@ -30,8 +30,6 @@ public class UnityNet extends Unity
 		
 				this.body.setLinearVelocity(new Vec2(0f,0f)); // il est arrivé à destination
 				
-				
-				
 				Vec2 n = null;
 				if(next != null) // il y a un node suivant
 				{
@@ -45,7 +43,7 @@ public class UnityNet extends Unity
 				if(n!=null)
 				{
 						Vec2 diff = n.sub(this.body.getPosition());
-						if(diff.length() < 0.2f)
+						if(diff.length() < 0.4f)
 						{
 							next = null;
 		

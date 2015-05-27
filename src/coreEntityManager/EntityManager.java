@@ -190,7 +190,7 @@ public class EntityManager implements IBaseRavage,IEventCallBack,IRegionSelected
 			header.setMessage(add);
 			try 
 			{
-				NetManager.SendMessage(header);
+				NetManager.PackMessage(header);
 			} catch (IOException e) {
 				// TODO Auto-generated catch block
 				e.printStackTrace();

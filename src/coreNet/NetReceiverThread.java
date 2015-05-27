@@ -12,7 +12,7 @@ public class NetReceiverThread extends Thread
 	// num port receiver
 	private final int PORT = 1234;
 	// size of buffer
-	private final int SIZEBUFFER = 1024;
+	private final int SIZEBUFFER = 4096;
 	// buffer de réception 
 	private byte[] buffer;
 	// Datagram Socket de réception
@@ -43,9 +43,13 @@ public class NetReceiverThread extends Thread
 				// transformation dans un bytearrayinputstream
 				ByteArrayInputStream bais = new ByteArrayInputStream(b);
 				ObjectInputStream ois = new ObjectInputStream(bais);
-				NetHeader header = (NetHeader) ois.readObject();
+				//NetHeader header = (NetHeader) ois.readObject();
+				NetDatagram data = (NetDatagram) ois.readObject();
 				// push dans le netmanager
-				NetManager.pushNetMessage(header);
+				//NetManager.pushNetMessage(header);
+				
+				/// push des NetDatagram
+				NetManager.pushNetDatagram(data);
 				
 			}
 			
@@ -53,15 +57,15 @@ public class NetReceiverThread extends Thread
 		catch (SocketException e) 
 		{
 			// TODO Auto-generated catch block
-			e.printStackTrace();
+			System.out.println("SOCKET FAILED " + e.getMessage());
 		} catch (IOException e) 
 		{
 			// TODO Auto-generated catch block
-			e.printStackTrace();
+			System.out.println("SOCKET FAILED " + e.getMessage());
 		} catch (ClassNotFoundException e) 
 		{
 			// TODO Auto-generated catch block
-			e.printStackTrace();
+			System.out.println("SOCKET FAILED " + e.getMessage());
 		} 
 		
 		
