@@ -79,7 +79,7 @@ public class DrawableUnityManager implements IBaseRavage, Drawable
 		}
 		
 		// pour chaque unity r�seau
-		for(Unity unity : EntityManager.getVectorUnityNet() )
+		for(Unity unity : EntityManager.getVectorUnityNet().values() )
 		{
 			// on récupère la position
 			Vector2f pos = new Vector2f(unity.getPosx(),unity.getPosy());

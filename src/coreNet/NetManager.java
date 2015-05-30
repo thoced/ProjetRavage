@@ -15,8 +15,10 @@ import java.util.concurrent.locks.ReentrantLock;
 
 import org.jsfml.system.Time;
 
+import coreEntity.Unity;
 import coreGUI.IRegionSelectedCallBack;
 import coreGUI.RectSelected;
+import coreNet.NetHeader.TYPE;
 import ravage.IBaseRavage;
 
 public class NetManager implements IBaseRavage
@@ -43,7 +45,7 @@ public class NetManager implements IBaseRavage
 	
 	// NetMessage
 	private static NetDatagram netDatagram;
-	
+			
 	public NetManager()
 	{
 		// instance du listcallback
@@ -55,7 +57,8 @@ public class NetManager implements IBaseRavage
 		lock = new ReentrantLock();
 		// instance de socket emission
 		// instance de NetDatagram
-		netDatagram = new NetDatagram();
+		//netDatagram = new NetDatagram();
+		createNetDatagram();
 		
 	}
 	
@@ -63,6 +66,11 @@ public class NetManager implements IBaseRavage
 	{
 		// attach de callback
 		listCallBack.add( obj);
+	}
+	
+	public static void createNetDatagram()
+	{
+		netDatagram = new NetDatagram();
 	}
 
 	public static void pushNetMessage(NetHeader header)
@@ -82,7 +90,8 @@ public class NetManager implements IBaseRavage
 		
 		lock.unlock();
 	}
-
+		
+	
 	@Override
 	public void init()
 	{
@@ -117,12 +126,15 @@ public class NetManager implements IBaseRavage
 		if(socketEmission != null)
 		socketEmission.send(datagram);
 		
+		
 	}
 	
 	public static void PackMessage(NetHeader header) throws IOException
 	{
+		if(netDatagram == null)
+			createNetDatagram();
 		
-		if(netDatagram.getListHeader().size() < 8)
+		if(netDatagram.getListHeader().size() < 16)
 		{
 			netDatagram.getListHeader().add(header);
 		}
@@ -133,8 +145,18 @@ public class NetManager implements IBaseRavage
 			SendDatagram();
 			// clear du netdatagram
 			netDatagram.clear();
+			// création d'un nouveau datagram
+			createNetDatagram();
 		}
-
+		/*
+		 * 
+		 * 
+		netDatagram.getListHeader().add(header);
+		
+		SendDatagram();
+		
+		netDatagram.clear();
+*/
 	}
 	
 	public static void SendDatagram() throws IOException
@@ -169,9 +191,12 @@ public class NetManager implements IBaseRavage
 				{
 					// envoie
 					if(netDatagram.getListHeader().size() > 0)
+					{
 						SendDatagram();
-					// suppression
-					netDatagram.clear();
+						// suppression
+						netDatagram.clear();
+						createNetDatagram();
+					}
 					
 				} catch (IOException e) {
 					// TODO Auto-generated catch block
@@ -181,8 +206,8 @@ public class NetManager implements IBaseRavage
 		
 		// on vérifie si il n'y a pas qlq chose dans le listnetmessage
 		lock.lock();
-		/*
-		while(listNetMessage.size() > 0)
+		
+	/*	while(listNetMessage.size() > 0)
 		{
 			// on récupère le premier placé
 			header = listNetMessage.get(0);
@@ -192,9 +217,9 @@ public class NetManager implements IBaseRavage
 			if(header != null)	// appel au dispatcher
 				dispatcher(header);
 
-		}
-		*/
+		}*/
 		
+	
 		
 		
 		
@@ -222,10 +247,11 @@ public class NetManager implements IBaseRavage
 			
 			// clear du listnetdatagram
 			listNetDatagram.clear();
+			listNetDatagram = new ArrayList<NetDatagram>();
 		}
 		
-		
 		lock.unlock();
+	
 
 	}
 	

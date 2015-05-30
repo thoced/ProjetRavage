@@ -200,6 +200,7 @@ public class menuDialogRavage extends JDialog implements ActionListener, INetMan
 				header.setTypeMessage(TYPE.HELLO);
 				// emission
 				NetManager.PackMessage(header);
+				//NetManager.SendMessage(header);
 					
 			} catch (IOException e1) 
 			{

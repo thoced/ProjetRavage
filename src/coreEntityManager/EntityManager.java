@@ -2,6 +2,7 @@ package coreEntityManager;
 
 import java.io.IOException;
 import java.util.ArrayList;
+import java.util.Hashtable;
 import java.util.List;
 import java.util.Random;
 
@@ -46,7 +47,10 @@ public class EntityManager implements IBaseRavage,IEventCallBack,IRegionSelected
 	// vecteur des unity du player
 	private static List<Unity> vectorUnity;
 	// vecteur des unity du joueur adverse (réseau)
-	private static List<UnityNet> vectorUnityNet;
+	//private static List<UnityNet> vectorUnityNet;
+	
+	private static Hashtable<Integer,UnityNet> vectorUnityNet;
+	
 	// test clock
 	private Clock clock;
 	private Time delta;
@@ -68,7 +72,8 @@ public class EntityManager implements IBaseRavage,IEventCallBack,IRegionSelected
 		// liste des unitÃ©s selectionnÃ©s
 		listUnitySelected = new ArrayList<Unity>();
 		// instance vectorunitynet
-		vectorUnityNet = new ArrayList<UnityNet>();
+		//vectorUnityNet = new ArrayList<UnityNet>();
+		vectorUnityNet = new Hashtable<Integer,UnityNet>();
 		
 		clock = new Clock();
 		delta = Time.ZERO;
@@ -84,15 +89,22 @@ public class EntityManager implements IBaseRavage,IEventCallBack,IRegionSelected
 		for(Unity unity : vectorUnity)
 		{
 			unity.update(deltaTime);
+			// ajout test dans le netUnityDatagra
+			
 		}
 		// on parse les unités adverses (réseau)
-		for(Unity unity :vectorUnityNet)
+		for(Unity unity :vectorUnityNet.values())
 		{
 			unity.update(deltaTime);
 		}
 		
 		if(arrow!=null)
 			arrow.update(deltaTime);
+		
+		
+		// code test - envoie de la liste des unité
+		
+	
 	}
 
 	@Override
@@ -117,11 +129,19 @@ public class EntityManager implements IBaseRavage,IEventCallBack,IRegionSelected
 	
 	
 
-	public static List<UnityNet> getVectorUnityNet() {
+	/*public static List<UnityNet> getVectorUnityNet() {
 		return vectorUnityNet;
 	}
 
 	public static void setVectorUnityNet(List<UnityNet> vectorUnityNet) {
+		EntityManager.vectorUnityNet = vectorUnityNet;
+	}*/
+
+	public static Hashtable<Integer, UnityNet> getVectorUnityNet() {
+		return vectorUnityNet;
+	}
+
+	public static void setVectorUnityNet(Hashtable<Integer, UnityNet> vectorUnityNet) {
 		EntityManager.vectorUnityNet = vectorUnityNet;
 	}
 
@@ -191,6 +211,8 @@ public class EntityManager implements IBaseRavage,IEventCallBack,IRegionSelected
 			try 
 			{
 				NetManager.PackMessage(header);
+				
+				//NetManager.SendMessage(header);
 			} catch (IOException e) {
 				// TODO Auto-generated catch block
 				e.printStackTrace();
@@ -263,8 +285,8 @@ public class EntityManager implements IBaseRavage,IEventCallBack,IRegionSelected
 		u.setPosition(unity.getPosx(), unity.getPosy());;
 		u.setId(unity.getIdUnity());
 		// ajout dans le vecteur unity réseau
-		vectorUnityNet.add(u);
-		
+		//vectorUnityNet.add(u);
+		vectorUnityNet.put(u.getId(), u);
 		
 	}
 	
@@ -273,7 +295,7 @@ public class EntityManager implements IBaseRavage,IEventCallBack,IRegionSelected
 	{
 		// réception du unity move réseau	
 		// on récupère le bon unity
-		System.out.println("réception d'un move: " + String.valueOf(unity.getNextPosx()) + " : " + String.valueOf(unity.getNextPosy()));
+		/*System.out.println("réception d'un move: " + String.valueOf(unity.getNextPosx()) + " : " + String.valueOf(unity.getNextPosy()));
 		for(int i=0;i<vectorUnityNet.size();i++)
 		{
 			UnityNet u = vectorUnityNet.get(i);
@@ -287,7 +309,30 @@ public class EntityManager implements IBaseRavage,IEventCallBack,IRegionSelected
 				u.setNext(n);
 				vectorUnityNet.set(i,u);
 			}
+		}*/
+		
+		
+		UnityNet un = vectorUnityNet.get(unity.getId());
+		if(un != null)
+		{
+			// l'unité est trouvée
+			Node n = new Node(unity.getNextPosx(),unity.getNextPosy(),true);
+			un.setPosXYMeter(unity.getPosx(),unity.getPosy());
+			un.setNext(n);
 		}
+		else
+		{
+			// l'unité n'est pas trouvé suite à un probleme réseau, il faut donc l'ajouter
+			// création d'une unité venant du réseau
+			UnityNet u= new UnityNet();
+			u.init();
+			u.setPosition(unity.getPosx(), unity.getPosy());;
+			u.setId(unity.getId());
+			// ajout dans le vecteur unity réseau
+			//vectorUnityNet.add(u);
+			vectorUnityNet.put(u.getId(), u);
+		}
+		
 	
 	}
 
