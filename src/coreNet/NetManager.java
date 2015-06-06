@@ -23,6 +23,8 @@ import ravage.IBaseRavage;
 
 public class NetManager implements IBaseRavage
 {
+	private final static  int MAX_INFO_IN_DATAGRAM = 32; 
+	
 	private static Lock lock;
 	
 	private static List<NetHeader> listNetMessage;
@@ -134,7 +136,7 @@ public class NetManager implements IBaseRavage
 		if(netDatagram == null)
 			createNetDatagram();
 		
-		if(netDatagram.getListHeader().size() < 64)
+		if(netDatagram.getListHeader().size() < MAX_INFO_IN_DATAGRAM)
 		{
 			netDatagram.getListHeader().add(header);
 		}
@@ -272,6 +274,10 @@ public class NetManager implements IBaseRavage
 			case MOVE: 	NetMoveUnity munity = (NetMoveUnity)header.getMessage();
 					   	callBackMove(munity);
 					   	break;
+					   	
+			case SYNC: 	NetSynchronize sync = (NetSynchronize)header.getMessage();
+						callBackSync(sync);
+						break;
 					   	
 								   	
 			default: break;

@@ -1,5 +1,7 @@
 package coreNet;
 
+import org.jbox2d.common.Vec2;
+
 public class NetMoveUnity extends NetBase 
 {
 	private int id;
@@ -12,6 +14,7 @@ public class NetMoveUnity extends NetBase
 	
 	private float nextPosy;
 
+
 	public int getId() {
 		return id;
 	}
@@ -19,6 +22,7 @@ public class NetMoveUnity extends NetBase
 	public void setId(int id) {
 		this.id = id;
 	}
+	
 
 	public float getPosx() {
 		return posx;

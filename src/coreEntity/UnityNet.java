@@ -28,7 +28,7 @@ public class UnityNet extends Unity
 				posx = body.getPosition().x * PhysicWorldManager.getRatioPixelMeter();
 				posy = body.getPosition().y * PhysicWorldManager.getRatioPixelMeter();
 		
-				this.body.setLinearVelocity(new Vec2(0f,0f)); // il est arrivé à destination
+			//	this.body.setLinearVelocity(new Vec2(0f,0f)); // il est arrivé à destination
 				
 				Vec2 n = null;
 				if(next != null) // il y a un node suivant
@@ -40,18 +40,25 @@ public class UnityNet extends Unity
 					
 				}
 				
+				
 				if(n!=null)
 				{
-						Vec2 diff = n.sub(this.body.getPosition());
-						if(diff.length() < 0.4f)
+						this.vecTarget = n.sub(this.body.getPosition());
+						if(this.vecTarget.length() < 0.4f)
 						{
 							next = null;
+							this.body.setLinearVelocity(new Vec2(0f,0f));
 		
 						}
 						else
 						{
-							diff.normalize();
-							this.body.setLinearVelocity(diff.mul(6f));
+							this.vecTarget.normalize();
+							// on calcul la rotation
+							this.computeRotation();
+							// on applique un vecteur de d�placement
+							this.body.setLinearVelocity(this.vecTarget.mul(6f));
+							
+							
 						}	
 				}
 			

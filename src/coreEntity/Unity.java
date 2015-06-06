@@ -7,6 +7,7 @@ import java.util.Random;
 
 import org.jbox2d.collision.shapes.CircleShape;
 import org.jbox2d.collision.shapes.Shape;
+import org.jbox2d.common.Rot;
 import org.jbox2d.common.Vec2;
 import org.jbox2d.dynamics.Body;
 import org.jbox2d.dynamics.BodyDef;
@@ -15,9 +16,9 @@ import org.jbox2d.dynamics.Fixture;
 import org.jbox2d.dynamics.FixtureDef;
 import org.jsfml.system.Clock;
 import org.jsfml.system.Time;
+import org.jsfml.system.Vector2f;
 import org.newdawn.slick.util.pathfinding.Path;
 import org.newdawn.slick.util.pathfinding.navmesh.NavPath;
-
 
 import coreAI.AstarManager;
 import coreAI.ICallBackAStar;
@@ -27,11 +28,13 @@ import coreNet.NetHeader;
 import coreNet.NetHeader.TYPE;
 import coreNet.NetManager;
 import coreNet.NetMoveUnity;
+import coreNet.NetSynchronize;
 import corePhysic.PhysicWorldManager;
 import ravage.IBaseRavage;
 
 public class Unity implements IBaseRavage,ICallBackAStar
 {
+	protected final static float  TIME_BEFORE_TELEPORTATION = 0.5f;
 
 	protected int id;
 	
@@ -48,6 +51,10 @@ public class Unity implements IBaseRavage,ICallBackAStar
 	protected Body body;
 	
 	protected Vec2 targetPosition;
+	
+	protected Vec2 vecTarget;
+	
+	protected Vec2 vecDirFormation; // vecteur de formation finale
 	
 	// pathfinal pour le systeme classique
 	protected List<Node> pathFinal;
@@ -109,6 +116,7 @@ public class Unity implements IBaseRavage,ICallBackAStar
 		resetSearchClock = new Clock();
 		
 	
+	
 		
 		
 		
@@ -117,13 +125,30 @@ public class Unity implements IBaseRavage,ICallBackAStar
 	
 	}
 	
+	
+	
+	public Vec2 getVecTarget() {
+		return vecTarget;
+	}
+
+
+
+	public void setVecTarget(Vec2 vecTarget) {
+		this.vecTarget = vecTarget;
+	}
+
+
+
 	public void stop()
 	{
 		this.isStop = true;
 	}
 	
-	public boolean setTargetPosition(float px,float py,int tx,int ty)
+	public boolean setTargetPosition(float px,float py,int tx,int ty,Vec2 dir)
 	{
+		// instance de vecteur de formation finale
+		this.vecDirFormation = dir;
+		
 		this.tfx = px;
 		this.tfy = py;
 		// une demande de chemin va Ítre effectuÈe, on stoppe l'unitÈ pour Èviter le phÈnomËne de rebond
@@ -223,6 +248,41 @@ public class Unity implements IBaseRavage,ICallBackAStar
 			}
 		 
 	}
+	
+	
+	protected void NetSendSynchronise()
+	{
+		NetHeader header = new NetHeader();
+		header.setTypeMessage(TYPE.SYNC);
+		NetSynchronize sync = new NetSynchronize();
+		sync.setIdUnity(this.getId());
+		sync.setPosx(this.getPositionMeterX());
+		sync.setPosy(this.getPositionMeterY());
+		sync.setRotation(this.getBody().getAngle());
+		header.setMessage(sync);
+		// Èmission
+		try
+		{
+			NetManager.PackMessage(header);
+			//NetManager.SendMessage(header);
+			
+		} catch (IOException e) {
+			// TODO Auto-generated catch block
+			e.printStackTrace();
+		}
+	}
+	
+	protected void computeRotation()
+	{
+		if(this.vecTarget != null)
+		{
+			Rot r = new Rot();
+			r.s = this.vecTarget.y;
+			r.c = this.vecTarget.x;
+			float angle = r.getAngle(); 
+			this.body.setTransform(this.getBody().getPosition(), angle);
+		}
+	}
 
 	@Override
 	public void update(Time deltaTime) 
@@ -242,7 +302,7 @@ public class Unity implements IBaseRavage,ICallBackAStar
 		if(!nextNode)
 		{
 			elapseSearchClock = Time.add(elapseSearchClock, deltaTime);
-			if(elapseSearchClock.asSeconds() > 2f) // si bloqu√© plus de 2 secondes
+			if(elapseSearchClock.asSeconds() > TIME_BEFORE_TELEPORTATION) // si bloqu√© plus de 2 secondes
 			{
 				elapseSearchClock = Time.ZERO;
 				// on saute une node de recherche
@@ -295,8 +355,9 @@ public class Unity implements IBaseRavage,ICallBackAStar
 				// ------------------------------------
 						
 					Vec2 n =  new Vec2(this.tfx / PhysicWorldManager.getRatioPixelMeter(),this.tfy  / PhysicWorldManager.getRatioPixelMeter());
-					Vec2 diff = n.sub(this.body.getPosition());
-					if(diff.length() < 0.2f )
+					this.vecTarget = n.sub(this.body.getPosition());
+					
+					if(this.vecTarget.length() < 0.2f )
 						{
 							this.body.setLinearVelocity(new Vec2(0f,0f));
 							// envoie sur le rÈseau
@@ -305,14 +366,26 @@ public class Unity implements IBaseRavage,ICallBackAStar
 							{
 								this.NetSend(this.body.getPosition().x, this.body.getPosition().y,this.body.getPosition().x, this.body.getPosition().y);
 								this.isArrived = true;
+							
 							}
+							
+							
+							// il est arrivÈ, on tourne l'axe vers la vecteur fleche pointÈ
+							this.vecTarget = this.vecDirFormation;
+							// on dÈtermine l'angle du sprite
+							this.computeRotation();
+							// envoie de la synchronisation finale
+							this.NetSendSynchronise();
 									
 						}
 						else
 						{
-							diff.normalize();
-							this.body.setLinearVelocity(diff.mul(6f));
-									
+							this.vecTarget.normalize();
+							// on calcul la rotation
+							this.computeRotation();
+							// on applique un vecteur de dÈplacement
+							this.body.setLinearVelocity(this.vecTarget.mul(6f));
+							
 							// envoie des informations sur le rÈseau
 								this.NetSend(this.body.getPosition().x, this.body.getPosition().y, n.x, n.y);
 								
@@ -331,17 +404,22 @@ public class Unity implements IBaseRavage,ICallBackAStar
 					// ------------------------------------------------
 				
 					Vec2 n =  new Vec2(mx,my);
-					Vec2 diff = n.sub(this.body.getPosition());
-					if(diff.length() < 0.4f)
+					this.vecTarget = n.sub(this.body.getPosition());
+				
+					if(this.vecTarget.length() < 0.4f)
 					{
 						nextNode = true;
-						
 						this.body.setLinearVelocity(new Vec2(0f,0f));
+					
+					
 					}
 					else
 					{
-						diff.normalize();
-						this.body.setLinearVelocity(diff.mul(6f));
+						this.vecTarget.normalize();
+						// on calcul la rotation
+						this.computeRotation();
+						// on applique un vecteur de dÈplacement
+						this.body.setLinearVelocity(this.vecTarget.mul(6f));
 					}
 					
 				}
@@ -351,6 +429,14 @@ public class Unity implements IBaseRavage,ICallBackAStar
 		// Code pour t√©l√©porter une unit√© bloqu√©
 		// ------------------------------------
 			
+	}
+	
+	public Vec2 getVectorTarget()
+	{
+		if(this.vecTarget == null)
+			return new Vec2(1,0);
+		else
+			return this.vecTarget;
 	}
 
 	@Override

@@ -295,23 +295,7 @@ public class EntityManager implements IBaseRavage,IEventCallBack,IRegionSelected
 	{
 		// réception du unity move réseau	
 		// on récupère le bon unity
-		/*System.out.println("réception d'un move: " + String.valueOf(unity.getNextPosx()) + " : " + String.valueOf(unity.getNextPosy()));
-		for(int i=0;i<vectorUnityNet.size();i++)
-		{
-			UnityNet u = vectorUnityNet.get(i);
-			
-			if(u.getId() == unity.getId())
-			{
-				System.out.println("application du move : " + String.valueOf(unity.getId()));
-				// création d'un node NEXT
-				Node n = new Node(unity.getNextPosx(),unity.getNextPosy(),true);
-				u.setPosXYMeter(unity.getPosx(),unity.getPosy());
-				u.setNext(n);
-				vectorUnityNet.set(i,u);
-			}
-		}*/
-		
-		
+				
 		UnityNet un = vectorUnityNet.get(unity.getId());
 		if(un != null)
 		{
@@ -319,6 +303,7 @@ public class EntityManager implements IBaseRavage,IEventCallBack,IRegionSelected
 			Node n = new Node(unity.getNextPosx(),unity.getNextPosy(),true);
 			un.setPosXYMeter(unity.getPosx(),unity.getPosy());
 			un.setNext(n);
+					
 		}
 		else
 		{
@@ -344,9 +329,16 @@ public class EntityManager implements IBaseRavage,IEventCallBack,IRegionSelected
 	}
 
 	@Override
-	public void onSynchronize(NetSynchronize sync) {
-		// TODO Auto-generated method stub
-		
+	public void onSynchronize(NetSynchronize sync) 
+	{
+		UnityNet un = vectorUnityNet.get(sync.getIdUnity());
+		if(un != null)
+		{
+			
+			un.setPosXYMeter(sync.getPosx(),sync.getPosy());
+			un.getBody().setTransform(un.getBody().getPosition(),sync.getRotation());
+					
+		}
 	}
 
 	@Override
@@ -377,7 +369,7 @@ public class EntityManager implements IBaseRavage,IEventCallBack,IRegionSelected
 			// on calcul la position ecran
 			Vector2f pos = Vector2f.div(new Vector2f(dep.x,dep.y), PhysicWorldManager.getRatioPixelMeter());
 			// on envoie l'unité sur sa positoin
-			if(u.setTargetPosition(dep.x,dep.y,(int)pos.x+1,(int)pos.y+1) == false)
+			if(u.setTargetPosition(dep.x,dep.y,(int)pos.x+1,(int)pos.y+1,dir) == false)
 			{
 				// aucune position possible pour l'unité, on la place derrière
 				
