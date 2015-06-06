@@ -134,7 +134,7 @@ public class NetManager implements IBaseRavage
 		if(netDatagram == null)
 			createNetDatagram();
 		
-		if(netDatagram.getListHeader().size() < 16)
+		if(netDatagram.getListHeader().size() < 64)
 		{
 			netDatagram.getListHeader().add(header);
 		}
@@ -245,10 +245,12 @@ public class NetManager implements IBaseRavage
 				datagram.getListHeader().clear();
 			}
 			
-			// clear du listnetdatagram
+			
+		}
+		
+		// clear du listnetdatagram
 			listNetDatagram.clear();
 			listNetDatagram = new ArrayList<NetDatagram>();
-		}
 		
 		lock.unlock();
 	
@@ -271,10 +273,7 @@ public class NetManager implements IBaseRavage
 					   	callBackMove(munity);
 					   	break;
 					   	
-			case SYNC:  NetSynchronize sync = (NetSynchronize)header.getMessage();
-						callBackSync(sync);
-						break;
-					   	
+								   	
 			default: break;
 		}
 	}

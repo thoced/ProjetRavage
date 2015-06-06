@@ -12,7 +12,7 @@ public class NetReceiverThread extends Thread
 	// num port receiver
 	private final int PORT = 1234;
 	// size of buffer
-	private final int SIZEBUFFER = 2048;
+	private final int SIZEBUFFER = 4048;
 	// buffer de réception 
 	private byte[] buffer;
 	// Datagram Socket de réception
