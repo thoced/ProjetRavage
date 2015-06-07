@@ -34,26 +34,40 @@ import ravage.IBaseRavage;
 
 public class Unity implements IBaseRavage,ICallBackAStar
 {
+	// temps avant téléportation
 	protected final static float  TIME_BEFORE_TELEPORTATION = 0.5f;
 
+	// id de l'unité
 	protected int id;
 	
+	// type d'unité
+	protected int idType;
+	
+	/// position x et y en pixels
 	protected float posx,posy;
 	
+	// 
 	protected int tx,ty;
 	
+	// position target en pixels
 	protected float tfx,tfy;  // target en pixels
 	
+	// position de l'unité sur une node
 	protected int   nodex,nodey;
 	
+	// angle de rotation
 	protected float rotation;
 	
+	// body physic
 	protected Body body;
 	
+	// 
 	protected Vec2 targetPosition;
 	
+	// vecteur direction 
 	protected Vec2 vecTarget;
 	
+	// vecteur direction de formation
 	protected Vec2 vecDirFormation; // vecteur de formation finale
 	
 	// pathfinal pour le systeme classique
@@ -101,7 +115,7 @@ public class Unity implements IBaseRavage,ICallBackAStar
 		body = PhysicWorldManager.getWorld().createBody(bdef);
 		
 		Shape shape = new CircleShape();
-		shape.m_radius = 0.45f;
+		shape.m_radius = 0.5f;
 		
 		FixtureDef fDef = new FixtureDef();
 		fDef.shape = shape;
@@ -114,14 +128,6 @@ public class Unity implements IBaseRavage,ICallBackAStar
 		
 		// instance du resetSearch
 		resetSearchClock = new Clock();
-		
-	
-	
-		
-		
-		
-	
-	
 	
 	}
 	
@@ -272,14 +278,24 @@ public class Unity implements IBaseRavage,ICallBackAStar
 		}
 	}
 	
+	protected float lerp(float value, float start, float end)
+	{
+	    return start + (end - start) * value;
+	}
+	
 	protected void computeRotation()
 	{
 		if(this.vecTarget != null)
 		{
+			// on crée la class de rotation
 			Rot r = new Rot();
 			r.s = this.vecTarget.y;
 			r.c = this.vecTarget.x;
-			float angle = r.getAngle(); 
+			// receptin de l'angle de rotation
+			//float angle = r.getAngle(); 
+			// assouplissement en utilisant un lerp
+			float angle = lerp(0.2f,this.body.getAngle(), r.getAngle() ); // angle de la tourelle déterminé
+			
 			this.body.setTransform(this.getBody().getPosition(), angle);
 		}
 	}
@@ -312,7 +328,7 @@ public class Unity implements IBaseRavage,ICallBackAStar
 					int y = this.pathFinalPath.getY(this.indexNode);
 					//this.pathFinal.remove(0);
 					// on tÃ©lÃ©porte l'unitÃ©
-					this.body.setTransform(new Vec2(x,y), 0f);
+					this.body.setTransform(new Vec2(x,y), this.body.getAngle());
 					nextNode = true;
 				}
 				
