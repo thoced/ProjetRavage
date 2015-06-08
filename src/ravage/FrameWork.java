@@ -18,6 +18,7 @@ import org.jbox2d.dynamics.BodyDef;
 import org.jbox2d.dynamics.BodyType;
 import org.jbox2d.dynamics.Fixture;
 import org.jbox2d.dynamics.FixtureDef;
+import org.jsfml.graphics.Color;
 import org.jsfml.graphics.RectangleShape;
 import org.jsfml.graphics.RenderTexture;
 import org.jsfml.graphics.RenderWindow;
@@ -39,6 +40,8 @@ import coreEntity.Unity;
 import coreEntityManager.EntityManager;
 import coreEvent.EventManager;
 import coreGUI.RectSelected;
+import coreGUIInterface.GuiManager;
+import coreGUIInterface.PanelRavage;
 import coreGUISwing.menuDialogRavage;
 import coreLevel.Level;
 import coreLevel.LevelManager;
@@ -58,6 +61,7 @@ public class FrameWork
 	private RectSelected rect;
 	private NetManager netManager;
 	private EventManager eventManager;
+	private GuiManager	guiManager;
 	// Clocks
 	private Clock frameClock;
 	// fps
@@ -70,6 +74,9 @@ public class FrameWork
 	// RenderTarget
 	private RenderTexture renderTexture;
 	private Sprite	renderSprite;
+	// Render pour le Gui
+	private RenderTexture renderGui;
+	private Sprite renderGuiSprite;
 	
 	private menuDialogRavage menu;
 	
@@ -84,7 +91,7 @@ public class FrameWork
 		
 
 		// creation de l'environnemnet graphique jsfml
-		window = new RenderWindow(new VideoMode(1680,1050),"ProjetRavage",RenderWindow.FULLSCREEN);
+		window = new RenderWindow(new VideoMode(1024,768),"ProjetRavage");
 		window.setFramerateLimit(60);
 		// Instance des variables
 		frameClock = new Clock();
@@ -112,6 +119,8 @@ public class FrameWork
 		rect.init();
 		eventManager = new EventManager();
 		eventManager.init();
+		guiManager = new GuiManager();
+		guiManager.init();
 		
 		
 		// attachement au call back
@@ -130,8 +139,16 @@ public class FrameWork
 		renderTexture = new RenderTexture();
 		renderTexture.create(window.getSize().x, window.getSize().y);
 		renderSprite = new Sprite(renderTexture.getTexture());
+		// création de la texture pour le render gui
+		renderGui = new RenderTexture();
+		renderGui.create(window.getSize().x, window.getSize().y);
+		renderGuiSprite = new Sprite(renderGui.getTexture());
 		
+		// création des guis tests
 		
+		PanelRavage panel = new PanelRavage("My panel",0,0,256,380);
+		panel.setTextureBackground(TexturesManager.GetTextureByName("panel.png"));
+		guiManager.addGui(panel);
 		
 		
 		// on place une unity
@@ -186,7 +203,8 @@ public class FrameWork
 			for(Event event : window.pollEvents())
 			{
 				// catch des events
-				eventManager.catchEvent(event);
+				if(guiManager.catchEvent(event) != true)  // si un evenement est attrapé par le guiManager, on ne passe pas l'evenement au Manager d'eventment du jeu
+					eventManager.catchEvent(event);
 
 				if(event.type == Event.Type.CLOSED) 
 				{
@@ -236,6 +254,10 @@ public class FrameWork
 			// Draw des unity
 			drawaUnityManager.draw(renderTexture, null);
 			renderTexture.display();
+			// draw du guiManager
+			renderGui.clear(Color.TRANSPARENT);
+			guiManager.draw(renderGui, null);
+			renderGui.display();
 			
 			// draw du rect
 			rect.draw(renderTexture, null);
@@ -243,6 +265,7 @@ public class FrameWork
 			// draw final
 			window.clear();
 			window.draw(renderSprite);
+			window.draw(renderGuiSprite);
 			window.display();
 			
 			

@@ -104,6 +104,8 @@ public class EventManager implements IBaseRavage
 	{
 		// ajout dans la liste call back temporary
 		listCallBackTemporary.add(i);
+		
+		
 	}
 	
 	public static void removeCallBack(IEventCallBack r)
