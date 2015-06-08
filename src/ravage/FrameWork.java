@@ -146,7 +146,7 @@ public class FrameWork
 		
 		// création des guis tests
 		
-		PanelRavage panel = new PanelRavage("My panel",0,0,256,380);
+		PanelRavage panel = new PanelRavage("My panel",512,384,1024,768);
 		panel.setTextureBackground(TexturesManager.GetTextureByName("panel.png"));
 		guiManager.addGui(panel);
 		

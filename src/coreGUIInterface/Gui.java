@@ -45,6 +45,8 @@ public class Gui implements Drawable {
 			this.spriteBackground.setOrigin(new Vector2f(0f,0f));
 			// TextureRect
 			this.spriteBackground.setTextureRect(new IntRect(0,0,this.textureBackground.getSize().x,this.textureBackground.getSize().y));
+			// taille
+			this.spriteBackground.setScale(width/this.textureBackground.getSize().x,height/this.textureBackground.getSize().y);
 		}
 	}
 
