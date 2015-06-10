@@ -7,6 +7,7 @@ import java.awt.image.BufferStrategy;
 import java.io.IOException;
 import java.nio.ByteBuffer;
 
+import javax.swing.ButtonGroup;
 import javax.swing.JButton;
 import javax.swing.JDialog;
 import javax.swing.JEditorPane;
@@ -43,6 +44,8 @@ import java.awt.BufferCapabilities;
 import java.awt.Dialog.ModalExclusionType;
 import java.awt.Window.Type;
 
+import javax.swing.JRadioButton;
+
 public class menuDialogRavage extends JDialog implements ActionListener, INetManagerCallBack
 {
 	private JTextField tNickName;
@@ -57,6 +60,11 @@ public class menuDialogRavage extends JDialog implements ActionListener, INetMan
 	private NetManager netManager;
 	
 	private menuThread mt;
+	private JRadioButton rNon;
+	private JRadioButton rOui;
+	private JComboBox comboResolution;
+	
+	
 	
 	public menuDialogRavage(JFrame frame,String titre,boolean modal,NetManager netmanager)
 	{
@@ -139,6 +147,33 @@ public class menuDialogRavage extends JDialog implements ActionListener, INetMan
 		cFlags.setBounds(404, 46, 168, 20);
 		getContentPane().add(cFlags);
 		
+		comboResolution = new JComboBox();
+		comboResolution.setModel(new DefaultComboBoxModel(new String[] {"1024 / 768", "1152 / 864", "1280 / 720", "1280 / 768", "1280 / 800", "1280 / 960", "1280 / 1024", "1360 / 768", "1366 / 768", "1400 / 1050", "1440 / 900", "1600 / 900", "1600 / 1024", "1680 / 1050", "1920 / 1080"}));
+		comboResolution.setBounds(93, 399, 228, 20);
+		getContentPane().add(comboResolution);
+		
+		JLabel lblNewLabel_5 = new JLabel("R\u00E9solution");
+		lblNewLabel_5.setBounds(10, 399, 73, 20);
+		getContentPane().add(lblNewLabel_5);
+		
+		JLabel lblNewLabel_6 = new JLabel("FullScreen");
+		lblNewLabel_6.setBounds(10, 434, 79, 14);
+		getContentPane().add(lblNewLabel_6);
+		
+		ButtonGroup group = new ButtonGroup();
+		
+		rOui = new JRadioButton("Oui");
+		rOui.setBounds(126, 430, 109, 23);
+		getContentPane().add(rOui);
+		
+		rNon = new JRadioButton("Non");
+		rNon.setSelected(true);
+		rNon.setBounds(237, 430, 109, 23);
+		getContentPane().add(rNon);
+		
+		group.add(rOui);
+		group.add(rNon);
+		
 		builderString = new StringBuilder();
 		
 		 mt = new menuThread(netManager);
@@ -146,6 +181,32 @@ public class menuDialogRavage extends JDialog implements ActionListener, INetMan
 		 
 		
 
+	}
+	
+	public boolean isFullScreen()
+	{
+		if(rOui.isSelected())
+			return true;
+		else
+			return false;
+	}
+	
+	public int[] getResolutionScreenXY()
+	{
+		String resolution = (String)comboResolution.getSelectedItem();
+		resolution.trim();
+		String[] xy = resolution.split("/");
+		int x = 1024,y = 768;
+		if(xy != null && xy.length == 2)
+		{
+			 x = Integer.parseInt(xy[0].trim());
+			 y = Integer.parseInt(xy[1].trim());
+		}
+		
+		int[] rxy = new int[2];
+		rxy[0] = x;
+		rxy[1] = y;
+		return rxy;
 	}
 	@Override
 	public void dispose() {

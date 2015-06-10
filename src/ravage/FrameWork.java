@@ -27,6 +27,7 @@ import org.jsfml.graphics.TextureCreationException;
 import org.jsfml.system.Clock;
 import org.jsfml.system.Time;
 import org.jsfml.system.Vector2f;
+import org.jsfml.system.Vector2i;
 import org.jsfml.window.Keyboard;
 import org.jsfml.window.VideoMode;
 import org.jsfml.window.event.Event;
@@ -40,6 +41,7 @@ import coreEntity.Unity;
 import coreEntityManager.EntityManager;
 import coreEvent.EventManager;
 import coreGUI.RectSelected;
+import coreGUIInterface.ButtonRavage;
 import coreGUIInterface.GuiManager;
 import coreGUIInterface.PanelRavage;
 import coreGUISwing.menuDialogRavage;
@@ -89,10 +91,7 @@ public class FrameWork
 		
 		// Lancement du menu
 		
-
-		// creation de l'environnemnet graphique jsfml
-		window = new RenderWindow(new VideoMode(1024,768),"ProjetRavage");
-		window.setFramerateLimit(60);
+		window = new RenderWindow(new VideoMode(1024,768),"ProjetRavage",RenderWindow.DEFAULT);
 		// Instance des variables
 		frameClock = new Clock();
 		fpsTime = Time.ZERO;
@@ -100,7 +99,17 @@ public class FrameWork
 		menu = new menuDialogRavage(null, "Projet Ravage Menu", true,netManager);
 		menu.setVisible(true);
 		menu.dispose();
+		
+		// creation de l'environnemnet graphique jsfml
+		window.close();
+		if(menu.isFullScreen())
+			window = new RenderWindow(new VideoMode(menu.getResolutionScreenXY()[0],menu.getResolutionScreenXY()[1]),"ProjetRavage",RenderWindow.FULLSCREEN);
+		else
+			window = new RenderWindow(new VideoMode(menu.getResolutionScreenXY()[0],menu.getResolutionScreenXY()[1]),"ProjetRavage",RenderWindow.DEFAULT);
+		
+		window.setFramerateLimit(60);
 				
+		
 	
 		// Instance des managers
 		physicWorld = new PhysicWorldManager();
@@ -146,51 +155,17 @@ public class FrameWork
 		
 		// création des guis tests
 		
-		PanelRavage panel = new PanelRavage("My panel",512,384,1024,768);
+		/*PanelRavage panel = new PanelRavage("My panel",512,384,128,256);
 		panel.setTextureBackground(TexturesManager.GetTextureByName("panel.png"));
+		panel.setColorBackground(new Color(128,128,128));
+		panel.setOutlineColorBackground(new Color(200,200,200));
+		panel.setSizeOutlineBackground(4f);
 		guiManager.addGui(panel);
 		
-		
-		// on place une unity
-		/*for(int y=0;y < 32;y++)
-		{
-			for(int x=0;x<32;x++)
-			{
-				Unity unity = new Unity();
-				unity.init();
-				unity.setPosition(new Vec2(x * 2, (y * 2) + 192 ));
-				entityManager.getVectorUnity().add(unity);
-			}
-		}*/
-	
-	/*	for(int i=0;i<60;i+=2)
-		{
-			Unity unity = new Unity();
-			unity.init();
-			unity.setPosition(20 + i,12);
-			entityManager.getVectorUnity().add(unity);
-			
-		//	unity.setTargetPosition(363,217);
-		}
-		*/
-		
-		
-		
-	//	NavPath paths = navmesh.findPath(1f	, 1f, 100, 110, true);
-		
-	/*	if(paths != null)
-		{
-			System.out.println(paths.length());
-			
-			for(int i=0;i<paths.length();i++)
-			{
-				float x = paths.getX(i);
-				float y = paths.getY(i);
-				System.out.println("X: " + x + " Y: " + y);
-			}
-		}*/
-		
-		
+		ButtonRavage button = new ButtonRavage("my button",32,32,64,32);
+		button.setColorBackground(new Color(128,32,32));
+	    panel.addGui(button);*/
+
 		
 	}
 
