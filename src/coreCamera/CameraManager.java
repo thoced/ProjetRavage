@@ -15,6 +15,7 @@ import org.jsfml.window.event.MouseButtonEvent;
 import org.jsfml.window.event.MouseEvent;
 
 import coreEvent.IEventCallBack;
+import ravage.FrameWork;
 import ravage.IBaseRavage;
 
 public class CameraManager implements IBaseRavage, IEventCallBack
@@ -62,13 +63,13 @@ public class CameraManager implements IBaseRavage, IEventCallBack
 		if(Keyboard.isKeyPressed(Key.UP))
 			 this.center = Vector2f.sub(this.center, Vector2f.mul(new Vector2f(0f,1f), mul));
 		
-		if(Mouse.getPosition().x > this.view.getSize().x - 64f)
+		if(Mouse.getPosition(FrameWork.getWindow()).x > this.view.getSize().x - 64f)
 			 this.center = Vector2f.add(this.center, Vector2f.mul(new Vector2f(1f,0f), mul));
-		if(Mouse.getPosition().x < 64f)
+		if(Mouse.getPosition(FrameWork.getWindow()).x < 64f)
 			 this.center = Vector2f.sub(this.center, Vector2f.mul(new Vector2f(1f,0f), mul));
-		if(Mouse.getPosition().y > this.view.getSize().y - 64f)
+		if(Mouse.getPosition(FrameWork.getWindow()).y > this.view.getSize().y - 64f)
 			this.center = Vector2f.add(this.center, Vector2f.mul(new Vector2f(0f,1f), mul));
-		if(Mouse.getPosition().y < 64f)
+		if(Mouse.getPosition(FrameWork.getWindow()).y < 64f)
 			 this.center = Vector2f.sub(this.center, Vector2f.mul(new Vector2f(0f,1f), mul));
 		
 		// compute du View
