@@ -75,6 +75,18 @@ public class Gui implements Drawable {
 		if(shape != null)
 			shape.setOutlineThickness(size);
 	}
+	
+	public void setPosition(float x,float y)
+	{
+		this.x = x;
+		this.y = y;
+		// update de la position graphique
+		if(this.shape != null)
+		{
+			this.shape.setPosition(new Vector2f(this.x,this.y));
+		}
+		
+	}
 
 	public float getWidth() {
 		return width;

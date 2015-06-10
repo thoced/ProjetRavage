@@ -16,6 +16,8 @@ public class PanelRavage extends Gui
 {
 	// container de Gui
 	protected List<Gui> containerGui;
+	// isPressed
+	protected boolean isPressed = false;
 	
 	public PanelRavage(String title)
 	{
@@ -64,6 +66,8 @@ public class PanelRavage extends Gui
 					gui.onMousePressed(event);
 						
 				}
+				//Is Pressed
+				isPressed = true;
 				// on return true car le panel a capté l'event
 				return true;
 			}
@@ -77,20 +81,32 @@ public class PanelRavage extends Gui
 	@Override
 	public boolean onMouseReleased(Event event) 
 	{
+		// is released
+		boolean isReleased = false;
+		
 		if(this.shape != null)
 		{
 			Vector2f posMouse = new Vector2f(event.asMouseEvent().position.x,event.asMouseEvent().position.y);
 			if(this.shape.getGlobalBounds().contains(posMouse))
 			{
-				// un evenement de click est sur le panel, on passe l'evenement au gui enfants
+				
+				// on positionne le isReleased a true car on a déja released le panel
+				isReleased = true;
+			}
+			
+			// boucle dans les gui enfants même si le gui parent n'a pas été released, afin de débloquer un bouton si le clic est resté enfoncé
+			
+			if(isPressed) //  si au moins le panel avait été pressed 
+			{
 				for(Gui gui : containerGui)
 				{
 					gui.onMouseReleased(event);
 						
 				}
-				// on return true car le panel a capté l'event
-				return true;
 			}
+			
+			// false sur la variable ispressed
+			isPressed = false;
 		}
 		
 		return false;

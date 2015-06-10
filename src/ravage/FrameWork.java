@@ -155,7 +155,7 @@ public class FrameWork
 		
 		// création des guis tests
 		
-		/*PanelRavage panel = new PanelRavage("My panel",512,384,128,256);
+		PanelRavage panel = new PanelRavage("My panel",512,384,128,256);
 		panel.setTextureBackground(TexturesManager.GetTextureByName("panel.png"));
 		panel.setColorBackground(new Color(128,128,128));
 		panel.setOutlineColorBackground(new Color(200,200,200));
@@ -164,7 +164,11 @@ public class FrameWork
 		
 		ButtonRavage button = new ButtonRavage("my button",32,32,64,32);
 		button.setColorBackground(new Color(128,32,32));
-	    panel.addGui(button);*/
+	    panel.addGui(button);
+	    
+	    ButtonRavage button2 = new ButtonRavage("my button 2",32,72,64,32);
+		button2.setColorBackground(new Color(128,32,32));
+	    panel.addGui(button2);
 
 		
 	}

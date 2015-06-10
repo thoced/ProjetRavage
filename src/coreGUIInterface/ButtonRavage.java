@@ -15,12 +15,18 @@ public class ButtonRavage extends Gui
 	public ButtonRavage(String title) 
 	{
 		super(title);
+		// création de l'epaisseur du bouton
+		if(this.shape != null)
+			this.shape.setOutlineThickness(1f);
 		// TODO Auto-generated constructor stub
 	}
 	
 	public ButtonRavage(String title,float x,float y, float width,float height)
 	{
 		super(title,x,y,width,height);
+		// création de l'epaisseur du bouton
+		if(this.shape != null)
+			this.shape.setOutlineThickness(1f);
 		
 	}
 
@@ -32,8 +38,9 @@ public class ButtonRavage extends Gui
 			Vector2f posMouse = new Vector2f(event.asMouseEvent().position.x,event.asMouseEvent().position.y);
 			if(this.shape.getGlobalBounds().contains(posMouse))
 			{
-				
-				this.shape.setFillColor(new Color(16,16,16));
+			
+				this.shape.setOutlineColor(new Color(108,16,16));
+				this.setPosition(this.getX() + 1, this.getY() + 1);
 				// le bouton est pressé
 				this.isPressed = true;
 				return true;
@@ -49,7 +56,8 @@ public class ButtonRavage extends Gui
 		// TODO Auto-generated method stub
 		if(this.shape != null && this.isPressed)
 		{
-				this.shape.setFillColor(new Color(128,32,32));
+				
+				this.setPosition(this.getX() - 1, this.getY() - 1);
 				this.isPressed = false;
 				return true;
 			
