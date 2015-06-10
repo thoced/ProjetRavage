@@ -1,7 +1,9 @@
 package coreGUIInterface;
 
+import org.jsfml.graphics.Color;
 import org.jsfml.graphics.Drawable;
 import org.jsfml.graphics.IntRect;
+import org.jsfml.graphics.RectangleShape;
 import org.jsfml.graphics.RenderStates;
 import org.jsfml.graphics.RenderTarget;
 import org.jsfml.graphics.Sprite;
@@ -25,7 +27,8 @@ public class Gui implements Drawable {
 	protected float width,height;
 	// Texture et Sprite Background
 	protected Texture textureBackground;
-	protected Sprite  spriteBackground;
+	// Rectangle shape pour la forme du gui
+	protected RectangleShape shape;
 	
 
 	public Texture getTextureBackground() {
@@ -38,7 +41,7 @@ public class Gui implements Drawable {
 		// création du spritebackground
 		if(this.textureBackground != null)
 		{
-			this.spriteBackground = new Sprite(this.textureBackground);
+			/*this.spriteBackground = new Sprite(this.textureBackground);
 			// placement du sprite
 			this.spriteBackground.setPosition(new Vector2f(this.x,this.y));
 			// création du bounds
@@ -46,8 +49,31 @@ public class Gui implements Drawable {
 			// TextureRect
 			this.spriteBackground.setTextureRect(new IntRect(0,0,this.textureBackground.getSize().x,this.textureBackground.getSize().y));
 			// taille
-			this.spriteBackground.setScale(width/this.textureBackground.getSize().x,height/this.textureBackground.getSize().y);
+			this.spriteBackground.setScale(width/this.textureBackground.getSize().x,height/this.textureBackground.getSize().y);*/
+			
+			shape.setTexture(textureBackground);
+			shape.setTextureRect(new IntRect(0,0,this.textureBackground.getSize().x,this.textureBackground.getSize().y));
 		}
+	}
+	
+	public void setColorBackground(Color color)
+	{
+		if(shape != null)
+			shape.setFillColor(color);
+		
+		
+	}
+	
+	public void setOutlineColorBackground(Color color)
+	{
+		if(shape != null)
+			shape.setOutlineColor(color);
+	}
+	
+	public void setSizeOutlineBackground(float size)
+	{
+		if(shape != null)
+			shape.setOutlineThickness(size);
 	}
 
 	public float getWidth() {
@@ -103,6 +129,10 @@ public class Gui implements Drawable {
 		this.y = y;
 		this.width = width;
 		this.height = height;
+		// création du shape
+		shape = new RectangleShape();
+		shape.setSize(new Vector2f(width,height));
+		shape.setPosition(new Vector2f(x,y));
 		
 	}
 	

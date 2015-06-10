@@ -35,6 +35,7 @@ public class PanelRavage extends Gui
 	{
 		if(containerGui != null)
 		{
+			gui.shape.setPosition(Vector2f.add(gui.shape.getPosition(), this.shape.getPosition()));
 			containerGui.add(gui);
 		}
 	}
@@ -52,10 +53,10 @@ public class PanelRavage extends Gui
 	@Override
 	public boolean onMousePressed(Event event)
 	{
-		if(this.spriteBackground != null)
+		if(this.shape != null )
 		{
 			Vector2f posMouse = new Vector2f(event.asMouseEvent().position.x,event.asMouseEvent().position.y);
-			if(this.spriteBackground.getGlobalBounds().contains(posMouse))
+			if(this.shape.getGlobalBounds().contains(posMouse))
 			{
 				// un evenement de click est sur le panel, on passe l'evenement au gui enfants
 				for(Gui gui : containerGui)
@@ -76,10 +77,10 @@ public class PanelRavage extends Gui
 	@Override
 	public boolean onMouseReleased(Event event) 
 	{
-		if(this.spriteBackground != null)
+		if(this.shape != null)
 		{
 			Vector2f posMouse = new Vector2f(event.asMouseEvent().position.x,event.asMouseEvent().position.y);
-			if(this.spriteBackground.getGlobalBounds().contains(posMouse))
+			if(this.shape.getGlobalBounds().contains(posMouse))
 			{
 				// un evenement de click est sur le panel, on passe l'evenement au gui enfants
 				for(Gui gui : containerGui)
@@ -102,14 +103,16 @@ public class PanelRavage extends Gui
 		super.draw(arg0, arg1);
 		
 		// affichage du sprite si il existe
-		if(this.spriteBackground!=null)
+		if(this.shape!=null)
 		{
-			arg0.draw(spriteBackground);
+			arg0.draw(shape);
 		}
 		
 		// appel des affichages des gui enfants
 		for(Gui gui : containerGui)
 		{
+			Vector2f relative = new Vector2f(x,y);
+			gui.shape.setPosition(Vector2f.add(relative, new Vector2f(gui.getX(),gui.getY())));
 			gui.draw(arg0, arg1);
 		}
 	}
