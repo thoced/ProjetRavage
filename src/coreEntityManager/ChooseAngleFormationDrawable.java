@@ -57,7 +57,7 @@ public class ChooseAngleFormationDrawable implements IBaseRavage, Drawable, IEve
 		
 		// chargement du sprite
 		arrowPoint = new Sprite(TexturesManager.GetTextureByName("arrowPoint.png"));
-		arrowPoint.setOrigin(new Vector2f(0,8));
+		arrowPoint.setOrigin(new Vector2f(8,8));
 		
 	
 	}
