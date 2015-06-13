@@ -29,7 +29,80 @@ public class Gui implements Drawable {
 	protected Texture textureBackground;
 	// Rectangle shape pour la forme du gui
 	protected RectangleShape shape;
+	// Color Shape
+	protected Color colorBackground = Color.WHITE;
+	// epaisseur
+	protected float tickness = 0f;
+	// Color tickness
+	protected Color colorTickness = Color.WHITE;
 	
+	public void Init()
+	{
+		
+			// création du shape
+			shape = new RectangleShape();
+			shape.setSize(new Vector2f(width,height));
+			shape.setPosition(new Vector2f(x,y));
+			
+			if(this.textureBackground != null)
+			{
+				/*this.spriteBackground = new Sprite(this.textureBackground);
+				// placement du sprite
+				this.spriteBackground.setPosition(new Vector2f(this.x,this.y));
+				// création du bounds
+				this.spriteBackground.setOrigin(new Vector2f(0f,0f));
+				// TextureRect
+				this.spriteBackground.setTextureRect(new IntRect(0,0,this.textureBackground.getSize().x,this.textureBackground.getSize().y));
+				// taille
+				this.spriteBackground.setScale(width/this.textureBackground.getSize().x,height/this.textureBackground.getSize().y);*/
+				
+				
+				shape.setTexture(textureBackground);
+				shape.setTextureRect(new IntRect(0,0,this.textureBackground.getSize().x,this.textureBackground.getSize().y));
+			}
+			shape.setFillColor(colorBackground);
+			shape.setOutlineColor(colorTickness);
+			shape.setOutlineThickness(tickness);
+		
+	}
+
+	
+	
+	public float getTickness() {
+		return tickness;
+	}
+
+
+
+	public void setTickness(float tickness) {
+		this.tickness = tickness;
+	}
+
+
+
+	public Color getColorTickness() {
+		return colorTickness;
+	}
+
+
+
+	public void setColorBackground(Color colorBackground) {
+		this.colorBackground = colorBackground;
+	}
+
+
+
+	public void setColorTickness(Color colorTickness) {
+		this.colorTickness = colorTickness;
+	}
+
+
+
+	public Color getColorBackground() {
+		return colorBackground;
+	}
+
+
 
 	public Texture getTextureBackground() {
 		return textureBackground;
@@ -39,42 +112,10 @@ public class Gui implements Drawable {
 	{
 		this.textureBackground = textureBackground;
 		// création du spritebackground
-		if(this.textureBackground != null)
-		{
-			/*this.spriteBackground = new Sprite(this.textureBackground);
-			// placement du sprite
-			this.spriteBackground.setPosition(new Vector2f(this.x,this.y));
-			// création du bounds
-			this.spriteBackground.setOrigin(new Vector2f(0f,0f));
-			// TextureRect
-			this.spriteBackground.setTextureRect(new IntRect(0,0,this.textureBackground.getSize().x,this.textureBackground.getSize().y));
-			// taille
-			this.spriteBackground.setScale(width/this.textureBackground.getSize().x,height/this.textureBackground.getSize().y);*/
-			
-			shape.setTexture(textureBackground);
-			shape.setTextureRect(new IntRect(0,0,this.textureBackground.getSize().x,this.textureBackground.getSize().y));
-		}
-	}
-	
-	public void setColorBackground(Color color)
-	{
-		if(shape != null)
-			shape.setFillColor(color);
-		
 		
 	}
 	
-	public void setOutlineColorBackground(Color color)
-	{
-		if(shape != null)
-			shape.setOutlineColor(color);
-	}
-	
-	public void setSizeOutlineBackground(float size)
-	{
-		if(shape != null)
-			shape.setOutlineThickness(size);
-	}
+
 	
 	public void setPosition(float x,float y)
 	{
@@ -110,6 +151,7 @@ public class Gui implements Drawable {
 
 	public void setX(float x) {
 		this.x = x;
+			
 	}
 
 	public float getY() {
@@ -132,6 +174,7 @@ public class Gui implements Drawable {
 	{
 		this.title = title;
 		
+		
 	}
 	
 	public Gui(String title,float x,float y,float width,float height)
@@ -141,10 +184,7 @@ public class Gui implements Drawable {
 		this.y = y;
 		this.width = width;
 		this.height = height;
-		// création du shape
-		shape = new RectangleShape();
-		shape.setSize(new Vector2f(width,height));
-		shape.setPosition(new Vector2f(x,y));
+	
 		
 	}
 	

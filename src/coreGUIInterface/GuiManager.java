@@ -16,7 +16,7 @@ public class GuiManager implements Drawable, IBaseRavage
 {
 
 	// container des Gui Principaux
-	private List<Gui> containerGuiMain;
+	private static List<Gui> containerGuiMain;
 	
 	@Override
 	public void init() 
@@ -26,7 +26,7 @@ public class GuiManager implements Drawable, IBaseRavage
 		
 	}
 	
-	public void addGui(Gui gui)
+	public static void addGui(Gui gui)
 	{
 		if(containerGuiMain != null)
 		{
@@ -34,7 +34,7 @@ public class GuiManager implements Drawable, IBaseRavage
 		}
 	}
 	
-	public void removeGui(Gui gui)
+	public static void removeGui(Gui gui)
 	{
 		if(containerGuiMain != null)
 		{
