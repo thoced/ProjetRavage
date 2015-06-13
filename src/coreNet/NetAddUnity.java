@@ -2,9 +2,12 @@ package coreNet;
 
 import java.io.Serializable;
 
+import coreEntity.Unity.TYPEUNITY;
+
 public class NetAddUnity extends NetBase implements Serializable
 {
-	private int typeUnity;
+		
+	private TYPEUNITY typeUnity;
 	
 	private int idUnity;
 	
@@ -13,12 +16,13 @@ public class NetAddUnity extends NetBase implements Serializable
 	private float posy;
 	
 	private float rotation;
-
-	public int getTypeUnity() {
+	
+	
+	public TYPEUNITY getTypeUnity() {
 		return typeUnity;
 	}
 
-	public void setTypeUnity(int typeUnity) {
+	public void setTypeUnity(TYPEUNITY typeUnity) {
 		this.typeUnity = typeUnity;
 	}
 
