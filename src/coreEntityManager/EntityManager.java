@@ -21,10 +21,13 @@ import org.jsfml.window.event.MouseButtonEvent;
 import org.jsfml.window.event.MouseEvent;
 
 import coreAI.Node;
+import coreEntity.Knight;
 import coreEntity.Unity;
 import coreEntity.UnityNet;
 import coreEvent.IEventCallBack;
 import coreGUI.IRegionSelectedCallBack;
+import coreGUIInterface.GuiManager;
+import coreGUIInterface.panelFormation;
 import coreLevel.LevelManager;
 import coreNet.INetManagerCallBack;
 import coreNet.NetAddUnity;
@@ -193,20 +196,20 @@ public class EntityManager implements IBaseRavage,IEventCallBack,IRegionSelected
 		if(keyboardEvent.key == Keyboard.Key.A )
 		{
 			// on ajoute une unité
-			Unity unity = new Unity();
-			unity.init();
-			unity.setPosition(NetManager.getPosxStartFlag(),NetManager.getPosyStartFlag());
+			Knight knight = new Knight();
+			knight.init();
+			knight.setPosition(NetManager.getPosxStartFlag(),NetManager.getPosyStartFlag());
 			// réception de l'id unique pour l'unité
-			unity.setId(EntityManager.getNewIdUnity());
-			EntityManager.getVectorUnity().add(unity);
+			knight.setId(EntityManager.getNewIdUnity());
+			EntityManager.getVectorUnity().add(knight);
 			// on envoie sur le réseau
 			NetHeader header = new NetHeader();
 			header.setTypeMessage(TYPE.ADD);
 			NetAddUnity add = new NetAddUnity();
-			add.setPosx(unity.getPositionMeterX());
-			add.setPosy(unity.getPositionMeterY());
-			add.setTypeUnity(0);
-			add.setIdUnity(unity.getId());
+			add.setPosx(knight.getPositionMeterX());
+			add.setPosy(knight.getPositionMeterY());
+			add.setTypeUnity(knight.getIdType());
+			add.setIdUnity(knight.getId());
 			header.setMessage(add);
 			try 
 			{
@@ -239,7 +242,8 @@ public class EntityManager implements IBaseRavage,IEventCallBack,IRegionSelected
 			// on calcul la formation
 			Vector2f pos = Vector2f.div(posMouseWorld, PhysicWorldManager.getRatioPixelMeter());
 		    computeFormation(listUnitySelected,posMouseWorld.x,posMouseWorld.y,dirFormation);
-			    
+		    
+		   
 		    // suppression de la fleche dans les callback
 			arrow.destroy();
 			arrow = null;
