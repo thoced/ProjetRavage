@@ -14,6 +14,7 @@ import org.jbox2d.dynamics.BodyDef;
 import org.jbox2d.dynamics.BodyType;
 import org.jbox2d.dynamics.Fixture;
 import org.jbox2d.dynamics.FixtureDef;
+import org.jsfml.graphics.IntRect;
 import org.jsfml.system.Clock;
 import org.jsfml.system.Time;
 import org.jsfml.system.Vector2f;
@@ -34,6 +35,7 @@ import ravage.IBaseRavage;
 
 public class Unity implements IBaseRavage,ICallBackAStar
 {
+	public enum TYPEUNITY {KNIGHT};
 	// temps avant téléportation
 	protected final static float  TIME_BEFORE_TELEPORTATION = 0.5f;
 
@@ -41,7 +43,7 @@ public class Unity implements IBaseRavage,ICallBackAStar
 	protected int id;
 	
 	// type d'unité
-	protected int idType;
+	protected TYPEUNITY idType;
 	
 	/// position x et y en pixels
 	protected float posx,posy;
@@ -69,6 +71,12 @@ public class Unity implements IBaseRavage,ICallBackAStar
 	
 	// vecteur direction de formation
 	protected Vec2 vecDirFormation; // vecteur de formation finale
+	
+	// IntRect du sprite d'animation à afficher
+	protected IntRect[] animSpriteRect;
+	protected IntRect	currentAnim;
+	protected int		indAnim; // indice d'animation
+	protected Time		timeElapsedAnim = Time.ZERO; // temps entre deux anim
 	
 	// pathfinal pour le systeme classique
 	protected List<Node> pathFinal;
@@ -100,37 +108,28 @@ public class Unity implements IBaseRavage,ICallBackAStar
 	@Override
 	public void init() 
 	{
-		// TODO Auto-generated method stub
-		// intialisation du body
-		BodyDef bdef = new BodyDef();
-		bdef.active = true;
-		bdef.bullet = false;
-		bdef.type = BodyType.DYNAMIC;
-		bdef.fixedRotation = false;
-		bdef.userData = this;
-	
-		//bdef.gravityScale = 0.0f;
-		
-		// creation du body
-		body = PhysicWorldManager.getWorld().createBody(bdef);
-		
-		Shape shape = new CircleShape();
-		shape.m_radius = 0.5f;
-		
-		FixtureDef fDef = new FixtureDef();
-		fDef.shape = shape;
-		fDef.density = 1.0f;
-		
-		fDef.friction = 0.0f;
-		fDef.restitution = 0.0f;
-	
-		Fixture fix = body.createFixture(fDef);
-		
-		// instance du resetSearch
-		resetSearchClock = new Clock();
+				
 	
 	}
 	
+	
+	
+	public TYPEUNITY getIdType() {
+		return idType;
+	}
+
+
+
+	public void setIdType(TYPEUNITY idType) {
+		this.idType = idType;
+	}
+
+
+
+	public IntRect getCurrentAnim()
+	{
+		return currentAnim;
+	}
 	
 	
 	public Vec2 getVecTarget() {
