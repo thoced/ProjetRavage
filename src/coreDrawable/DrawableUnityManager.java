@@ -1,5 +1,6 @@
 package coreDrawable;
 
+import java.lang.reflect.Field;
 import java.util.ArrayList;
 import java.util.List;
 
@@ -16,6 +17,7 @@ import org.jsfml.system.Time;
 import org.jsfml.system.Vector2f;
 
 import CoreTexturesManager.TexturesManager;
+import coreEntity.Knight;
 import coreEntity.Unity;
 import coreEntityManager.EntityManager;
 import ravage.IBaseRavage;
@@ -35,6 +37,7 @@ public class DrawableUnityManager implements IBaseRavage, Drawable
 	
 	// test utilisation de sprite pour l'affichage des unités
 	private Sprite sprite_unite;
+	private Sprite sprite_knight;
 	
 
 	@Override
@@ -49,8 +52,8 @@ public class DrawableUnityManager implements IBaseRavage, Drawable
 	 listCallBackRemove = new ArrayList<Drawable>();
 	 
 	 // instance de sprite_unite
-	 sprite_unite = new Sprite(TexturesManager.GetTextureByName("unity_sprite_01.png"));
-	 sprite_unite.setOrigin(new Vector2f(16f,16f));
+	 sprite_knight = new Sprite(TexturesManager.GetTextureByName("ANIM_Melee_class_01_.png"));
+	 sprite_knight.setOrigin(new Vector2f(16f,16f));
 	}
 
 	@Override
@@ -91,13 +94,23 @@ public class DrawableUnityManager implements IBaseRavage, Drawable
 			buffer.add(v4);*/
 			
 			// test affichage sprite
-			sprite_unite.setPosition(new Vector2f(unity.getPosx(),unity.getPosy()));
-			// rotation
 			
-			// on spécifie la roation
-			sprite_unite.setRotation((float)((unity.getBody().getAngle() * 180f) / Math.PI) % 360f);
 			
-			arg0.draw(sprite_unite);
+			switch(unity.getClass().getSimpleName())
+			{
+				case "Knight" :	sprite_knight.setPosition(new Vector2f(unity.getPosx(),unity.getPosy()));		
+								// on spécifie la roation
+								sprite_knight.setRotation((float)((unity.getBody().getAngle() * 180f) / Math.PI) % 360f);
+								// on spécifie l'anim a jouer
+								sprite_knight.setTextureRect(unity.getCurrentAnim());
+								// on affiche
+								arg0.draw(sprite_knight);
+				break;
+			}
+			
+			
+			
+			
 			
 		}
 		
@@ -120,12 +133,12 @@ public class DrawableUnityManager implements IBaseRavage, Drawable
 			
 			
 			// test affichage sprite
-			sprite_unite.setPosition(new Vector2f(unity.getPosx(),unity.getPosy()));
+			sprite_knight.setPosition(new Vector2f(unity.getPosx(),unity.getPosy()));
 			// rotation
 		// on spécifie la roation
-			sprite_unite.setRotation((float)((unity.getBody().getAngle() * 180f) / Math.PI) % 360f);
+			sprite_knight.setRotation((float)((unity.getBody().getAngle() * 180f) / Math.PI) % 360f);
 			
-			arg0.draw(sprite_unite);
+			arg0.draw(sprite_knight);
 			
 		}
 		
