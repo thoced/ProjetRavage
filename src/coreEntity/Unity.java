@@ -33,7 +33,7 @@ import coreNet.NetSynchronize;
 import corePhysic.PhysicWorldManager;
 import ravage.IBaseRavage;
 
-public class Unity implements IBaseRavage,ICallBackAStar
+public abstract class Unity implements IBaseRavage,ICallBackAStar
 {
 	public enum TYPEUNITY {KNIGHT};
 	// temps avant téléportation
@@ -105,6 +105,15 @@ public class Unity implements IBaseRavage,ICallBackAStar
 	
 	protected boolean isStop =false;
 	
+	// enum des modes dans lesquels l'unité peut se trouver
+    public static enum MODE {WALK,STRIKE,PAUSE};
+	
+    // mode dans lequel l'unité se trouve
+	protected MODE mode = MODE.PAUSE; 
+	
+	// ennemy attribué
+	protected Unity enemyAttribute;
+	
 	@Override
 	public void init() 
 	{
@@ -114,6 +123,18 @@ public class Unity implements IBaseRavage,ICallBackAStar
 	
 	
 	
+	public Unity getEnemyAttribute() {
+		return enemyAttribute;
+	}
+
+
+
+	public void setEnemyAttribute(Unity enemyAttribute) {
+		this.enemyAttribute = enemyAttribute;
+	}
+
+
+
 	public TYPEUNITY getIdType() {
 		return idType;
 	}
@@ -641,6 +662,19 @@ public class Unity implements IBaseRavage,ICallBackAStar
 			this.nextNode = true;
 			this.isArrived = false;
 		}
+	}
+	
+	public void setMode(MODE mode)
+	{
+		// on spécifie le mode d'action
+		this.mode = mode;
+	}
+	
+	abstract public void strikeNow();
+	
+	public void attributeEnemy(Unity enemy)
+	{
+		this.setEnemyAttribute(enemy);
 	}
 
 

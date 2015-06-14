@@ -8,14 +8,13 @@ import org.jbox2d.dynamics.Fixture;
 import org.jbox2d.dynamics.FixtureDef;
 import org.jsfml.graphics.IntRect;
 import org.jsfml.system.Clock;
-import org.jsfml.system.Time;
 
+import coreEntity.Unity.TYPEUNITY;
 import corePhysic.PhysicWorldManager;
 
-public class Knight extends Unity 
+public class KnightNet extends UnityNet 
 {
 
-	
 	@Override
 	public void init() 
 	{
@@ -62,63 +61,4 @@ public class Knight extends Unity
 				// type d'unity
 				this.idType = TYPEUNITY.KNIGHT;
 	}
-
-	@Override
-	public void update(Time deltaTime) 
-	{
-		// appel au super constructeur
-		super.update(deltaTime);
-		
-		if(this.mode == MODE.STRIKE) // en mode je frappe comme un gros lourd !!!
-		{
-			// on récupère l'animation courante
-			this.currentAnim = this.animSpriteRect[indAnim];
-			// on additionne le temps écoulé
-			this.timeElapsedAnim = Time.add(this.timeElapsedAnim, deltaTime);
-			// si le temps écoulé est supérieur à ***  on incrémente l'indice d'animation
-			if(this.timeElapsedAnim.asSeconds() > 0.03f)
-			{
-				this.timeElapsedAnim = Time.ZERO;
-				indAnim++;
-				if(indAnim > 14)
-				{
-					indAnim = 0;
-					this.setMode(MODE.PAUSE); // on repositionne en pause après avoir frappé une fois
-				}
-			}
-		}
-		
-		if(mode == MODE.PAUSE) // en mode je suis sur place et je ne fais rien !!!
-		{
-			// on récupère l'animation courante
-			this.currentAnim = this.animSpriteRect[0];
-		}
-		
-		if(mode == MODE.WALK) // en mode je me déplace !!!
-		{
-			// on récupère l'animation courante
-			this.currentAnim = this.animSpriteRect[0];
-		}
-		
-	}
-
-	@Override
-	public void strikeNow() {
-		// TODO Auto-generated method stub
-		this.setMode(MODE.STRIKE);
-	}
-
-	@Override
-	public void attributeEnemy(Unity enemy) {
-		// TODO Auto-generated method stub
-		super.attributeEnemy(enemy);
-		
-		this.strikeNow();
-	}
-
-	
-
-	
-	
-	
 }

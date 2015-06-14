@@ -178,7 +178,7 @@ public class NetManager implements IBaseRavage
 				if(socketEmission != null)
 				socketEmission.send(datagram);
 				
-				System.out.println("Buffer Size : " + String.valueOf(buffer.length));
+			//	System.out.println("Buffer Size : " + String.valueOf(buffer.length));
 	}
 
 	

@@ -3,10 +3,19 @@ package coreEntity;
 import java.util.ArrayList;
 import java.util.List;
 
+import org.jbox2d.collision.shapes.CircleShape;
+import org.jbox2d.collision.shapes.Shape;
 import org.jbox2d.common.Vec2;
+import org.jbox2d.dynamics.BodyDef;
+import org.jbox2d.dynamics.BodyType;
+import org.jbox2d.dynamics.Fixture;
+import org.jbox2d.dynamics.FixtureDef;
+import org.jsfml.graphics.IntRect;
+import org.jsfml.system.Clock;
 import org.jsfml.system.Time;
 
 import coreAI.Node;
+import coreEntity.Unity.TYPEUNITY;
 import coreNet.NetHeader;
 import coreNet.NetMoveUnity;
 import coreNet.NetHeader.TYPE;
@@ -28,7 +37,7 @@ public class UnityNet extends Unity
 				posx = body.getPosition().x * PhysicWorldManager.getRatioPixelMeter();
 				posy = body.getPosition().y * PhysicWorldManager.getRatioPixelMeter();
 		
-			//	this.body.setLinearVelocity(new Vec2(0f,0f)); // il est arrivé à destination
+				this.body.setLinearVelocity(new Vec2(0f,0f)); // il est arrivé à destination
 				
 				Vec2 n = null;
 				if(next != null) // il y a un node suivant
@@ -63,5 +72,14 @@ public class UnityNet extends Unity
 				}
 			
 	}
+
+	@Override
+	public void strikeNow() {
+		// TODO Auto-generated method stub
+		
+	}
+
+	
+
 	
 }

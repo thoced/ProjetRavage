@@ -117,28 +117,21 @@ public class DrawableUnityManager implements IBaseRavage, Drawable
 		// pour chaque unity réseau
 		for(Unity unity : EntityManager.getVectorUnityNet().values() )
 		{
-			// on rÃ©cupÃ¨re la position
-		/*	Vector2f pos = new Vector2f(unity.getPosx(),unity.getPosy());
-			// on crÃ©e les 4 vertex
-			Vertex v1 = new Vertex(Vector2f.add(pos, new Vector2f(-16f,-16f)), this.getCoordText(1));
-			Vertex v2 = new Vertex(Vector2f.add(pos, new Vector2f(16f,-16f)), this.getCoordText(2));
-			Vertex v3 = new Vertex(Vector2f.add(pos,new Vector2f(16f,16f)), this.getCoordText(3));
-			Vertex v4 = new Vertex(Vector2f.add(pos, new Vector2f(-16f,16f)), this.getCoordText(4));
-			
-			// on ajoute dans le buffer
-			buffer.add(v1);
-			buffer.add(v2);
-			buffer.add(v3);
-			buffer.add(v4);*/
-			
-			
-			// test affichage sprite
-			sprite_knight.setPosition(new Vector2f(unity.getPosx(),unity.getPosy()));
-			// rotation
-		// on spécifie la roation
-			sprite_knight.setRotation((float)((unity.getBody().getAngle() * 180f) / Math.PI) % 360f);
+		
 			
 			arg0.draw(sprite_knight);
+			
+			switch(unity.getClass().getSimpleName())
+			{
+				case "KnightNet" :	sprite_knight.setPosition(new Vector2f(unity.getPosx(),unity.getPosy()));		
+								// on spécifie la roation
+								sprite_knight.setRotation((float)((unity.getBody().getAngle() * 180f) / Math.PI) % 360f);
+								// on spécifie l'anim a jouer
+								sprite_knight.setTextureRect(unity.getCurrentAnim());
+								// on affiche
+								arg0.draw(sprite_knight);
+				break;
+			}
 			
 		}
 		
