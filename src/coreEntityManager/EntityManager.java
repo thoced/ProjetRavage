@@ -6,7 +6,9 @@ import java.util.Hashtable;
 import java.util.List;
 import java.util.Random;
 
+import org.jbox2d.collision.AABB;
 import org.jbox2d.common.Vec2;
+import org.jbox2d.dynamics.Body;
 import org.jsfml.graphics.FloatRect;
 import org.jsfml.system.Clock;
 import org.jsfml.system.Time;
@@ -15,6 +17,7 @@ import org.jsfml.system.Vector2i;
 import org.jsfml.window.Keyboard;
 import org.jsfml.window.Mouse;
 import org.jsfml.window.Keyboard.Key;
+import org.jsfml.window.Mouse.Button;
 import org.jsfml.window.event.Event;
 import org.jsfml.window.event.KeyEvent;
 import org.jsfml.window.event.MouseButtonEvent;
@@ -22,7 +25,9 @@ import org.jsfml.window.event.MouseEvent;
 
 import coreAI.Node;
 import coreEntity.Knight;
+import coreEntity.KnightNet;
 import coreEntity.Unity;
+import coreEntity.Unity.TYPEUNITY;
 import coreEntity.UnityNet;
 import coreEvent.IEventCallBack;
 import coreGUI.IRegionSelectedCallBack;
@@ -67,6 +72,8 @@ public class EntityManager implements IBaseRavage,IEventCallBack,IRegionSelected
 	// variable sur les coordonnées de souris
 	private Vector2f posMouseWorld;
 
+	private static int idTestUnity = 0;
+	
 	@Override
 	public void init()
 	{
@@ -180,11 +187,24 @@ public class EntityManager implements IBaseRavage,IEventCallBack,IRegionSelected
 		}
 		else if(mouseEvent.asMouseButtonEvent().button == Mouse.Button.RIGHT)
 		{
-			
-			// création de la fleche de selection d'angle de formation
-		    if(arrow == null)
-		    	arrow  = new ChooseAngleFormationDrawable(posMouseWorld,posMouseWorld);
-		
+			Vector2f p = Vector2f.div(posMouseWorld, PhysicWorldManager.getRatioPixelMeter());
+			// on teste si on ne clic pas sur un ennimi, si non en rentre dans le code de formation et de destination
+			Unity unityPicked = this.getUnityPicked(p.x,p.y);
+			if(unityPicked != null)
+			{
+				if(unityPicked.getClass().getSuperclass() == UnityNet.class) // on vient de cliquer sur une unité ennemie
+				{
+					// pour toutes les unités selectionnées, on attribue l'ennemy
+					for(Unity u : this.listUnitySelected)
+						u.attributeEnemy(unityPicked);
+				}
+			}
+			else
+			{
+				// création de la fleche de selection d'angle de formation
+			    if(arrow == null)
+			    	arrow  = new ChooseAngleFormationDrawable(posMouseWorld,posMouseWorld);
+			}
 		}
 		
 		
@@ -193,6 +213,8 @@ public class EntityManager implements IBaseRavage,IEventCallBack,IRegionSelected
 	@Override
 	public void onKeyboard(KeyEvent keyboardEvent) 
 	{
+		
+		
 		if(keyboardEvent.key == Keyboard.Key.A )
 		{
 			// on ajoute une unité
@@ -222,6 +244,19 @@ public class EntityManager implements IBaseRavage,IEventCallBack,IRegionSelected
 			}
 		}
 		
+		if(keyboardEvent.key == Keyboard.Key.B )
+		{	
+			// ajout d'un ennemi pour les test
+			NetAddUnity unity = new NetAddUnity();
+			unity.setIdUnity(idTestUnity);
+			unity.setTypeUnity(TYPEUNITY.KNIGHT);
+			unity.setPosx(20);
+			unity.setPosy(20);
+			unity.setRotation(0f);
+			idTestUnity++;
+			this.onAddUnity(unity);
+		}
+		
 	}
 
 	@Override
@@ -234,19 +269,25 @@ public class EntityManager implements IBaseRavage,IEventCallBack,IRegionSelected
 	@Override
 	public void onMouseReleased(MouseButtonEvent event) 
 	{
-		// on relache le clic, on récupère la dirction de formation et on lance la formation
-		if(arrow != null)
+		
+		if(event.button == Button.RIGHT)
 		{
-			// on récupère le vecteur de direction pour la formation
-			dirFormation = arrow.getVectorDirectionFormation();
-			// on calcul la formation
-			Vector2f pos = Vector2f.div(posMouseWorld, PhysicWorldManager.getRatioPixelMeter());
-		    computeFormation(listUnitySelected,posMouseWorld.x,posMouseWorld.y,dirFormation);
-		    
-		   
-		    // suppression de la fleche dans les callback
-			arrow.destroy();
-			arrow = null;
+		
+				// on relache le clic, on récupère la dirction de formation et on lance la formation
+				if(arrow != null)
+				{
+					// on récupère le vecteur de direction pour la formation
+					dirFormation = arrow.getVectorDirectionFormation();
+					// on calcul la formation
+					Vector2f pos = Vector2f.div(posMouseWorld, PhysicWorldManager.getRatioPixelMeter());
+				    computeFormation(listUnitySelected,posMouseWorld.x,posMouseWorld.y,dirFormation);
+				    
+				   
+				    // suppression de la fleche dans les callback
+					arrow.destroy();
+					arrow = null;
+				}
+			
 		}
 
 	}
@@ -283,14 +324,16 @@ public class EntityManager implements IBaseRavage,IEventCallBack,IRegionSelected
 	@Override
 	public void onAddUnity(NetAddUnity unity)
 	{
-		// création d'une unité venant du réseau
-		UnityNet u= new UnityNet();
-		u.init();
-		u.setPosition(unity.getPosx(), unity.getPosy());;
-		u.setId(unity.getIdUnity());
-		// ajout dans le vecteur unity réseau
-		//vectorUnityNet.add(u);
-		vectorUnityNet.put(u.getId(), u);
+		switch(unity.getTypeUnity())
+		{
+		case KNIGHT: KnightNet u = new KnightNet();
+					u.init();
+					u.setPosition(unity.getPosx(), unity.getPosy());;
+					u.setId(unity.getIdUnity());
+					vectorUnityNet.put(u.getId(), u);
+					break;
+		}
+		
 		
 	}
 	
@@ -452,6 +495,35 @@ public class EntityManager implements IBaseRavage,IEventCallBack,IRegionSelected
 		}*/
 		
 
+	}
+	
+	public Unity getUnityPicked(float x,float y)
+	{
+		   AABB tree = new AABB();
+		   tree.lowerBound.set(new Vec2(x - 2f,y - 2f));
+		   tree.upperBound.set(new Vec2(x + 2f,y + 2f));
+		   ListBodyForOneRegion listRegion = new ListBodyForOneRegion();
+		   PhysicWorldManager.getWorld().queryAABB(listRegion, tree);
+
+		   // on récupère la liste des bodys dans la région
+		   List<Body> list = listRegion.getListBody();
+		   if(list != null && list.size() > 0)
+		   {
+			   for(Body body : list) // on liste et on récupère l'objet picked
+			   {
+	
+				   Vec2 diff = new Vec2(x,y).sub(body.getPosition());
+				   System.out.println("lenght : " + diff.length() );
+				    
+				   if(diff.length() < 2f)
+				   {
+					   // on est sur le body qui est sur la position de la souris
+					   return (Unity)body.getUserData();
+				   }
+			   }
+		   }
+		
+		return null;
 	}
 
 }
