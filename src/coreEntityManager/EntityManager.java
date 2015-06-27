@@ -7,6 +7,7 @@ import java.util.List;
 import java.util.Random;
 
 import org.jbox2d.collision.AABB;
+import org.jbox2d.common.Rot;
 import org.jbox2d.common.Vec2;
 import org.jbox2d.dynamics.Body;
 import org.jsfml.graphics.FloatRect;
@@ -27,6 +28,7 @@ import coreAI.Node;
 import coreEntity.Knight;
 import coreEntity.KnightNet;
 import coreEntity.Unity;
+import coreEntity.Unity.ANIMATE;
 import coreEntity.Unity.TYPEUNITY;
 import coreEntity.UnityNet;
 import coreEvent.IEventCallBack;
@@ -39,8 +41,10 @@ import coreNet.NetAddUnity;
 import coreNet.NetHeader;
 import coreNet.NetHeader.TYPE;
 import coreNet.NetHello;
+import coreNet.NetKill;
 import coreNet.NetManager;
 import coreNet.NetMoveUnity;
+import coreNet.NetStrike;
 import coreNet.NetSynchronize;
 import corePhysic.PhysicWorldManager;
 import ravage.FrameWork;
@@ -53,11 +57,15 @@ public class EntityManager implements IBaseRavage,IEventCallBack,IRegionSelected
 	// compteur d'id 
 	private static int cptIdUnity = -1;
 	// vecteur des unity du player
-	private static List<Unity> vectorUnity;
+	private static Hashtable<Integer,Unity> vectorUnity;
+	// vecteur de killed
+	private static List<Unity> vectorUnityKilled;
 	// vecteur des unity du joueur adverse (rÈseau)
 	//private static List<UnityNet> vectorUnityNet;
 	
 	private static Hashtable<Integer,UnityNet> vectorUnityNet;
+	// vecteur net killed
+	private static List<Unity> vectorUnityNetKilled;
 	
 	// test clock
 	private Clock clock;
@@ -78,12 +86,14 @@ public class EntityManager implements IBaseRavage,IEventCallBack,IRegionSelected
 	public void init()
 	{
 		// TODO Auto-generated method stub
-		vectorUnity = new ArrayList<Unity>();
+		vectorUnity = new Hashtable<Integer,Unity>();
+		vectorUnityKilled = new ArrayList<Unity>();
 		// liste des unit√©s selectionn√©s
 		listUnitySelected = new ArrayList<Unity>();
 		// instance vectorunitynet
 		//vectorUnityNet = new ArrayList<UnityNet>();
 		vectorUnityNet = new Hashtable<Integer,UnityNet>();
+		vectorUnityNetKilled = new ArrayList<Unity>();
 		
 		clock = new Clock();
 		delta = Time.ZERO;
@@ -96,7 +106,7 @@ public class EntityManager implements IBaseRavage,IEventCallBack,IRegionSelected
 	public void update(Time deltaTime) 
 	{
 		// on parse les unit√©
-		for(Unity unity : vectorUnity)
+		for(Unity unity : vectorUnity.values())
 		{
 			unity.update(deltaTime);
 			// ajout test dans le netUnityDatagra
@@ -112,7 +122,25 @@ public class EntityManager implements IBaseRavage,IEventCallBack,IRegionSelected
 			arrow.update(deltaTime);
 		
 		
-		// code test - envoie de la liste des unitÈ
+		// on regarde si il n'existe pas d'unitÈ ‡ supprimer dans le vecteur unitykilled
+		if(this.vectorUnityKilled.size() > 0)
+		{
+			for(Unity u : this.vectorUnityKilled)
+			{
+				this.vectorUnity.remove(u.getId());
+			}
+		}
+		this.vectorUnityKilled.clear();
+		
+		// on regarde si il n'existe pas d'unitÈ ‡ supprimer dans le vecteur unitykilled Net
+			if(this.vectorUnityNetKilled.size() > 0)
+			{
+				for(Unity u : this.vectorUnityNetKilled)
+				{
+					this.vectorUnityNet.remove(u.getId());
+				}
+			}
+		this.vectorUnityNetKilled.clear();
 		
 	
 	}
@@ -123,19 +151,7 @@ public class EntityManager implements IBaseRavage,IEventCallBack,IRegionSelected
 		
 	}
 
-	/**
-	 * @return the vectorUnity
-	 */
-	public static List<Unity> getVectorUnity() {
-		return vectorUnity;
-	}
-
-	/**
-	 * @param vectorUnity the vectorUnity to set
-	 */
-	public static void setVectorUnity(List<Unity> vectorUnity) {
-		EntityManager.vectorUnity = vectorUnity;
-	}
+	
 	
 	
 
@@ -146,6 +162,14 @@ public class EntityManager implements IBaseRavage,IEventCallBack,IRegionSelected
 	public static void setVectorUnityNet(List<UnityNet> vectorUnityNet) {
 		EntityManager.vectorUnityNet = vectorUnityNet;
 	}*/
+
+	public static Hashtable<Integer, Unity> getVectorUnity() {
+		return vectorUnity;
+	}
+
+	public static void setVectorUnity(Hashtable<Integer, Unity> vectorUnity) {
+		EntityManager.vectorUnity = vectorUnity;
+	}
 
 	public static Hashtable<Integer, UnityNet> getVectorUnityNet() {
 		return vectorUnityNet;
@@ -171,7 +195,7 @@ public class EntityManager implements IBaseRavage,IEventCallBack,IRegionSelected
 			this.listUnitySelected.clear();
 			
 			Vec2 mousePos = new Vec2(posMouseWorld.x / pixels,posMouseWorld.y / pixels ); 
-			for(Unity unity : vectorUnity)
+			for(Unity unity : vectorUnity.values())
 			{
 				// si la souris est sur l'unit√©
 				if(unity.getBody().getPosition().sub(mousePos).length() < .5f)
@@ -197,6 +221,8 @@ public class EntityManager implements IBaseRavage,IEventCallBack,IRegionSelected
 					// pour toutes les unitÈs selectionnÈes, on attribue l'ennemy
 					for(Unity u : this.listUnitySelected)
 						u.attributeEnemy(unityPicked);
+					// pour toutes les unitÈs, on crÈe leur position de formation pour attaquer
+					this.computeFormationStrike(unityPicked, listUnitySelected, new Vec2(1,0));
 				}
 			}
 			else
@@ -223,7 +249,7 @@ public class EntityManager implements IBaseRavage,IEventCallBack,IRegionSelected
 			knight.setPosition(NetManager.getPosxStartFlag(),NetManager.getPosyStartFlag());
 			// rÈception de l'id unique pour l'unitÈ
 			knight.setId(EntityManager.getNewIdUnity());
-			EntityManager.getVectorUnity().add(knight);
+			EntityManager.getVectorUnity().put(knight.getId(), knight);
 			// on envoie sur le rÈseau
 			NetHeader header = new NetHeader();
 			header.setTypeMessage(TYPE.ADD);
@@ -251,7 +277,7 @@ public class EntityManager implements IBaseRavage,IEventCallBack,IRegionSelected
 			unity.setIdUnity(idTestUnity);
 			unity.setTypeUnity(TYPEUNITY.KNIGHT);
 			unity.setPosx(20);
-			unity.setPosy(20);
+			unity.setPosy(17);
 			unity.setRotation(0f);
 			idTestUnity++;
 			this.onAddUnity(unity);
@@ -297,7 +323,7 @@ public class EntityManager implements IBaseRavage,IEventCallBack,IRegionSelected
 	{
 		
 		// on vient de receptionn√© la region selectionn√©
-		for(Unity unity : vectorUnity)
+		for(Unity unity : vectorUnity.values())
 		{
 			if(region.contains(new Vector2f(unity.getBody().getPosition().x * PhysicWorldManager.getRatioPixelMeter(),
 					unity.getBody().getPosition().y * PhysicWorldManager.getRatioPixelMeter())))
@@ -350,6 +376,7 @@ public class EntityManager implements IBaseRavage,IEventCallBack,IRegionSelected
 			Node n = new Node(unity.getNextPosx(),unity.getNextPosy(),true);
 			un.setPosXYMeter(unity.getPosx(),unity.getPosy());
 			un.setNext(n);
+			un.setAnimate(ANIMATE.WALK); // on active l'animation de mouvement
 					
 		}
 		else
@@ -366,6 +393,33 @@ public class EntityManager implements IBaseRavage,IEventCallBack,IRegionSelected
 		}
 		
 	
+	}
+	
+	@Override
+	public void onStrike(NetStrike strike)
+	{
+		// on rÈceptionne un message de frappe sur notre unitÈ.
+		// on va rÈcupÈrÈ l'unitÈ en question
+		Unity unity = this.vectorUnity.get(strike.getIdTarget());
+		// on va la frapper
+		if(unity != null)
+			unity.setDamage(strike.getForce());
+		
+		// il faut rÈcupÈrer l'unitÈ rÈseau qui frappe pour lui jouer l'animation
+		Unity unityNet = this.vectorUnityNet.get(strike.getIdStriker());
+		if(unityNet != null)
+			unityNet.setAnimate(ANIMATE.STRIKE);
+	}
+	
+	@Override
+	public void onKill(NetKill kill)
+	{
+		// on recoit le message de mort d'une unitÈ adverse
+		Unity unity = this.vectorUnityNet.get(kill.getId());
+		if(unity != null)
+			unity.setKill();
+			
+		
 	}
 
 	public static int getNewIdUnity()
@@ -391,6 +445,52 @@ public class EntityManager implements IBaseRavage,IEventCallBack,IRegionSelected
 	@Override
 	public void onMouse(MouseEvent buttonEvent) {
 		// TODO Auto-generated method stub
+		
+	}
+	
+	public float getRadian(float degre)
+	{
+		float radian = (float) (degre * (Math.PI / 180));
+		return radian;
+	}
+	
+	public void computeFormationStrike(Unity enemy,List<Unity> listUnity, Vec2 dir)
+	{
+		// en partant du centre (enemy), par couche, on fait un tour en utilisant l'objet Rot
+		int couche = 0;
+		int nbpercouche = 8;
+		float pasDegre = 0f;
+		float pasRadian = 0f;
+		Vec2 vector;
+		float distance = 1f;
+		int indListUnity = 0;
+		int maxboucle = 0;
+		
+		Rot rot = new Rot();
+		rot.set(0f);
+		
+		// pour chaque couche on dÈtermine le nombre de recherche
+		while(indListUnity < listUnity.size() && maxboucle < 32)
+		{
+			Unity unity = listUnity.get(indListUnity);
+			rot.set(this.getRadian(pasDegre));
+			vector = new Vec2(rot.s,rot.c);
+			
+			// on recheche les emplacements
+			Vec2 centre = enemy.getBody().getPosition();
+			Vec2 pos = centre.add(vector.mul(distance));
+			
+			boolean obstacle = LevelManager.getLevel().isNodeObstacle((int)pos.x, (int)pos.y);
+			if(!obstacle)
+			{
+				unity.setTargetPosition(pos.x * PhysicWorldManager.getRatioPixelMeter(), pos.y * PhysicWorldManager.getRatioPixelMeter(), (int)pos.x, (int)pos.y, new Vec2(1,0));
+				indListUnity++;
+			}
+			// augmentation du pas
+			pasDegre += 45f;
+			// max boucle pour la sÈcuritÈ
+			maxboucle++;
+		}
 		
 	}
 
@@ -515,7 +615,7 @@ public class EntityManager implements IBaseRavage,IEventCallBack,IRegionSelected
 				   Vec2 diff = new Vec2(x,y).sub(body.getPosition());
 				   System.out.println("lenght : " + diff.length() );
 				    
-				   if(diff.length() < 2f)
+				   if(diff.length() < 0.5f)
 				   {
 					   // on est sur le body qui est sur la position de la souris
 					   return (Unity)body.getUserData();
@@ -525,5 +625,22 @@ public class EntityManager implements IBaseRavage,IEventCallBack,IRegionSelected
 		
 		return null;
 	}
+	
+	public static void IamKilled(Unity unity)
+	{
+		// l'unitÈ est morte, elle demande ‡ Ítre dÈtruite de la liste
+		vectorUnityKilled.add(unity);
+		
+	}
+	
+	public static void IamKilledNet(Unity unity)
+	{
+		// l'unitÈ est morte, elle demande ‡ Ítre dÈtruite de la liste
+				vectorUnityNetKilled.add(unity);
+	}
+
+
+
+	
 
 }

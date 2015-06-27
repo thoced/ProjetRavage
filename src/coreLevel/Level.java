@@ -55,6 +55,15 @@ public class Level implements IBaseRavage, Drawable
 		
 		
 	}
+	
+	public boolean isNodeObstacle(int x,int y)
+	{
+		Node n = this.nodes[(375 * y) + x];
+		if(n.getType() != 0)
+			return true;
+		else
+			return false;
+	}
 
 	@Override
 	public void init() {

@@ -278,7 +278,16 @@ public class NetManager implements IBaseRavage
 			case SYNC: 	NetSynchronize sync = (NetSynchronize)header.getMessage();
 						callBackSync(sync);
 						break;
-					   	
+						
+			case STRIKE: NetStrike strike = (NetStrike)header.getMessage();
+						callBackStrike(strike);
+						break;
+						
+			case KILL: NetKill kill = (NetKill)header.getMessage();
+						callBackKill(kill);
+						break;
+			
+	
 								   	
 			default: break;
 		}
@@ -313,6 +322,22 @@ public class NetManager implements IBaseRavage
 		for(INetManagerCallBack i : listCallBack)
 		{
 			i.onSynchronize(sync);
+		}
+	}
+	
+	private void callBackStrike(NetStrike strike)
+	{
+		for(INetManagerCallBack i : listCallBack)
+		{
+			i.onStrike(strike);
+		}
+	}
+	
+	public void callBackKill(NetKill kill)
+	{
+		for(INetManagerCallBack i : listCallBack)
+		{
+			i.onKill(kill);
 		}
 	}
 	

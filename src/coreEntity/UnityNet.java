@@ -15,6 +15,7 @@ import org.jsfml.system.Clock;
 import org.jsfml.system.Time;
 
 import coreAI.Node;
+import coreEntity.Unity.ANIMATE;
 import coreEntity.Unity.TYPEUNITY;
 import coreNet.NetHeader;
 import coreNet.NetMoveUnity;
@@ -23,9 +24,13 @@ import corePhysic.PhysicWorldManager;
 
 public class UnityNet extends Unity 
 {
+	
+	@Override
+	public void init() {
+		// TODO Auto-generated method stub
+		super.init();
+	}
 
-	
-	
 	@Override
 	public void update(Time deltaTime) 
 	{
@@ -70,7 +75,28 @@ public class UnityNet extends Unity
 							
 						}	
 				}
+				
+				// appel de l'animate
+				this.animate(deltaTime);
 			
+	}
+
+	@Override
+	public  void animate(Time deltaTime) {
+		// TODO Auto-generated method stub
+		
+	}
+
+	@Override
+	public void setDamage(int damage) {
+		// TODO Auto-generated method stub
+		
+	}
+
+	@Override
+	public void setKill() {
+		// TODO Auto-generated method stub
+		
 	}
 
 	@Override
@@ -78,6 +104,12 @@ public class UnityNet extends Unity
 		// TODO Auto-generated method stub
 		
 	}
+
+	
+
+	
+
+
 
 	
 

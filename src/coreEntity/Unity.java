@@ -24,11 +24,14 @@ import org.newdawn.slick.util.pathfinding.navmesh.NavPath;
 import coreAI.AstarManager;
 import coreAI.ICallBackAStar;
 import coreAI.Node;
+import coreEntityManager.EntityManager;
 import coreLevel.LevelManager;
 import coreNet.NetHeader;
 import coreNet.NetHeader.TYPE;
+import coreNet.NetKill;
 import coreNet.NetManager;
 import coreNet.NetMoveUnity;
+import coreNet.NetStrike;
 import coreNet.NetSynchronize;
 import corePhysic.PhysicWorldManager;
 import ravage.IBaseRavage;
@@ -106,13 +109,16 @@ public abstract class Unity implements IBaseRavage,ICallBackAStar
 	protected boolean isStop =false;
 	
 	// enum des modes dans lesquels l'unité peut se trouver
-    public static enum MODE {WALK,STRIKE,PAUSE};
+    public static enum ANIMATE {WALK,STRIKE,PAUSE,KILL};
 	
     // mode dans lequel l'unité se trouve
-	protected MODE mode = MODE.PAUSE; 
+	protected ANIMATE animate = ANIMATE.PAUSE; 
 	
 	// ennemy attribué
 	protected Unity enemyAttribute;
+	
+	// est on mort ?
+	protected boolean isKilled = false;
 	
 	@Override
 	public void init() 
@@ -123,8 +129,25 @@ public abstract class Unity implements IBaseRavage,ICallBackAStar
 	
 	
 	
-	public Unity getEnemyAttribute() {
-		return enemyAttribute;
+	public Unity getEnemyAttribute() 
+	{
+		// on vérifie si cette enemy existe toujours dans l'entity mananger (si il a n'a pas été tué)
+		if(this.enemyAttribute != null)
+		{
+			if(EntityManager.getVectorUnityNet().contains(this.enemyAttribute))
+				return enemyAttribute;
+			else
+			{
+				this.enemyAttribute = null;
+			}
+	
+		}
+		
+		return this.enemyAttribute;
+		
+		
+		
+		
 	}
 
 
@@ -249,6 +272,49 @@ public abstract class Unity implements IBaseRavage,ICallBackAStar
 	public float getPositionMeterY()
 	{
 		return body.getPosition().y;
+	}
+	
+	protected void NetKill(int id)
+	{
+		// emission sur le réseau que je suis mort
+		NetHeader header = new NetHeader();
+		header.setTypeMessage(TYPE.KILL);
+		NetKill kill = new NetKill();
+		kill.setId(id);
+		header.setMessage(kill);
+		// émission
+		try
+		{
+			NetManager.PackMessage(header);
+			//NetManager.SendMessage(header);
+								
+		} catch (IOException e) {
+			// TODO Auto-generated catch block
+			e.printStackTrace();
+		}
+	}
+	
+	protected void NetStrike(int idTarget, int force)
+	{
+		// emission d'une frappe sur le reseau
+		NetHeader header = new NetHeader();
+		header.setTypeMessage(TYPE.STRIKE);
+		NetStrike strike = new NetStrike();
+		strike.setIdStriker(this.getId());
+		strike.setIdTarget(idTarget);
+		strike.setForce(force);
+		header.setMessage(strike);
+		// émission
+		try
+		{
+			NetManager.PackMessage(header);
+			//NetManager.SendMessage(header);
+						
+		} catch (IOException e) {
+			// TODO Auto-generated catch block
+			e.printStackTrace();
+		}
+		
 	}
 	
 	protected void NetSend(float x,float y,float dx,float dy)
@@ -465,7 +531,18 @@ public abstract class Unity implements IBaseRavage,ICallBackAStar
 		// Code pour tÃ©lÃ©porter une unitÃ© bloquÃ©
 		// ------------------------------------
 			
+		// appel à la methode animate
+				this.animate(deltaTime);
 	}
+	
+	// abstract pour l'animation
+	public abstract void animate(Time deltaTime);
+	
+	// abstract pour les dommages
+	public abstract void setDamage(int damage);
+	
+	// abstract pour la mort
+	public abstract void setKill();
 	
 	public Vec2 getVectorTarget()
 	{
@@ -664,10 +741,10 @@ public abstract class Unity implements IBaseRavage,ICallBackAStar
 		}
 	}
 	
-	public void setMode(MODE mode)
+	public void setAnimate(ANIMATE animate)
 	{
 		// on spécifie le mode d'action
-		this.mode = mode;
+		this.animate = animate;
 	}
 	
 	abstract public void strikeNow();

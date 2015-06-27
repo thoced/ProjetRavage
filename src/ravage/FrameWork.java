@@ -38,6 +38,7 @@ import coreAI.Node;
 import coreCamera.CameraManager;
 import coreDrawable.DrawableUnityManager;
 import coreEntity.Unity;
+import coreEntityManager.BloodManager;
 import coreEntityManager.EntityManager;
 import coreEvent.EventManager;
 import coreGUI.RectSelected;
@@ -64,6 +65,7 @@ public class FrameWork
 	private NetManager netManager;
 	private EventManager eventManager;
 	private GuiManager	guiManager;
+	private BloodManager bloodManager;
 	// Clocks
 	private Clock frameClock;
 	// fps
@@ -130,6 +132,8 @@ public class FrameWork
 		eventManager.init();
 		guiManager = new GuiManager();
 		guiManager.init();
+		bloodManager = new BloodManager();
+		bloodManager.init();
 		
 		
 		// attachement au call back
@@ -227,6 +231,7 @@ public class FrameWork
 			rect.update(deltaTime);
 			eventManager.update(deltaTime);
 			netManager.update(deltaTime);
+			bloodManager.update(deltaTime);
 			
 			// Draw des composants
 			renderTexture.clear();

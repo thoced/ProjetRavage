@@ -19,6 +19,7 @@ import org.jsfml.window.event.MouseEvent;
 
 import CoreTexturesManager.TexturesManager;
 import coreDrawable.DrawableUnityManager;
+import coreDrawable.DrawableUnityManager.LAYERS;
 import coreEvent.EventManager;
 import coreEvent.IEventCallBack;
 import corePhysic.PhysicWorldManager;
@@ -51,7 +52,7 @@ public class ChooseAngleFormationDrawable implements IBaseRavage, Drawable, IEve
 		posEnd = end;
 		
 		// ajout dans le drawablecallback
-		DrawableUnityManager.AddDrawable(this);
+		DrawableUnityManager.AddDrawable(this,LAYERS.FRONT);
 		// ajout dans le callback EventManager
 		EventManager.addCallBack(this);
 		

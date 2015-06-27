@@ -2,6 +2,7 @@ package coreEntity;
 
 import org.jbox2d.collision.shapes.CircleShape;
 import org.jbox2d.collision.shapes.Shape;
+import org.jbox2d.common.Vec2;
 import org.jbox2d.dynamics.BodyDef;
 import org.jbox2d.dynamics.BodyType;
 import org.jbox2d.dynamics.Fixture;
@@ -10,11 +11,22 @@ import org.jsfml.graphics.IntRect;
 import org.jsfml.system.Clock;
 import org.jsfml.system.Time;
 
+import coreEntity.Unity.ANIMATE;
+import coreEntityManager.BloodManager;
+import coreEntityManager.EntityManager;
 import corePhysic.PhysicWorldManager;
 
 public class Knight extends Unity 
 {
 
+	// Timer pour la cadence de frappe
+	private final float frequenceStrike = 1f;
+	private Time  timeElapsedStrike = Time.ZERO;
+	
+	// energie
+	
+	private int energy = 100;
+	
 	
 	@Override
 	public void init() 
@@ -52,8 +64,8 @@ public class Knight extends Unity
 				resetSearchClock = new Clock();
 				
 				// anim sprite
-				this.animSpriteRect = new IntRect[15];
-				for(int i=0;i<15;i++)
+				this.animSpriteRect = new IntRect[16];
+				for(int i=0;i<16;i++)
 					this.animSpriteRect[i] = new IntRect(0 + i * 32,0,32,32);
 				
 				this.currentAnim = this.animSpriteRect[0];
@@ -66,54 +78,116 @@ public class Knight extends Unity
 	@Override
 	public void update(Time deltaTime) 
 	{
-		// appel au super constructeur
-		super.update(deltaTime);
 		
-		if(this.mode == MODE.STRIKE) // en mode je frappe comme un gros lourd !!!
-		{
-			// on récupère l'animation courante
-			this.currentAnim = this.animSpriteRect[indAnim];
-			// on additionne le temps écoulé
-			this.timeElapsedAnim = Time.add(this.timeElapsedAnim, deltaTime);
-			// si le temps écoulé est supérieur à ***  on incrémente l'indice d'animation
-			if(this.timeElapsedAnim.asSeconds() > 0.03f)
+		
+			// appel au super constructeur
+			super.update(deltaTime);
+			
+			// on vérifie si la distance entre l'ennemi est inférieur à 1
+			// on frappe et en envoie sur le réseau
+			// on incrémente le temps
+			
+			this.timeElapsedStrike = Time.add(this.timeElapsedStrike, deltaTime);
+			
+			if(this.getEnemyAttribute() != null && timeElapsedStrike.asSeconds() > this.frequenceStrike)
 			{
-				this.timeElapsedAnim = Time.ZERO;
-				indAnim++;
-				if(indAnim > 14)
+				Unity enemy = this.getEnemyAttribute();
+			
+				// on calcul la distance
+				float distance = enemy.getBody().getPosition().sub(this.getBody().getPosition()).length();
+				if(distance < 2f )
 				{
-					indAnim = 0;
-					this.setMode(MODE.PAUSE); // on repositionne en pause après avoir frappé une fois
+					// on frappe
+					this.strikeNow();
+					this.timeElapsedStrike = Time.ZERO; // on positinne à 0 le temps écouté entre deux frappes
 				}
+				
 			}
-		}
-		
-		if(mode == MODE.PAUSE) // en mode je suis sur place et je ne fais rien !!!
-		{
-			// on récupère l'animation courante
-			this.currentAnim = this.animSpriteRect[0];
-		}
-		
-		if(mode == MODE.WALK) // en mode je me déplace !!!
-		{
-			// on récupère l'animation courante
-			this.currentAnim = this.animSpriteRect[0];
-		}
 		
 	}
 
 	@Override
 	public void strikeNow() {
 		// TODO Auto-generated method stub
-		this.setMode(MODE.STRIKE);
+		// activation de l'animation de frappe
+		this.setAnimate(ANIMATE.STRIKE);
+		// on lance sur le réseau la frappe
+		if(this.getEnemyAttribute() != null)
+			this.NetStrike(this.getEnemyAttribute().getId(), 10);
 	}
 
 	@Override
 	public void attributeEnemy(Unity enemy) {
 		// TODO Auto-generated method stub
 		super.attributeEnemy(enemy);
+				
+	}
+
+	@Override
+	public void animate(Time deltaTime) 
+	{
+		if(this.animate == ANIMATE.KILL)
+		{
+			this.currentAnim = this.animSpriteRect[15]; // on joue le sprite de kill
+		}
 		
-		this.strikeNow();
+		if(this.animate == ANIMATE.STRIKE) // en mode je frappe comme un gros lourd !!!
+		{
+				// on récupère l'animation courante
+				this.currentAnim = this.animSpriteRect[indAnim];
+				// on additionne le temps écoulé
+				this.timeElapsedAnim = Time.add(this.timeElapsedAnim, deltaTime);
+				// si le temps écoulé est supérieur à ***  on incrémente l'indice d'animation
+				if(this.timeElapsedAnim.asSeconds() > 0.03f)
+				{
+					this.timeElapsedAnim = Time.ZERO;
+					indAnim++;
+					if(indAnim > 14)
+					{
+						indAnim = 0;
+						this.animate = ANIMATE.PAUSE;
+					}
+				}
+			
+		}
+		
+		if(this.animate == ANIMATE.PAUSE) // en mode je suis sur place et je ne fais rien !!!
+		{
+			// on récupère l'animation courante
+			this.currentAnim = this.animSpriteRect[0];
+		}
+		
+		if(this.animate == ANIMATE.WALK) // en mode je me déplace !!!
+		{
+			// on récupère l'animation courante
+			this.currentAnim = this.animSpriteRect[0];
+		}
+		
+	}
+
+	@Override
+	public void setDamage(int damage) 
+	{
+		this.energy -= damage;
+		if(this.energy <= 0 )
+		{
+			// l'unité meurt, je vais envoyer un message kill sur le réseau et lancer l'anim de la mort
+			this.setAnimate(ANIMATE.KILL);
+			// emission sur le réseau
+			this.NetKill(this.getId());
+			// on est mort
+			EntityManager.IamKilled(this);
+			// je lance un peu de sang
+			BloodManager.addBlood(this.getPosx(), this.getPosy());
+			
+		}
+		
+	}
+
+	@Override
+	public void setKill() {
+		// TODO Auto-generated method stub
+		
 	}
 
 	

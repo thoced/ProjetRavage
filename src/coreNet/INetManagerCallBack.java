@@ -9,5 +9,9 @@ public interface INetManagerCallBack
 	public void onMoveUnity(NetMoveUnity unity);
 	
 	public void onSynchronize(NetSynchronize sync);
+	
+	public void onStrike(NetStrike strike);
+	
+	public void onKill(NetKill kill);
 		
 }

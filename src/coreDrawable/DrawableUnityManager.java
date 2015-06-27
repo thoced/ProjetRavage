@@ -25,10 +25,17 @@ import ravage.IBaseRavage;
 public class DrawableUnityManager implements IBaseRavage, Drawable
 {
 
-	// listCallBack des drawable
-	private static List<Drawable> listCallBackDrawable;
+	public static enum LAYERS {BACK,MIDDLE,FRONT};
+
 	// listCallBack remove
 	private static List<Drawable> listCallBackRemove;
+	
+	// listCallback des drawables layers back
+	private static List<Drawable> listCallBackDrawableBACK;
+	// listCallback des drawables layers middle
+	private static List<Drawable> listCallBackDrawableMIDDLE;
+	// listCallback des drawables layers middle
+	private static List<Drawable> listCallBackDrawableFRONT;
 	
 	private VertexArray buffer;
 	
@@ -48,7 +55,9 @@ public class DrawableUnityManager implements IBaseRavage, Drawable
 	 buffer = new VertexArray(PrimitiveType.QUADS);
 	 
 	 // instance du listCallBackDrawable
-	 listCallBackDrawable = new ArrayList<Drawable>();
+	 listCallBackDrawableBACK = new ArrayList<Drawable>();
+	 listCallBackDrawableMIDDLE = new ArrayList<Drawable>();
+	 listCallBackDrawableFRONT = new ArrayList<Drawable>();
 	 listCallBackRemove = new ArrayList<Drawable>();
 	 
 	 // instance de sprite_unite
@@ -77,7 +86,7 @@ public class DrawableUnityManager implements IBaseRavage, Drawable
 		// Vectoru direction des unitÈs
 		Vec2 dir = new Vec2(1,0);
 		// pour chaque unity 
-		for(Unity unity : EntityManager.getVectorUnity() )
+		for(Unity unity : EntityManager.getVectorUnity().values() )
 		{
 			// on r√©cup√®re la position
 			/*Vector2f pos = new Vector2f(unity.getPosx(),unity.getPosy());
@@ -94,6 +103,9 @@ public class DrawableUnityManager implements IBaseRavage, Drawable
 			buffer.add(v4);*/
 			
 			// test affichage sprite
+			
+			// on appel le BACK draw
+			this.CallBackDrawableBACK(arg0, arg1);
 			
 			
 			switch(unity.getClass().getSimpleName())
@@ -119,7 +131,7 @@ public class DrawableUnityManager implements IBaseRavage, Drawable
 		{
 		
 			
-			arg0.draw(sprite_knight);
+			//arg0.draw(sprite_knight);
 			
 			switch(unity.getClass().getSimpleName())
 			{
@@ -139,8 +151,14 @@ public class DrawableUnityManager implements IBaseRavage, Drawable
 		// affichage
 		//arg0.draw(buffer,state);
 		
-		// appel des drawable call back
-		this.CallBackDrawable(arg0,arg1);
+		// on appel le middle
+		this.CallBackDrawableMIDDLE(arg0, arg1);
+		
+		// on appel le front
+		this.CallBackDrawableFRONT(arg0, arg1);	
+		
+		// on supprimer le list remove
+		this.listCallBackRemove.clear();
 	
 		
 		
@@ -164,9 +182,19 @@ public class DrawableUnityManager implements IBaseRavage, Drawable
 	}
 	
 	// attachement
-	public static void AddDrawable(Drawable d)
+	public static void AddDrawable(Drawable d,LAYERS layer )
 	{
-		listCallBackDrawable.add(d);
+		switch(layer)
+		{
+		case BACK: listCallBackDrawableBACK.add(d);break;
+			
+		case MIDDLE: listCallBackDrawableMIDDLE.add(d);break;
+		
+		case FRONT: listCallBackDrawableFRONT.add(d);break;
+			
+		}
+		
+		
 	}
 	
 	public static void RemoveDrawable(Drawable d)
@@ -176,15 +204,37 @@ public class DrawableUnityManager implements IBaseRavage, Drawable
 	
 
 	
-	private void CallBackDrawable(RenderTarget render, RenderStates states)
+	private void CallBackDrawableBACK(RenderTarget render, RenderStates states)
 	{
 	
-		for(Drawable d : listCallBackDrawable)
+		for(Drawable d : listCallBackDrawableBACK)
 			d.draw(render, states);
 		
 		// suppresion des Èlements dans la liste remove
-		listCallBackDrawable.removeAll(listCallBackRemove);
-		listCallBackRemove.clear();
+		listCallBackDrawableBACK.removeAll(listCallBackRemove);
+		
+	}
+	
+	private void CallBackDrawableMIDDLE(RenderTarget render, RenderStates states)
+	{
+	
+		for(Drawable d : listCallBackDrawableMIDDLE)
+			d.draw(render, states);
+		
+		// suppresion des Èlements dans la liste remove
+		listCallBackDrawableMIDDLE.removeAll(listCallBackRemove);
+		
+		
+	}
+	private void CallBackDrawableFRONT(RenderTarget render, RenderStates states)
+	{
+	
+		for(Drawable d : listCallBackDrawableFRONT)
+			d.draw(render, states);
+		
+		// suppresion des Èlements dans la liste remove
+		listCallBackDrawableFRONT.removeAll(listCallBackRemove);
+
 	}
 
 	
