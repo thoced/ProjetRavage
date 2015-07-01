@@ -84,7 +84,7 @@ public class DrawableUnityManager implements IBaseRavage, Drawable
 		// affichage des unity
 		buffer.clear();
 		// Vectoru direction des unités
-		Vec2 dir = new Vec2(1,0);
+		//Vec2 dir = new Vec2(1,0);
 		// pour chaque unity 
 		for(Unity unity : EntityManager.getVectorUnity().values() )
 		{

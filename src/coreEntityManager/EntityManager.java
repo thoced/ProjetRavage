@@ -281,6 +281,8 @@ public class EntityManager implements IBaseRavage,IEventCallBack,IRegionSelected
 			unity.setRotation(0f);
 			idTestUnity++;
 			this.onAddUnity(unity);
+			
+			
 		}
 		
 	}
@@ -437,7 +439,7 @@ public class EntityManager implements IBaseRavage,IEventCallBack,IRegionSelected
 		{
 			
 			un.setPosXYMeter(sync.getPosx(),sync.getPosy());
-			un.getBody().setTransform(un.getBody().getPosition(),sync.getRotation());
+		//	un.getBody().setTransform(un.getBody().getPosition(),sync.getRotation());
 					
 		}
 	}

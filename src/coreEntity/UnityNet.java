@@ -68,7 +68,7 @@ public class UnityNet extends Unity
 						{
 							this.vecTarget.normalize();
 							// on calcul la rotation
-							this.computeRotation();
+							this.computeRotation(this.vecTarget);
 							// on applique un vecteur de déplacement
 							this.body.setLinearVelocity(this.vecTarget.mul(6f));
 							

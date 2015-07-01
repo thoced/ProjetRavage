@@ -350,7 +350,7 @@ public abstract class Unity implements IBaseRavage,ICallBackAStar
 		sync.setIdUnity(this.getId());
 		sync.setPosx(this.getPositionMeterX());
 		sync.setPosy(this.getPositionMeterY());
-		sync.setRotation(this.getBody().getAngle());
+		//sync.setRotation(this.getBody().getAngle());
 		header.setMessage(sync);
 		// émission
 		try
@@ -369,14 +369,14 @@ public abstract class Unity implements IBaseRavage,ICallBackAStar
 	    return start + (end - start) * value;
 	}
 	
-	protected void computeRotation()
+	protected void computeRotation(Vec2 vectarget)
 	{
-		if(this.vecTarget != null)
+		if(vectarget != null)
 		{
 			// on crée la class de rotation
 			Rot r = new Rot();
-			r.s = this.vecTarget.y;
-			r.c = this.vecTarget.x;
+			r.s = vectarget.y;
+			r.c = vectarget.x;
 			// receptin de l'angle de rotation
 			//float angle = r.getAngle(); 
 			// assouplissement en utilisant un lerp
@@ -475,7 +475,7 @@ public abstract class Unity implements IBaseRavage,ICallBackAStar
 							// il est arrivé, on tourne l'axe vers la vecteur fleche pointé
 							this.vecTarget = this.vecDirFormation;
 							// on détermine l'angle du sprite
-							this.computeRotation();
+							this.computeRotation(this.vecTarget);
 							// envoie de la synchronisation finale
 							this.NetSendSynchronise();
 									
@@ -484,7 +484,7 @@ public abstract class Unity implements IBaseRavage,ICallBackAStar
 						{
 							this.vecTarget.normalize();
 							// on calcul la rotation
-							this.computeRotation();
+							this.computeRotation(this.vecTarget);
 							// on applique un vecteur de déplacement
 							this.body.setLinearVelocity(this.vecTarget.mul(6f));
 							
@@ -519,7 +519,7 @@ public abstract class Unity implements IBaseRavage,ICallBackAStar
 					{
 						this.vecTarget.normalize();
 						// on calcul la rotation
-						this.computeRotation();
+						this.computeRotation(this.vecTarget);
 						// on applique un vecteur de déplacement
 						this.body.setLinearVelocity(this.vecTarget.mul(6f));
 					}
@@ -570,7 +570,7 @@ public abstract class Unity implements IBaseRavage,ICallBackAStar
 	
 	public void setPosXYMeter(float x,float y)
 	{
-		this.body.setTransform(new Vec2(x,y), 0f);
+		this.body.setTransform(new Vec2(x,y), this.body.getAngle());
 		posx = body.getPosition().x * PhysicWorldManager.getRatioPixelMeter();
 		posy = body.getPosition().y * PhysicWorldManager.getRatioPixelMeter();
 	}
