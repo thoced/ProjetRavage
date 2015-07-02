@@ -63,11 +63,25 @@ public class CameraManager implements IBaseRavage, IEventCallBack
 		if(Keyboard.isKeyPressed(Key.UP))
 			 this.center = Vector2f.sub(this.center, Vector2f.mul(new Vector2f(0f,1f), mul));
 		
-		if(Mouse.getPosition(FrameWork.getWindow()).x > this.view.getSize().x - 64f)
+		if(Keyboard.isKeyPressed(Key.SUBTRACT))
+		{
+			Vector2f size = this.view.getSize();
+			size = Vector2f.mul(size, 1.1f);
+			this.view.setSize(size);
+		}
+		
+		if(Keyboard.isKeyPressed(Key.ADD))
+		{
+			Vector2f size = this.view.getSize();
+			size = Vector2f.mul(size, 0.9f);
+			this.view.setSize(size);
+		}
+		
+		if(Mouse.getPosition(FrameWork.getWindow()).x > FrameWork.getWindow().getSize().x - 64f)
 			 this.center = Vector2f.add(this.center, Vector2f.mul(new Vector2f(1f,0f), mul));
 		if(Mouse.getPosition(FrameWork.getWindow()).x < 64f)
 			 this.center = Vector2f.sub(this.center, Vector2f.mul(new Vector2f(1f,0f), mul));
-		if(Mouse.getPosition(FrameWork.getWindow()).y > this.view.getSize().y - 64f)
+		if(Mouse.getPosition(FrameWork.getWindow()).y > FrameWork.getWindow().getSize().y - 64f)
 			this.center = Vector2f.add(this.center, Vector2f.mul(new Vector2f(0f,1f), mul));
 		if(Mouse.getPosition(FrameWork.getWindow()).y < 64f)
 			 this.center = Vector2f.sub(this.center, Vector2f.mul(new Vector2f(0f,1f), mul));
