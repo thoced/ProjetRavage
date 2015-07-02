@@ -2,8 +2,10 @@ package coreEntityManager;
 
 import java.util.ArrayList;
 import java.util.List;
+import java.util.Random;
 
 import org.jsfml.graphics.Drawable;
+import org.jsfml.graphics.IntRect;
 import org.jsfml.graphics.RenderStates;
 import org.jsfml.graphics.RenderTarget;
 import org.jsfml.graphics.Sprite;
@@ -22,6 +24,8 @@ public class BloodManager implements IBaseRavage,Drawable
 	private static List<Blood> listBlood;
 	// liste destruct blood
 	private static List<Blood> listDestroyBlood;
+	// tableau de texturerect
+	private static IntRect[] listIntRect;
 	
 	// texture blood
 	private static Texture textureBlood;
@@ -35,7 +39,15 @@ public class BloodManager implements IBaseRavage,Drawable
 		listBlood = new ArrayList<Blood>();
 		listDestroyBlood = new ArrayList<Blood>();
 		// chargement de la texture blood
-		textureBlood = new Texture(TexturesManager.GetTextureByName("blood.png"));
+		textureBlood = new Texture(TexturesManager.GetTextureByName("blood_splatt_01.png"));
+		// instance des intrects
+		listIntRect = new IntRect[15];
+		int x = 0;
+		for(int i=0;i<15;i++)
+		{
+			listIntRect[i] = new IntRect(x,0,32,32);
+			x+=32;
+		}
 
 	}
 
@@ -69,6 +81,14 @@ public class BloodManager implements IBaseRavage,Drawable
 		Sprite sprite = new Sprite(textureBlood);
 		sprite.setPosition(new Vector2f(posx,posy));
 		sprite.setOrigin(new Vector2f(16f,16f));
+		// on cré un rand pour la selection aléatoire du sang
+		Random rand = new Random();
+		int randomNum = rand.nextInt(15);
+		sprite.setTextureRect(listIntRect[randomNum]);
+		// random de l'angle du sang
+		float angleBlood = rand.nextFloat();
+		angleBlood = angleBlood * 360f;
+		sprite.setRotation(angleBlood);
 		Blood blood = new Blood();
 		blood.setSpriteBlood(sprite);
 		

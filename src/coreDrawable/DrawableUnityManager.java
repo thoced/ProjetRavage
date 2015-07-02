@@ -86,6 +86,10 @@ public class DrawableUnityManager implements IBaseRavage, Drawable
 		// Vectoru direction des unit�s
 		//Vec2 dir = new Vec2(1,0);
 		// pour chaque unity 
+		
+		// on appel le BACK draw
+		this.CallBackDrawableBACK(arg0, arg1);
+		
 		for(Unity unity : EntityManager.getVectorUnity().values() )
 		{
 			// on récupère la position
@@ -104,8 +108,7 @@ public class DrawableUnityManager implements IBaseRavage, Drawable
 			
 			// test affichage sprite
 			
-			// on appel le BACK draw
-			this.CallBackDrawableBACK(arg0, arg1);
+		
 			
 			
 			switch(unity.getClass().getSimpleName())

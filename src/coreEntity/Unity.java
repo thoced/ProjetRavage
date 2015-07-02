@@ -24,6 +24,7 @@ import org.newdawn.slick.util.pathfinding.navmesh.NavPath;
 import coreAI.AstarManager;
 import coreAI.ICallBackAStar;
 import coreAI.Node;
+import coreEntityManager.BloodManager;
 import coreEntityManager.EntityManager;
 import coreLevel.LevelManager;
 import coreNet.NetHeader;
@@ -296,6 +297,8 @@ public abstract class Unity implements IBaseRavage,ICallBackAStar
 	
 	protected void NetStrike(int idTarget, int force)
 	{
+		// test de sang
+				BloodManager.addBlood(this.getPosx(), this.getPosy());
 		// emission d'une frappe sur le reseau
 		NetHeader header = new NetHeader();
 		header.setTypeMessage(TYPE.STRIKE);

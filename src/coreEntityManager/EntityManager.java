@@ -400,6 +400,7 @@ public class EntityManager implements IBaseRavage,IEventCallBack,IRegionSelected
 	@Override
 	public void onStrike(NetStrike strike)
 	{
+		
 		// on réceptionne un message de frappe sur notre unité.
 		// on va récupéré l'unité en question
 		Unity unity = this.vectorUnity.get(strike.getIdTarget());
