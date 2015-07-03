@@ -100,6 +100,8 @@ public class Knight extends Unity
 					// on frappe
 					this.strikeNow();
 					this.timeElapsedStrike = Time.ZERO; // on positinne à 0 le temps écouté entre deux frappes
+					// on jette un peu de sang en dessous de l'ennemy virtuel
+					BloodManager.addBlood(enemy.getPosx(), enemy.getPosy());
 				}
 				
 			}
@@ -169,6 +171,7 @@ public class Knight extends Unity
 	public void setDamage(int damage) 
 	{
 		this.energy -= damage;
+		
 		if(this.energy <= 0 )
 		{
 			// l'unité meurt, je vais envoyer un message kill sur le réseau et lancer l'anim de la mort
@@ -177,10 +180,12 @@ public class Knight extends Unity
 			this.NetKill(this.getId());
 			// on est mort
 			EntityManager.IamKilled(this);
-			// je lance un peu de sang
-			BloodManager.addBlood(this.getPosx(), this.getPosy());
+			// je place le mort
+			BloodManager.addUnityKilled(this.getPosx(), this.getPosy());
 			
 		}
+		else
+			BloodManager.addBlood(this.getPosx(), this.getPosy()); // ajout du sang car je recois un damage
 		
 	}
 

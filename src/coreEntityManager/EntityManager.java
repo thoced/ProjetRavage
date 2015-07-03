@@ -276,8 +276,8 @@ public class EntityManager implements IBaseRavage,IEventCallBack,IRegionSelected
 			NetAddUnity unity = new NetAddUnity();
 			unity.setIdUnity(idTestUnity);
 			unity.setTypeUnity(TYPEUNITY.KNIGHT);
-			unity.setPosx(20);
-			unity.setPosy(17);
+			unity.setPosx(48);
+			unity.setPosy(28);
 			unity.setRotation(0f);
 			idTestUnity++;
 			this.onAddUnity(unity);
@@ -378,6 +378,7 @@ public class EntityManager implements IBaseRavage,IEventCallBack,IRegionSelected
 			Node n = new Node(unity.getNextPosx(),unity.getNextPosy(),true);
 			un.setPosXYMeter(unity.getPosx(),unity.getPosy());
 			un.setNext(n);
+			un.setVecDirFormation(unity.getVecDirFormation());
 			un.setAnimate(ANIMATE.WALK); // on active l'animation de mouvement
 					
 		}
@@ -440,6 +441,7 @@ public class EntityManager implements IBaseRavage,IEventCallBack,IRegionSelected
 		{
 			
 			un.setPosXYMeter(sync.getPosx(),sync.getPosy());
+			
 		//	un.getBody().setTransform(un.getBody().getPosition(),sync.getRotation());
 					
 		}

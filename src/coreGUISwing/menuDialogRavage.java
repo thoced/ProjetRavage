@@ -232,8 +232,8 @@ public class menuDialogRavage extends JDialog implements ActionListener, INetMan
 			case 0 :  	NetManager.setPosxStartFlag(340);
 						NetManager.setPosyStartFlag(33);
 						break;
-			case 1 :	NetManager.setPosxStartFlag(20);
-						NetManager.setPosyStartFlag(12);
+			case 1 :	NetManager.setPosxStartFlag(36);
+						NetManager.setPosyStartFlag(8);
 						break;
 			case 2 : 	NetManager.setPosxStartFlag(363);
 						NetManager.setPosyStartFlag(214);

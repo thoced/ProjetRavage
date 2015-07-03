@@ -1,5 +1,7 @@
 package coreNet;
 
+import org.jbox2d.common.Vec2;
+
 public class NetSynchronize extends NetBase 
 {
 	private int idUnity;
@@ -8,7 +10,17 @@ public class NetSynchronize extends NetBase
 	
 	private float posy;
 	
-	private float rotation;
+	private Vec2 vectorDirFormation; // formation final
+
+	
+	
+	public Vec2 getVectorDirFormation() {
+		return vectorDirFormation;
+	}
+
+	public void setVectorDirFormation(Vec2 vectorDirFormation) {
+		this.vectorDirFormation = vectorDirFormation;
+	}
 
 	public int getIdUnity() {
 		return idUnity;
@@ -34,13 +46,6 @@ public class NetSynchronize extends NetBase
 		this.posy = posy;
 	}
 
-	public float getRotation() {
-		return rotation;
-	}
-
-	public void setRotation(float rotation) {
-		this.rotation = rotation;
-	}
 	
 	
 }

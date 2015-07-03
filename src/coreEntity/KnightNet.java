@@ -129,7 +129,7 @@ public class KnightNet extends UnityNet
 		// on supprime l'objet du net
 		EntityManager.IamKilledNet(this);
 		// on lance un peu de sang
-		BloodManager.addBlood(this.getPosx(), this.getPosy());
+		BloodManager.addUnityKilled(this.getPosx(), this.getPosy());
 		
 	}
 	

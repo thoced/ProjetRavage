@@ -52,12 +52,18 @@ public class UnityNet extends Unity
 					// on calcul le vecteur velocity de différence
 					n = next.getPositionVec2();
 					
+					
 				}
+			
 				
 				
 				if(n!=null)
 				{
-						this.vecTarget = n.sub(this.body.getPosition());
+						if(this.vecDirFormation == null)
+							this.vecTarget = n.sub(this.body.getPosition());
+						else
+							this.vecTarget = this.vecDirFormation;  // on a recu le dernier message avec la formation finale
+						
 						if(this.vecTarget.length() < 0.4f)
 						{
 							next = null;

@@ -194,6 +194,20 @@ public abstract class Unity implements IBaseRavage,ICallBackAStar
 		this.isStop = true;
 	}
 	
+	
+	
+	public Vec2 getVecDirFormation() {
+		return vecDirFormation;
+	}
+
+
+
+	public void setVecDirFormation(Vec2 vecDirFormation) {
+		this.vecDirFormation = vecDirFormation;
+	}
+
+
+
 	public boolean setTargetPosition(float px,float py,int tx,int ty,Vec2 dir)
 	{
 		// instance de vecteur de formation finale
@@ -298,7 +312,7 @@ public abstract class Unity implements IBaseRavage,ICallBackAStar
 	protected void NetStrike(int idTarget, int force)
 	{
 		// test de sang
-				BloodManager.addBlood(this.getPosx(), this.getPosy());
+				//BloodManager.addBlood(this.getPosx(), this.getPosy());
 		// emission d'une frappe sur le reseau
 		NetHeader header = new NetHeader();
 		header.setTypeMessage(TYPE.STRIKE);
@@ -320,7 +334,7 @@ public abstract class Unity implements IBaseRavage,ICallBackAStar
 		
 	}
 	
-	protected void NetSend(float x,float y,float dx,float dy)
+	protected void NetSend(float x,float y,float dx,float dy,Vec2 vecDir)
 	{
 		    NetHeader header = new NetHeader();
 			header.setTypeMessage(TYPE.MOVE);
@@ -330,6 +344,7 @@ public abstract class Unity implements IBaseRavage,ICallBackAStar
 			move.setPosy(y);
 			move.setNextPosx(dx);
 			move.setNextPosy(dy);
+			move.setVecDirFormation(vecDir); // si null alors ce n'est pas encore le message de fin - permet de tourner l'unité vers son sens de formation
 			header.setMessage(move);
 			// émission
 			try
@@ -354,6 +369,7 @@ public abstract class Unity implements IBaseRavage,ICallBackAStar
 		sync.setPosx(this.getPositionMeterX());
 		sync.setPosy(this.getPositionMeterY());
 		//sync.setRotation(this.getBody().getAngle());
+		sync.setVectorDirFormation(this.vecDirFormation);
 		header.setMessage(sync);
 		// émission
 		try
@@ -450,7 +466,7 @@ public abstract class Unity implements IBaseRavage,ICallBackAStar
 					 this.indexNode++;
 					 
 					 // envoie des informations sur le réseau
-					 this.NetSend(this.body.getPosition().x, this.body.getPosition().y, mx, my);
+					 this.NetSend(this.body.getPosition().x, this.body.getPosition().y, mx, my,null); // null car ce n'est pas encore la destination finale (pour le retournement de formation)
 					 
 				}
 				else
@@ -469,7 +485,7 @@ public abstract class Unity implements IBaseRavage,ICallBackAStar
 									
 							if(!this.isArrived)
 							{
-								this.NetSend(this.body.getPosition().x, this.body.getPosition().y,this.body.getPosition().x, this.body.getPosition().y);
+								this.NetSend(this.body.getPosition().x, this.body.getPosition().y,this.body.getPosition().x, this.body.getPosition().y,this.vecDirFormation);
 								this.isArrived = true;
 							
 							}
@@ -492,7 +508,7 @@ public abstract class Unity implements IBaseRavage,ICallBackAStar
 							this.body.setLinearVelocity(this.vecTarget.mul(6f));
 							
 							// envoie des informations sur le réseau
-								this.NetSend(this.body.getPosition().x, this.body.getPosition().y, n.x, n.y);
+								this.NetSend(this.body.getPosition().x, this.body.getPosition().y, n.x, n.y,this.vecDirFormation);
 								
 								this.isArrived = false;
 						}

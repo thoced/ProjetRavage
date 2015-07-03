@@ -13,7 +13,17 @@ public class NetMoveUnity extends NetBase
 	private float nextPosx;
 	
 	private float nextPosy;
+	
+	private Vec2 vecDirFormation;
 
+		
+	public Vec2 getVecDirFormation() {
+		return vecDirFormation;
+	}
+
+	public void setVecDirFormation(Vec2 vecDirFormation) {
+		this.vecDirFormation = vecDirFormation;
+	}
 
 	public int getId() {
 		return id;

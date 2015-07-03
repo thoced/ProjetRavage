@@ -39,11 +39,11 @@ public class BloodManager implements IBaseRavage,Drawable
 		listBlood = new ArrayList<Blood>();
 		listDestroyBlood = new ArrayList<Blood>();
 		// chargement de la texture blood
-		textureBlood = new Texture(TexturesManager.GetTextureByName("blood_splatt_01.png"));
+		textureBlood = new Texture(TexturesManager.GetTextureByName("blood_splatt_02.png"));
 		// instance des intrects
-		listIntRect = new IntRect[15];
+		listIntRect = new IntRect[16];
 		int x = 0;
-		for(int i=0;i<15;i++)
+		for(int i=0;i<16;i++)
 		{
 			listIntRect[i] = new IntRect(x,0,32,32);
 			x+=32;
@@ -86,6 +86,26 @@ public class BloodManager implements IBaseRavage,Drawable
 		int randomNum = rand.nextInt(15);
 		sprite.setTextureRect(listIntRect[randomNum]);
 		// random de l'angle du sang
+		float angleBlood = rand.nextFloat();
+		angleBlood = angleBlood * 360f;
+		sprite.setRotation(angleBlood);
+		Blood blood = new Blood();
+		blood.setSpriteBlood(sprite);
+		
+		// ajout dans la liste
+		listBlood.add(blood);
+	}
+	
+	public static void addUnityKilled(float posx, float posy)
+	{
+		Sprite sprite = new Sprite(textureBlood);
+		sprite.setPosition(new Vector2f(posx,posy));
+		sprite.setOrigin(new Vector2f(16f,16f));
+	
+		// on place l'indice 15 qui est le corp décédé
+		sprite.setTextureRect(listIntRect[15]);
+		// random de l'angle du sang
+		Random rand = new Random();
 		float angleBlood = rand.nextFloat();
 		angleBlood = angleBlood * 360f;
 		sprite.setRotation(angleBlood);
