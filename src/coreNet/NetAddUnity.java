@@ -3,10 +3,12 @@ package coreNet;
 import java.io.Serializable;
 
 import coreEntity.Unity.TYPEUNITY;
+import coreEntityManager.EntityManager.CAMP;
 
 public class NetAddUnity extends NetBase implements Serializable
 {
-		
+	private CAMP  campUnity;
+	
 	private TYPEUNITY typeUnity;
 	
 	private int idUnity;
@@ -18,6 +20,15 @@ public class NetAddUnity extends NetBase implements Serializable
 	private float rotation;
 	
 	
+	
+	public CAMP getCampUnity() {
+		return campUnity;
+	}
+
+	public void setCampUnity(CAMP campUnity) {
+		this.campUnity = campUnity;
+	}
+
 	public TYPEUNITY getTypeUnity() {
 		return typeUnity;
 	}

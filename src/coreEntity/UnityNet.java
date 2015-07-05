@@ -100,9 +100,10 @@ public class UnityNet extends Unity
 	}
 
 	@Override
-	public void setKill() {
+	public void setKill()
+	{
 		// TODO Auto-generated method stub
-		
+		this.setKilled(true);
 	}
 
 	@Override

@@ -26,9 +26,17 @@ public class BloodManager implements IBaseRavage,Drawable
 	private static List<Blood> listDestroyBlood;
 	// tableau de texturerect
 	private static IntRect[] listIntRect;
+	// tableau des textures de cadavres
+	private static IntRect[][] listCadavres;  //[x][y]
 	
 	// texture blood
 	private static Texture textureBlood;
+	// Nombre de type de blood
+	private final int MAX_IND_BLOOD = 15;
+	// texture des cadavres
+	private static Texture textureCadavre;
+	// Nombre de type de cadavre
+	private final int MAX_IND_CADAVRE = 1;
 	
 	@Override
 	public void init()
@@ -39,14 +47,28 @@ public class BloodManager implements IBaseRavage,Drawable
 		listBlood = new ArrayList<Blood>();
 		listDestroyBlood = new ArrayList<Blood>();
 		// chargement de la texture blood
-		textureBlood = new Texture(TexturesManager.GetTextureByName("blood_splatt_02.png"));
+		textureBlood = new Texture(TexturesManager.GetTextureByName("Blood_Splatt.png"));
+		//chargement de la texture des cadavres
+		textureCadavre = new Texture(TexturesManager.GetTextureByName("cadavres.png"));
 		// instance des intrects
-		listIntRect = new IntRect[16];
-		int x = 0;
-		for(int i=0;i<16;i++)
+		listIntRect = new IntRect[MAX_IND_BLOOD];
+		listCadavres = new IntRect[MAX_IND_CADAVRE][2];
+		
+		int tx = 0;
+		for(int i=0;i<MAX_IND_BLOOD;i++)
 		{
-			listIntRect[i] = new IntRect(x,0,32,32);
-			x+=32;
+			listIntRect[i] = new IntRect(tx,0,32,32);
+			tx+=32;
+		}
+		// instance des intrect pour le cadavre
+		for(int y=0;y<2;y++)
+		{
+			for(int x=0;x<MAX_IND_CADAVRE;x++)
+			{
+				
+				listCadavres[x][y] = new IntRect(x*32,y*32,32,32);
+				
+			}
 		}
 
 	}
@@ -59,7 +81,7 @@ public class BloodManager implements IBaseRavage,Drawable
 			Time elapse = blood.getElapsedTimeBlood();
 			blood.setElapsedTimeBlood(Time.add(elapse, deltaTime));
 			// si le sang est resté plus de 5 seconde
-			if(blood.getElapsedTimeBlood().asSeconds() > 5f)
+			if(blood.getElapsedTimeBlood().asSeconds() > 120f)
 				listDestroyBlood.add(blood);
 				
 		}
@@ -78,6 +100,7 @@ public class BloodManager implements IBaseRavage,Drawable
 	
 	public static void addBlood(float posx,float posy)
 	{
+		
 		Sprite sprite = new Sprite(textureBlood);
 		sprite.setPosition(new Vector2f(posx,posy));
 		sprite.setOrigin(new Vector2f(16f,16f));
@@ -96,14 +119,22 @@ public class BloodManager implements IBaseRavage,Drawable
 		listBlood.add(blood);
 	}
 	
-	public static void addUnityKilled(float posx, float posy)
+	public static void addUnityKilled(float posx, float posy,EntityManager.CAMP camp)
 	{
-		Sprite sprite = new Sprite(textureBlood);
+		int indy = 0;
+		switch(camp)
+		{
+			case BLUE : indy = 1;break;
+			
+			case YELLOW:indy = 0;break;
+		}
+	
+		Sprite sprite = new Sprite(textureCadavre);
 		sprite.setPosition(new Vector2f(posx,posy));
 		sprite.setOrigin(new Vector2f(16f,16f));
 	
 		// on place l'indice 15 qui est le corp décédé
-		sprite.setTextureRect(listIntRect[15]);
+		sprite.setTextureRect(listCadavres[0][indy]);
 		// random de l'angle du sang
 		Random rand = new Random();
 		float angleBlood = rand.nextFloat();

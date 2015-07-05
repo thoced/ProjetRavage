@@ -20,6 +20,7 @@ import CoreTexturesManager.TexturesManager;
 import coreEntity.Knight;
 import coreEntity.Unity;
 import coreEntityManager.EntityManager;
+import coreEntityManager.EntityManager.CAMP;
 import ravage.IBaseRavage;
 
 public class DrawableUnityManager implements IBaseRavage, Drawable
@@ -44,7 +45,14 @@ public class DrawableUnityManager implements IBaseRavage, Drawable
 	
 	// test utilisation de sprite pour l'affichage des unités
 	private Sprite sprite_unite;
-	private Sprite sprite_knight;
+	
+	// KNIGHTS
+	private Sprite sprite_knight_YELLOW;
+	private Sprite sprite_knight_BLUE;
+	
+	// SPIRTE CURRENT
+	private Sprite SpriteCurrent;
+	private Sprite SpriteCurrentNet;
 	
 
 	@Override
@@ -61,8 +69,13 @@ public class DrawableUnityManager implements IBaseRavage, Drawable
 	 listCallBackRemove = new ArrayList<Drawable>();
 	 
 	 // instance de sprite_unite
-	 sprite_knight = new Sprite(TexturesManager.GetTextureByName("ANIM_Melee_class_01_.png"));
-	 sprite_knight.setOrigin(new Vector2f(16f,16f));
+	 sprite_knight_YELLOW = new Sprite(TexturesManager.GetTextureByName("ANIM_KNIGHT_YELLOW.png"));
+	 sprite_knight_YELLOW.setOrigin(new Vector2f(16f,16f));
+	 sprite_knight_BLUE = new Sprite(TexturesManager.GetTextureByName("ANIM_KNIGHT_BLUE.png"));
+	 sprite_knight_BLUE.setOrigin(new Vector2f(16f,16f));
+	 
+	 
+	 
 	}
 
 	@Override
@@ -109,21 +122,39 @@ public class DrawableUnityManager implements IBaseRavage, Drawable
 			// test affichage sprite
 			
 		
-			
-			
-			switch(unity.getClass().getSimpleName())
+			if(unity.getMyCamp() == CAMP.YELLOW)
 			{
-				case "Knight" :	sprite_knight.setPosition(new Vector2f(unity.getPosx(),unity.getPosy()));		
-								// on spécifie la roation
-								sprite_knight.setRotation((float)((unity.getBody().getAngle() * 180f) / Math.PI) % 360f);
-								// on spécifie l'anim a jouer
-								sprite_knight.setTextureRect(unity.getCurrentAnim());
-								// on affiche
-								arg0.draw(sprite_knight);
-				break;
+			
+				switch(unity.getClass().getSimpleName())
+				{
+					case "Knight" :	sprite_knight_YELLOW.setPosition(new Vector2f(unity.getPosx(),unity.getPosy()));		
+									// on spécifie la roation
+									sprite_knight_YELLOW.setRotation((float)((unity.getBody().getAngle() * 180f) / Math.PI) % 360f);
+									// on spécifie l'anim a jouer
+									sprite_knight_YELLOW.setTextureRect(unity.getCurrentAnim());
+									// on affiche
+									arg0.draw(sprite_knight_YELLOW);
+					break;
+				}
+			
 			}
+			else if(unity.getMyCamp() == CAMP.BLUE)
+			{
 			
-			
+				switch(unity.getClass().getSimpleName())
+				{
+					case "Knight" :	sprite_knight_BLUE.setPosition(new Vector2f(unity.getPosx(),unity.getPosy()));		
+									// on spécifie la roation
+									sprite_knight_BLUE.setRotation((float)((unity.getBody().getAngle() * 180f) / Math.PI) % 360f);
+									// on spécifie l'anim a jouer
+									sprite_knight_BLUE.setTextureRect(unity.getCurrentAnim());
+									// on affiche
+									arg0.draw(sprite_knight_BLUE);
+					break;
+				}
+				
+			}
+				
 			
 			
 			
@@ -136,16 +167,35 @@ public class DrawableUnityManager implements IBaseRavage, Drawable
 			
 			//arg0.draw(sprite_knight);
 			
-			switch(unity.getClass().getSimpleName())
+			if(unity.getMyCamp() == CAMP.YELLOW)
 			{
-				case "KnightNet" :	sprite_knight.setPosition(new Vector2f(unity.getPosx(),unity.getPosy()));		
-								// on spécifie la roation
-								sprite_knight.setRotation((float)((unity.getBody().getAngle() * 180f) / Math.PI) % 360f);
-								// on spécifie l'anim a jouer
-								sprite_knight.setTextureRect(unity.getCurrentAnim());
-								// on affiche
-								arg0.draw(sprite_knight);
-				break;
+				
+				switch(unity.getClass().getSimpleName())
+				{
+					case "KnightNet" :	sprite_knight_YELLOW.setPosition(new Vector2f(unity.getPosx(),unity.getPosy()));		
+									// on spécifie la roation
+										sprite_knight_YELLOW.setRotation((float)((unity.getBody().getAngle() * 180f) / Math.PI) % 360f);
+									// on spécifie l'anim a jouer
+										sprite_knight_YELLOW.setTextureRect(unity.getCurrentAnim());
+									// on affiche
+										arg0.draw(sprite_knight_YELLOW);
+					break;
+				}
+			
+			}
+			else if(unity.getMyCamp() == CAMP.BLUE)
+			{
+				switch(unity.getClass().getSimpleName())
+				{
+						case "KnightNet" :	sprite_knight_BLUE.setPosition(new Vector2f(unity.getPosx(),unity.getPosy()));		
+									// on spécifie la roation
+										sprite_knight_BLUE.setRotation((float)((unity.getBody().getAngle() * 180f) / Math.PI) % 360f);
+									// on spécifie l'anim a jouer
+										sprite_knight_BLUE.setTextureRect(unity.getCurrentAnim());
+					// on affiche
+										arg0.draw(sprite_knight_BLUE);
+										break;
+				}
 			}
 			
 		}

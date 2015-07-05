@@ -53,7 +53,10 @@ import ravage.IBaseRavage;
 
 public class EntityManager implements IBaseRavage,IEventCallBack,IRegionSelectedCallBack,INetManagerCallBack
 {
-	
+	// enum des camps
+	public static enum CAMP {BLUE,YELLOW};
+	// camp du joueur
+	public static CAMP campSelected;
 	// compteur d'id 
 	private static int cptIdUnity = -1;
 	// vecteur des unity du player
@@ -82,6 +85,16 @@ public class EntityManager implements IBaseRavage,IEventCallBack,IRegionSelected
 
 	private static int idTestUnity = 0;
 	
+	
+	
+	public static CAMP getCampSelected() {
+		return campSelected;
+	}
+
+	public static void setCampSelected(CAMP campSelected) {
+		EntityManager.campSelected = campSelected;
+	}
+
 	@Override
 	public void init()
 	{
@@ -120,6 +133,31 @@ public class EntityManager implements IBaseRavage,IEventCallBack,IRegionSelected
 		
 		if(arrow!=null)
 			arrow.update(deltaTime);
+		
+		
+		// recherche des enemy dans les zones
+		// pour chaque unity on lance la recherche
+		
+		for(Unity unity : this.vectorUnity.values())
+		{
+			if(unity.getEnemyAttribute() == null) // si aucun enemy n'est encore attribué.
+			{
+				// on lance la recherche
+				List<UnityNet> listEnemy = this.searchEnemyZone(unity);
+				if(listEnemy != null && listEnemy.size() > 0)
+				{
+					// on selectionne au hazard
+					Random rand = new Random();
+					int ind = rand.nextInt(listEnemy.size());
+					// on récupère l'enemy
+					UnityNet enemy = listEnemy.get(ind);
+					// on attribue l'enemy
+					
+					unity.attributeEnemy(enemy);
+					
+				}
+			}
+		}
 		
 		
 		// on regarde si il n'existe pas d'unité à supprimer dans le vecteur unitykilled
@@ -216,14 +254,14 @@ public class EntityManager implements IBaseRavage,IEventCallBack,IRegionSelected
 			Unity unityPicked = this.getUnityPicked(p.x,p.y);
 			if(unityPicked != null)
 			{
-				if(unityPicked.getClass().getSuperclass() == UnityNet.class) // on vient de cliquer sur une unité ennemie
-				{
+			
+				
 					// pour toutes les unités selectionnées, on attribue l'ennemy
 					for(Unity u : this.listUnitySelected)
 						u.attributeEnemy(unityPicked);
 					// pour toutes les unités, on crée leur position de formation pour attaquer
 					this.computeFormationStrike(unityPicked, listUnitySelected, new Vec2(1,0));
-				}
+				
 			}
 			else
 			{
@@ -249,6 +287,7 @@ public class EntityManager implements IBaseRavage,IEventCallBack,IRegionSelected
 			knight.setPosition(NetManager.getPosxStartFlag(),NetManager.getPosyStartFlag());
 			// réception de l'id unique pour l'unité
 			knight.setId(EntityManager.getNewIdUnity());
+			knight.setMyCamp(EntityManager.getCampSelected());
 			EntityManager.getVectorUnity().put(knight.getId(), knight);
 			// on envoie sur le réseau
 			NetHeader header = new NetHeader();
@@ -258,6 +297,7 @@ public class EntityManager implements IBaseRavage,IEventCallBack,IRegionSelected
 			add.setPosy(knight.getPositionMeterY());
 			add.setTypeUnity(knight.getIdType());
 			add.setIdUnity(knight.getId());
+			add.setCampUnity(knight.getMyCamp());
 			header.setMessage(add);
 			try 
 			{
@@ -358,6 +398,7 @@ public class EntityManager implements IBaseRavage,IEventCallBack,IRegionSelected
 					u.init();
 					u.setPosition(unity.getPosx(), unity.getPosy());;
 					u.setId(unity.getIdUnity());
+					u.setMyCamp(unity.getCampUnity());
 					vectorUnityNet.put(u.getId(), u);
 					break;
 		}
@@ -458,6 +499,8 @@ public class EntityManager implements IBaseRavage,IEventCallBack,IRegionSelected
 		float radian = (float) (degre * (Math.PI / 180));
 		return radian;
 	}
+	
+	
 	
 	public void computeFormationStrike(Unity enemy,List<Unity> listUnity, Vec2 dir)
 	{
@@ -607,23 +650,23 @@ public class EntityManager implements IBaseRavage,IEventCallBack,IRegionSelected
 		   AABB tree = new AABB();
 		   tree.lowerBound.set(new Vec2(x - 2f,y - 2f));
 		   tree.upperBound.set(new Vec2(x + 2f,y + 2f));
-		   ListBodyForOneRegion listRegion = new ListBodyForOneRegion();
+		   ListBodyEnemyForOneRegion listRegion = new ListBodyEnemyForOneRegion();
 		   PhysicWorldManager.getWorld().queryAABB(listRegion, tree);
 
 		   // on récupère la liste des bodys dans la région
-		   List<Body> list = listRegion.getListBody();
-		   if(list != null && list.size() > 0)
+		   List<UnityNet> list = listRegion.getListEnemy();
+		   if(list != null)
 		   {
-			   for(Body body : list) // on liste et on récupère l'objet picked
+			   for(UnityNet unity : list) // on liste et on récupère l'objet picked
 			   {
 	
-				   Vec2 diff = new Vec2(x,y).sub(body.getPosition());
+				   Vec2 diff = new Vec2(x,y).sub(unity.getBody().getPosition());
 				   System.out.println("lenght : " + diff.length() );
 				    
 				   if(diff.length() < 0.5f)
 				   {
 					   // on est sur le body qui est sur la position de la souris
-					   return (Unity)body.getUserData();
+					   return unity;
 				   }
 			   }
 		   }
@@ -644,7 +687,21 @@ public class EntityManager implements IBaseRavage,IEventCallBack,IRegionSelected
 				vectorUnityNetKilled.add(unity);
 	}
 
-
+	// methode qui recherche les enemys à proximité
+	public List<UnityNet> searchEnemyZone(Unity unity)
+	{
+		// créatin du AABB
+		AABB region = new AABB();
+		region.lowerBound.set(unity.getBody().getPosition().sub(new Vec2(10,10)));
+		region.upperBound.set(unity.getBody().getPosition().add(new Vec2(10,10)));
+		
+		// recherche
+		ListBodyEnemyForOneRegion queryCallBack = new ListBodyEnemyForOneRegion();
+		PhysicWorldManager.getWorld().queryAABB(queryCallBack, region);
+		
+		return queryCallBack.getListEnemy();
+		
+	}
 
 	
 

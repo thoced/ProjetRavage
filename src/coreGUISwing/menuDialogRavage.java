@@ -19,6 +19,8 @@ import javax.swing.JTextArea;
 import javax.swing.JTextField;
 import javax.swing.border.EmptyBorder;
 
+import coreEntityManager.EntityManager;
+import coreEntityManager.EntityManager.CAMP;
 import coreNet.INetManagerCallBack;
 import coreNet.NetAddUnity;
 import coreNet.NetHeader;
@@ -65,6 +67,7 @@ public class menuDialogRavage extends JDialog implements ActionListener, INetMan
 	private JRadioButton rNon;
 	private JRadioButton rOui;
 	private JComboBox comboResolution;
+	private JComboBox cCamp;
 	
 	
 	
@@ -176,6 +179,15 @@ public class menuDialogRavage extends JDialog implements ActionListener, INetMan
 		group.add(rOui);
 		group.add(rNon);
 		
+		JLabel labelCamp = new JLabel("Camp");
+		labelCamp.setBounds(364, 91, 33, 14);
+		getContentPane().add(labelCamp);
+		
+		cCamp = new JComboBox();
+		cCamp.setModel(new DefaultComboBoxModel(new String[] {"YELLOW", "BLUE"}));
+		cCamp.setBounds(404, 85, 168, 20);
+		getContentPane().add(cCamp);
+		
 		builderString = new StringBuilder();
 		
 		 mt = new menuThread(netManager);
@@ -244,6 +256,17 @@ public class menuDialogRavage extends JDialog implements ActionListener, INetMan
 						
 			
 			}
+			
+			// on précise le camp sélectionné
+			switch((String)cCamp.getSelectedItem())
+			{
+				case "YELLOW" : EntityManager.setCampSelected(CAMP.YELLOW);
+				break;
+				
+				case "BLUE": EntityManager.setCampSelected(CAMP.BLUE);
+				break;		
+			}
+			
 			
 			this.setVisible(false);
 			this.dispose();

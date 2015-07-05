@@ -39,6 +39,9 @@ import ravage.IBaseRavage;
 
 public abstract class Unity implements IBaseRavage,ICallBackAStar
 {
+	// appartenance à un camp
+	protected EntityManager.CAMP myCamp = EntityManager.CAMP.YELLOW;
+	
 	public enum TYPEUNITY {KNIGHT};
 	// temps avant téléportation
 	protected final static float  TIME_BEFORE_TELEPORTATION = 0.5f;
@@ -117,6 +120,7 @@ public abstract class Unity implements IBaseRavage,ICallBackAStar
 	
 	// ennemy attribué
 	protected Unity enemyAttribute;
+	protected Time elapsedSearchFollowEnemy = Time.ZERO;
 	
 	// est on mort ?
 	protected boolean isKilled = false;
@@ -130,6 +134,19 @@ public abstract class Unity implements IBaseRavage,ICallBackAStar
 	
 	
 	
+	
+	public EntityManager.CAMP getMyCamp() {
+		return myCamp;
+	}
+
+
+
+
+	public void setMyCamp(EntityManager.CAMP myCamp) {
+		this.myCamp = myCamp;
+	}
+
+
 	public Unity getEnemyAttribute() 
 	{
 		// on vérifie si cette enemy existe toujours dans l'entity mananger (si il a n'a pas été tué)
@@ -145,9 +162,6 @@ public abstract class Unity implements IBaseRavage,ICallBackAStar
 		}
 		
 		return this.enemyAttribute;
-		
-		
-		
 		
 	}
 
@@ -270,12 +284,15 @@ public abstract class Unity implements IBaseRavage,ICallBackAStar
 	
 	public void setPosition(float x,float y)
 	{
-		body.setTransform(new Vec2((float)x + 0.5f,(float)y + 0.5f),0f);
-		posx = body.getPosition().x * PhysicWorldManager.getRatioPixelMeter();
-		posy = body.getPosition().y * PhysicWorldManager.getRatioPixelMeter();
-		this.tfx = posx;
-		this.tfy = posy;
-		this.isArrived = true;
+		if(body != null)
+		{
+			body.setTransform(new Vec2((float)x + 0.5f,(float)y + 0.5f),0f);
+			posx = body.getPosition().x * PhysicWorldManager.getRatioPixelMeter();
+			posy = body.getPosition().y * PhysicWorldManager.getRatioPixelMeter();
+			this.tfx = posx;
+			this.tfy = posy;
+			this.isArrived = true;
+		}
 		
 	}
 	
@@ -420,7 +437,7 @@ public abstract class Unity implements IBaseRavage,ICallBackAStar
 		// -------------
 		
 		
-		if(!nextNode)
+		if(!nextNode && this.enemyAttribute == null) // si il n'y a pas de nextnode et qu'il n'y a pas d'unité enemy attribuée
 		{
 			elapseSearchClock = Time.add(elapseSearchClock, deltaTime);
 			if(elapseSearchClock.asSeconds() > TIME_BEFORE_TELEPORTATION) // si bloquÃ© plus de 2 secondes
@@ -544,6 +561,20 @@ public abstract class Unity implements IBaseRavage,ICallBackAStar
 					}
 					
 				}
+				
+		// déplacement vers un enemy, follow
+				
+				if(this.enemyAttribute != null && !this.enemyAttribute.isKilled())
+				{
+					elapsedSearchFollowEnemy = Time.add(elapsedSearchFollowEnemy, deltaTime);
+					if(elapsedSearchFollowEnemy.asSeconds() > 2f)
+					{
+						this.setTargetPosition(this.enemyAttribute.getPosx(), this.enemyAttribute.getPosy(), (int)this.enemyAttribute.getPositionMeterX(), (int)this.enemyAttribute.getPosYMeter(), new Vec2(1,0));
+						elapsedSearchFollowEnemy = Time.ZERO;
+					}
+				}
+				else
+					this.enemyAttribute = null;
 				
 				
 		// ------------------------------------
@@ -771,6 +802,20 @@ public abstract class Unity implements IBaseRavage,ICallBackAStar
 	public void attributeEnemy(Unity enemy)
 	{
 		this.setEnemyAttribute(enemy);
+	}
+
+
+
+
+	public boolean isKilled() {
+		return isKilled;
+	}
+
+
+
+
+	public void setKilled(boolean isKilled) {
+		this.isKilled = isKilled;
 	}
 
 

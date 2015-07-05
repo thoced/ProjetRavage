@@ -49,7 +49,7 @@ public class Knight extends Unity
 				body = PhysicWorldManager.getWorld().createBody(bdef);
 				
 				Shape shape = new CircleShape();
-				shape.m_radius = 0.5f;
+				shape.m_radius = 0.55f;
 				
 				FixtureDef fDef = new FixtureDef();
 				fDef.shape = shape;
@@ -181,18 +181,24 @@ public class Knight extends Unity
 			// on est mort
 			EntityManager.IamKilled(this);
 			// je place le mort
-			BloodManager.addUnityKilled(this.getPosx(), this.getPosy());
+			BloodManager.addUnityKilled(this.getPosx(), this.getPosy(),this.getMyCamp());
 			
 		}
 		else
+		{
+			// on indique que l'on est mort
+			this.setKill();
 			BloodManager.addBlood(this.getPosx(), this.getPosy()); // ajout du sang car je recois un damage
+			
+		}
 		
 	}
 
 	@Override
-	public void setKill() {
+	public void setKill() 
+	{
 		// TODO Auto-generated method stub
-		
+		this.isKilled = true;
 	}
 
 	

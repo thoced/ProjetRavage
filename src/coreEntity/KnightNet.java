@@ -40,7 +40,7 @@ public class KnightNet extends UnityNet
 				body = PhysicWorldManager.getWorld().createBody(bdef);
 				
 				Shape shape = new CircleShape();
-				shape.m_radius = 0.5f;
+				shape.m_radius = 0.55f;
 				
 				FixtureDef fDef = new FixtureDef();
 				fDef.shape = shape;
@@ -129,7 +129,7 @@ public class KnightNet extends UnityNet
 		// on supprime l'objet du net
 		EntityManager.IamKilledNet(this);
 		// on lance un peu de sang
-		BloodManager.addUnityKilled(this.getPosx(), this.getPosy());
+		BloodManager.addUnityKilled(this.getPosx(), this.getPosy(),this.getMyCamp());
 		
 	}
 	
