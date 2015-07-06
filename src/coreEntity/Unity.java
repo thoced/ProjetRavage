@@ -124,6 +124,8 @@ public abstract class Unity implements IBaseRavage,ICallBackAStar
 	
 	// est on mort ?
 	protected boolean isKilled = false;
+
+	private Time elapsedSearchClock;
 	
 	@Override
 	public void init() 
@@ -132,8 +134,7 @@ public abstract class Unity implements IBaseRavage,ICallBackAStar
 	
 	}
 	
-	
-	
+
 	
 	public EntityManager.CAMP getMyCamp() {
 		return myCamp;
@@ -442,16 +443,31 @@ public abstract class Unity implements IBaseRavage,ICallBackAStar
 			elapseSearchClock = Time.add(elapseSearchClock, deltaTime);
 			if(elapseSearchClock.asSeconds() > TIME_BEFORE_TELEPORTATION) // si bloquÃ© plus de 2 secondes
 			{
-				elapseSearchClock = Time.ZERO;
-				// on saute une node de recherche
-				if(this.pathFinalPath != null && this.pathFinalPath.getLength() > 0 && this.indexNode < this.pathFinalPath.getLength())
+				
+				if(this.enemyAttribute != null) // on est bloqué et on devrai se téléporter, ici on va rechercher un enemy proche
 				{
-					int x = this.pathFinalPath.getX(this.indexNode);
-					int y = this.pathFinalPath.getY(this.indexNode);
-					//this.pathFinal.remove(0);
-					// on tÃ©lÃ©porte l'unitÃ©
-					this.body.setTransform(new Vec2(x,y), this.body.getAngle());
-					nextNode = true;
+					// on applique un nouvelle enemy
+					UnityNet best = EntityManager.searchEnemyZoneNear(this);
+					if(best != null)
+						this.setEnemyAttribute(best);
+					// on replace le timer de téléportation à 0
+					elapsedSearchClock = Time.ZERO;
+					
+				}
+				else
+				{
+				
+					elapseSearchClock = Time.ZERO;
+					// on saute une node de recherche
+					if(this.pathFinalPath != null && this.pathFinalPath.getLength() > 0 && this.indexNode < this.pathFinalPath.getLength())
+					{
+						int x = this.pathFinalPath.getX(this.indexNode);
+						int y = this.pathFinalPath.getY(this.indexNode);
+						//this.pathFinal.remove(0);
+						// on tÃ©lÃ©porte l'unitÃ©
+						this.body.setTransform(new Vec2(x,y), this.body.getAngle());
+						nextNode = true;
+					}
 				}
 				
 
@@ -569,7 +585,15 @@ public abstract class Unity implements IBaseRavage,ICallBackAStar
 					elapsedSearchFollowEnemy = Time.add(elapsedSearchFollowEnemy, deltaTime);
 					if(elapsedSearchFollowEnemy.asSeconds() > 2f)
 					{
-						this.setTargetPosition(this.enemyAttribute.getPosx(), this.enemyAttribute.getPosy(), (int)this.enemyAttribute.getPositionMeterX(), (int)this.enemyAttribute.getPosYMeter(), new Vec2(1,0));
+						// on calcul la formation final de frappe
+						// on détermine la rotation finale
+						Vec2 vFinal = EntityManager.searchPosition(this,this.enemyAttribute);
+						Vec2 vEnemy = this.enemyAttribute.getBody().getPosition();
+						// on détermine le vecteur de direction
+						Vec2 vDir = vEnemy.sub(vFinal);
+						vDir.normalize();
+						
+						this.setTargetPosition(vFinal.x * PhysicWorldManager.getRatioPixelMeter(), vFinal.y * PhysicWorldManager.getRatioPixelMeter(), (int)vFinal.x, (int)vFinal.y, vDir);
 						elapsedSearchFollowEnemy = Time.ZERO;
 					}
 				}

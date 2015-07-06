@@ -319,6 +319,7 @@ public class EntityManager implements IBaseRavage,IEventCallBack,IRegionSelected
 			unity.setPosx(48);
 			unity.setPosy(28);
 			unity.setRotation(0f);
+			unity.setCampUnity(CAMP.BLUE);
 			idTestUnity++;
 			this.onAddUnity(unity);
 			
@@ -531,7 +532,14 @@ public class EntityManager implements IBaseRavage,IEventCallBack,IRegionSelected
 			boolean obstacle = LevelManager.getLevel().isNodeObstacle((int)pos.x, (int)pos.y);
 			if(!obstacle)
 			{
-				unity.setTargetPosition(pos.x * PhysicWorldManager.getRatioPixelMeter(), pos.y * PhysicWorldManager.getRatioPixelMeter(), (int)pos.x, (int)pos.y, new Vec2(1,0));
+				// on détermine la rotation finale
+				Vec2 vFinal = new Vec2(pos.x,pos.y);
+				Vec2 vEnemy = enemy.getBody().getPosition();
+				// on détermine le vecteur de direction
+				Vec2 vDir = vEnemy.sub(vFinal);
+				vDir.normalize();
+				
+				unity.setTargetPosition(pos.x * PhysicWorldManager.getRatioPixelMeter(), pos.y * PhysicWorldManager.getRatioPixelMeter(), (int)pos.x, (int)pos.y, vDir);
 				indListUnity++;
 			}
 			// augmentation du pas
@@ -700,6 +708,48 @@ public class EntityManager implements IBaseRavage,IEventCallBack,IRegionSelected
 		PhysicWorldManager.getWorld().queryAABB(queryCallBack, region);
 		
 		return queryCallBack.getListEnemy();
+		
+	}
+	
+	public static UnityNet searchEnemyZoneNear(Unity unity)
+	{
+		// créatin du AABB
+		AABB region = new AABB();
+		region.lowerBound.set(unity.getBody().getPosition().sub(new Vec2(10,10)));
+		region.upperBound.set(unity.getBody().getPosition().add(new Vec2(10,10)));
+		
+		// recherche
+		ListBodyEnemyForOneRegion queryCallBack = new ListBodyEnemyForOneRegion();
+		PhysicWorldManager.getWorld().queryAABB(queryCallBack, region);
+		
+		List<UnityNet> list = queryCallBack.getListEnemy();
+		// on regarde l'enemy le plus proche
+		if(list.size() > 0)
+		{
+			UnityNet best = list.get(0); // on prend le premier
+			for(UnityNet u : list)
+			{
+				if((best.getBody().getPosition().sub(unity.getBody().getPosition()).length() > (u.getBody().getPosition().sub(u.getBody().getPosition()).length())))
+					{
+						best = u;
+					}
+			}
+			
+			return best;
+		}
+		
+		return null;
+	}
+	
+	public static Vec2 searchPosition(Unity unity,Unity enemy) // recherche d'une place à coté d'un enemy
+	{
+		// on trace un vecteur
+		Vec2 diff = enemy.getBody().getPosition().sub(unity.getBody().getPosition());
+		diff.normalize();
+		// on multiplie par 1 pour obtenir la distance 
+		Vec2 pos = enemy.getBody().getPosition().add(diff.mul(1f).negate());
+		
+		return pos;
 		
 	}
 
