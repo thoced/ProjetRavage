@@ -237,9 +237,11 @@ public class FrameWork
 			renderTexture.clear();
 			renderTexture.setView(cameraManager.getView());
 			// Draw du level
-			currentLevel.draw(renderTexture, null);
+			currentLevel.drawBackground(renderTexture, null); // affichage du background du level
 			// Draw des unity
 			drawaUnityManager.draw(renderTexture, null);
+			// draw du level foregrounds
+			currentLevel.drawForeground(renderTexture, null); // affichage du foreground du level (arbre et toi
 			renderTexture.display();
 			// draw du guiManager
 			renderGui.clear(Color.TRANSPARENT);

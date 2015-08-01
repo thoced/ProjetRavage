@@ -84,7 +84,10 @@ public class LevelManager implements IBaseRavage
 				sprite.setOrigin(new Vector2f(0f,0f));
 				sprite.setPosition(new Vector2f(l.getPosx(),l.getPosy()));
 				// on ajoute dans le level
-				level.getBackgrounds().add(sprite);
+				if(l.getName().startsWith("BG")) // si le nom du fichier commence par BG dans tiled
+					level.getBackgrounds().add(sprite);
+				if(l.getName().startsWith("FG"))
+					level.getForegrounds().add(sprite);
 				
 			}
 			

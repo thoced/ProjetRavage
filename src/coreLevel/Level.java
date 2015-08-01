@@ -26,6 +26,8 @@ public class Level implements IBaseRavage, Drawable
 {
 	// Textures de background
 	private List<Sprite> backgrounds;
+	// Textures de foreground - Arbres et toits
+	private List<Sprite> foregrounds;
 	// Tableau des valeurs Tiled (pour la recherche de chemin)
 	private Node[] nodes;
 	// Obstacles box2d
@@ -35,10 +37,35 @@ public class Level implements IBaseRavage, Drawable
 	{
 		// instances du background
 		backgrounds = new ArrayList<Sprite>();
+		// instance de foreground
+		foregrounds = new ArrayList<Sprite>();
 		// instance des nodes
 		nodes = new Node[375*250];
 		
 		
+	}
+	
+	public void drawBackground(RenderTarget render,RenderStates state)
+	{
+		// on affiche le background du level
+		
+				for(Sprite s : backgrounds)
+				{
+					FloatRect result = s.getGlobalBounds().intersection(CameraManager.getCameraBounds());
+					if(result != null)
+						render.draw(s);
+				}
+	}
+	
+	public void drawForeground(RenderTarget render,RenderStates state)
+	{
+		// on affiche le foreground
+				for(Sprite f : foregrounds)
+				{
+					FloatRect result = f.getGlobalBounds().intersection(CameraManager.getCameraBounds());
+					if(result != null)
+						render.draw(f);
+				}
 	}
 	
 	@Override
@@ -51,6 +78,14 @@ public class Level implements IBaseRavage, Drawable
 			FloatRect result = s.getGlobalBounds().intersection(CameraManager.getCameraBounds());
 			if(result != null)
 				render.draw(s);
+		}
+		
+		// on affiche le foreground
+		for(Sprite f : foregrounds)
+		{
+			FloatRect result = f.getGlobalBounds().intersection(CameraManager.getCameraBounds());
+			if(result != null)
+				render.draw(f);
 		}
 		
 		
@@ -81,6 +116,16 @@ public class Level implements IBaseRavage, Drawable
 	public void destroy() {
 		// TODO Auto-generated method stub
 		
+	}
+
+	
+	
+	public List<Sprite> getForegrounds() {
+		return foregrounds;
+	}
+
+	public void setForegrounds(List<Sprite> foregrounds) {
+		this.foregrounds = foregrounds;
 	}
 
 	/**

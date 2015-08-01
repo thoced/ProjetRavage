@@ -64,12 +64,13 @@ public class Knight extends Unity
 				resetSearchClock = new Clock();
 				
 				// anim sprite
-				this.animSpriteRect = new IntRect[16];
-				for(int i=0;i<16;i++)
+				this.animSpriteRect = new IntRect[19];
+				for(int i=0;i<19;i++)
 					this.animSpriteRect[i] = new IntRect(0 + i * 32,0,32,32);
 				
 				this.currentAnim = this.animSpriteRect[0];
 				this.indAnim = 0;
+				this.indAnimWalk = 0;
 				
 				// type d'unity
 				this.idType = TYPEUNITY.KNIGHT;
@@ -144,9 +145,9 @@ public class Knight extends Unity
 				{
 					this.timeElapsedAnim = Time.ZERO;
 					indAnim++;
-					if(indAnim > 14)
+					if(indAnim > 18)
 					{
-						indAnim = 0;
+						indAnim = 4;
 						this.animate = ANIMATE.PAUSE;
 					}
 				}
@@ -162,7 +163,20 @@ public class Knight extends Unity
 		if(this.animate == ANIMATE.WALK) // en mode je me déplace !!!
 		{
 			// on récupère l'animation courante
-			this.currentAnim = this.animSpriteRect[0];
+			this.currentAnim = this.animSpriteRect[indAnimWalk];
+			// on additionne le temps écoulé
+			this.timeElapsedAnim = Time.add(this.timeElapsedAnim, deltaTime);
+			// si le temps écoulé est supérieur à ***  on incrémente l'indice d'animation
+			if(this.timeElapsedAnim.asSeconds() > 0.08f)
+			{
+				this.timeElapsedAnim = Time.ZERO;
+				indAnimWalk++;
+				if(indAnimWalk > 3)
+				{
+					indAnimWalk = 0;
+					this.animate = ANIMATE.WALK;
+				}
+			}
 		}
 		
 	}

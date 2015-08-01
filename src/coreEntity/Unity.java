@@ -83,6 +83,7 @@ public abstract class Unity implements IBaseRavage,ICallBackAStar
 	protected IntRect[] animSpriteRect;
 	protected IntRect	currentAnim;
 	protected int		indAnim; // indice d'animation
+	protected int 		indAnimWalk; // indice d'animation pour la marche
 	protected Time		timeElapsedAnim = Time.ZERO; // temps entre deux anim
 	
 	// pathfinal pour le systeme classique
@@ -514,7 +515,7 @@ public abstract class Unity implements IBaseRavage,ICallBackAStar
 					if(this.vecTarget.length() < 0.2f )
 						{
 							this.body.setLinearVelocity(new Vec2(0f,0f));
-							// envoie sur le réseau
+						
 									
 							if(!this.isArrived)
 							{
@@ -544,6 +545,9 @@ public abstract class Unity implements IBaseRavage,ICallBackAStar
 								this.NetSend(this.body.getPosition().x, this.body.getPosition().y, n.x, n.y,this.vecDirFormation);
 								
 								this.isArrived = false;
+								
+							// enclenchement de l'animatino
+								this.setAnimate(ANIMATE.WALK);
 						}
 					
 					
@@ -574,6 +578,8 @@ public abstract class Unity implements IBaseRavage,ICallBackAStar
 						this.computeRotation(this.vecTarget);
 						// on applique un vecteur de déplacement
 						this.body.setLinearVelocity(this.vecTarget.mul(6f));
+						// animation
+						this.setAnimate(ANIMATE.WALK);
 					}
 					
 				}
@@ -819,6 +825,8 @@ public abstract class Unity implements IBaseRavage,ICallBackAStar
 	{
 		// on spécifie le mode d'action
 		this.animate = animate;
+		
+		
 	}
 	
 	abstract public void strikeNow();
